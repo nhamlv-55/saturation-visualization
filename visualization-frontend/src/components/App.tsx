@@ -5,7 +5,7 @@ import Main from './Main';
 import Aside from './Aside';
 import { Dag, ParsedLine } from '../model/dag';
 import SatNode from '../model/sat-node';
-import './App.css';
+import '../styles/App.css';
 import { assert } from '../model/util';
 import { filterNonParents, filterNonConsequences, mergePreprocessing, passiveDagForSelection } from '../model/transformations';
 import { findCommonConsequences } from '../model/find-node';

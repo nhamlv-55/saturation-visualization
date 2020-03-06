@@ -132,7 +132,7 @@
         "text": "#000000",
         "defaultStyle": {
             "border": "#FF3232",
-            "background": "#FF5959"
+            "background": "#ffff00"
         }
     },
     "activated-deleted": {
