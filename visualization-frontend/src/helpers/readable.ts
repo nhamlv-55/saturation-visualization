@@ -1,14 +1,28 @@
 import {parse} from "s-exify";
 
+const negateMap = {
+    "<": ">=",
+    ">": "<=",
+    "=": "!=",
+    "<=": ">",
+    ">=": "<",
+    "!=": "=",
+    "&&": "||",
+    "||": "&&"
+};
+
+const logSym = ["&&", "||"];
+
 export function toReadable(expr, varList) {
     if (expr[0] !== "("){
         expr = "(" + expr + ")";
     }
-    let reorderResult = parseResult(parse(expr), "");
+    let parsedResult = parseResult(parse(expr), "");
     if (varList.length === 0 ){
-        return reorderResult;
+        return parsedResult;
     }
-    return replaceVarNames(reorderResult, varList);
+    console.log(equivalence(parsedResult, 0));
+    return replaceVarNames(parsedResult, varList);
 }
 
 function parseResult(lst, sep) {
@@ -20,7 +34,7 @@ function parseResult(lst, sep) {
 
     //symbols for mathematical operations
     //Note: "-" is not included because negative numbers are in the form (- x)
-    let logOp = ["=", "<=", ">=", ">", "<", "+", "*", "/"];
+    let logOp = ["!=", "=", "<=", ">=", ">", "<", "+", "*", "/"];
 
     //empty list should return empty string
     if (lst.length < 1){
@@ -44,8 +58,9 @@ function parseResult(lst, sep) {
     }
 
     //Adds not symbol (!) to beginning of clause
-    if (lst[0] === "not"){
-        return "!" + parseResult(lst[1], "");
+    if (lst[0] === "not") {
+        lst[1][0] = negateMap[lst[1][0]];
+        return parseResult(lst[1], "")
     }
 
     //prevents trailing logical symbol
@@ -80,5 +95,41 @@ function replaceVarNames(expr, varList) {
         }
     }
     return expr;
+}
+
+function equivalence(expr, reorder:number) {
+    let sym = "";
+    for (let i = 0; i < logSym.length; i++) {
+        if (expr.includes(logSym[i])){
+            sym = logSym[i];
+            break;
+        }
+    }
+    let result = "";
+    if (typeof expr === "string") {
+        let exprList = expr.split(sym);
+        if (reorder >= 0 && reorder < exprList.length) {
+            for (let i = 0; i < exprList.length; i++) {
+                if (i < reorder) {
+                    result += negate(exprList[i]) + " " + negateMap[sym] + " ";
+                }
+                else if (i === reorder){
+                    result += negate(exprList[i]) + " -> ";
+                }
+                else if (i === exprList.length - 1){
+                    result += exprList[i];
+                }
+                else {
+                    result += exprList[i] + " " + sym + " ";
+                }
+            }
+        }
+    }
+    return result;
+}
+
+function negate(expr) {
+    let exprList = expr.split(" ");
+    return expr.replace(exprList[1], negateMap[exprList[1]]);
 }
 
