@@ -170,7 +170,6 @@
 }
 
 .component-menu .options-card .form-label {
-  display: block;
   margin: 1rem 0 0.5rem;
 }
 
@@ -179,7 +178,8 @@
 }
 
 .component-menu .options-card input[type="text"],
-.component-menu .options-card select {
+.component-menu .options-card select,
+.optionsList {
   height: 2rem;
   width: 100%;
   padding: 0 0.5rem;
@@ -216,6 +216,7 @@
   color: #f8f9fb;
   text-decoration: none;
   font-size: 0.8rem;
+  display: inline-block;
 }
 
 .component-menu .fake-button:hover {
@@ -225,4 +226,18 @@
 
 .component-menu .fake-button:active {
   box-shadow: inset 1px 3px 8px 2px rgba(0, 0, 0, .1);
+}
+
+.displaySpacerOption {
+  padding: 5px;
+}
+
+.eyeImage {
+  height: 20px;
+  width: 20px;
+}
+
+.showHideButton {
+  background-color: white;
+  border: none;
 }

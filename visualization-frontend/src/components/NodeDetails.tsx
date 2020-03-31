@@ -3,6 +3,7 @@ import * as React from 'react';
 import '../styles/NodeDetails.css';
 import {toDiff} from "../helpers/diff";
 import {lemmaColours} from "../helpers/network";
+import {getOp, reorder} from "../helpers/readable";
 type Props = {
     nodes: any,
     PobLemmasMap: {},
@@ -65,6 +66,7 @@ export default class NodeDetails extends React.Component<Props, {}> {
                     };
                     lemma_list.push(<h3 style={lemmaStyle} key={"lemma-header-"+ lemma[0]}>ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h3>);
                     let expr = this.props.ExprMap[lemma[0]];
+                    expr = reorder(expr, [0], [1], getOp(expr));
                     lemma_list.push(<pre  key={"lemma-expr-"+lemma[0]}>{expr}</pre>);
                 }
             }

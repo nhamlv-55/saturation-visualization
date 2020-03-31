@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {options} from "../helpers/spacerOptions";
+import eye from "./../resources/icons/singles/eye.svg"
 
 class MenuOptions extends React.Component<any, any> {
     state = {
@@ -9,14 +10,13 @@ class MenuOptions extends React.Component<any, any> {
     };
     
     storeSpacerOptions() {
-        let fullOptionString = "";
-        if (this.state.optionName.includes("spacer")){
-            fullOptionString = "fp." + this.state.optionName + "=" + this.state.optionValue + " ";
-        }
-        else {
-            fullOptionString = this.state.optionName + "=" + this.state.optionValue + " ";
-        }
+        if (this.state.optionValue === "" || this.state.optionName === "") return;
+        let fullOptionString = this.props.spacerUserOptions +  " "  + this.state.optionName + "=" + this.state.optionValue + " ";
         this.props.changeSpacerUserOptions(fullOptionString);
+        this.setState({
+            optionName: "",
+            optionValue: ""
+        })
     }
     
     displaySpacerOptions() {
@@ -55,14 +55,14 @@ class MenuOptions extends React.Component<any, any> {
     
     changeOptionType(e){
         let tempList = options.filter(option => option.name === e.target.value);
+        let type = "custom";
         if (tempList.length > 0) {
-            let selectedOption = tempList[0];
-            this.setState({
-                optionName: selectedOption.name
-            });
-            this.getOptions(selectedOption.name, selectedOption.type);
-            
+            type = tempList[0].type;
         }
+        this.setState({
+            optionName: e.target.value
+        });
+        this.getOptions(e.target.value, type);
     }
     changeSpacerManualUserOptions(event: React.ChangeEvent<HTMLInputElement>) {
         const newValue = event.target.value;
@@ -77,13 +77,17 @@ class MenuOptions extends React.Component<any, any> {
                     <ul>
                         <li>
                             <label htmlFor="userOptions" className="form-label">Additional Spacer options</label>
+                            <button className="showHideButton" title={"showHide"}><img className="eyeImage" src={eye} alt="eye"/></button>
                             {selectedOptions.length !== 0 && selectedOptions.map((option, key) => {
                                 if (option !== "") {
                                     let kvp = option.split("=");
                                     let name = kvp[0];
                                     let value = kvp[1];
                                     return (
-                                        <p key={key}>{name}: {value}</p>
+                                        <div className="displaySpacerOption">
+                                            <span key={key}>{name}: {value}</span>
+                                            <button className="fake-button" type="button">x</button>
+                                        </div>
                                     );
                                 }
                                 return "";
@@ -100,7 +104,7 @@ class MenuOptions extends React.Component<any, any> {
                         <input type="text" name="manualRun" onChange={this.changeSpacerManualUserOptions.bind(this)}/>
                         <li>
                             <label htmlFor="varOptions" className="form-label">Variable Designation</label>
-                            <p>Enter a single spacer separated list of your chosen variables in the order they appear (var1 var2 var3 ..)</p>
+                            <p>Enter a single space separated list of your chosen variables in the order they appear (var1 var2 var3 ..)</p>
                             <input type="text" name="variables" onChange={this.props.onChangeVariables}/>
                         </li>
                     </ul>

@@ -3,6 +3,7 @@ import { HashRouter, Route} from "react-router-dom";
 import { AppWrapper } from './AppWrapper'
 import { Menu } from './Menu';
 import { RouteComponentProps } from 'react-router';
+import Dashboard from "./Dashboard";
 type State = {
     problem: string,
     problemName: string,
@@ -18,7 +19,7 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
     state: State = {
         problem: "",
         problemName: "",
-        spacerUserOptions: "fp.spacer.max_level=4 fp.spacer.dump_benchmarks=true fp.spacer.arith.solver=6",
+        spacerUserOptions: "",
         hideBracketsAssoc: true,
         nonStrictForNegatedStrictInequalities: true,
         orientClauses: true,
@@ -50,6 +51,12 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
                 }/>
                 <Route path="/iterative/" render={() => 
                     this.appComponent("iterative", "")
+                }/>
+                <Route path="/dashboard/" render={() =>
+                    <Dashboard />
+                }/>
+                <Route path="/dashboard/benchmarks" render={() =>
+                    <Dashboard />
                 }/>
             </HashRouter>
         );
