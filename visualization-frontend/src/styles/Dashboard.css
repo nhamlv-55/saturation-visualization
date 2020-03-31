@@ -60,6 +60,19 @@ body {
     top: 1%;
     width: 5%;
 }
+.custom-button {
+    position:absolute;
+    right: 1%;
+    top: 5%;
+    width: 5%;
+}
+
+.clear-button {
+    position:absolute;
+    right: 1%;
+    top: 9%;
+    width: 5%;
+}
 
 .depth-overview {
     position: absolute;

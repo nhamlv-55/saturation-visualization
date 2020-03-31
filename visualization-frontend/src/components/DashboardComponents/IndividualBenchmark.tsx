@@ -17,7 +17,6 @@ class IndividualBenchmark extends React.Component<any, any> {
     render() {
         let dataDisplay = ["result","depth", "memory", "max_memory", "SPACER_num_invariants", "SPACER_num_lemmas",
             "SPACER_num_propagations", "SPACER_num_active_lemmas"];
-        console.log(this.props.data);
         let timeData = this.filterTimeData();
         return (
           <div className="overview">
