@@ -26,15 +26,15 @@ body {
 
 .overview {
     position: absolute; 
-    top: 3%;
+    top: 2%;
     left: 13%;
-    width: 90%;
-    height: 100%;
+    width: 87%;
+    height: 98%;
 }
 
 .time {
     position: absolute;
-    right: 1%;
+    right: 5%;
     bottom: 5%;
 }
 
@@ -120,4 +120,8 @@ body {
 
 .right-arrow:hover {
     cursor: pointer
+}
+
+.data-details {
+    font-size: 30px;
 }

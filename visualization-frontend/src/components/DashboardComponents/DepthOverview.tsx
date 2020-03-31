@@ -34,7 +34,7 @@ class DepthOverview extends React.Component<any, any> {
         };
         let index = d3.map(data,function(d) {return d.index;}).keys();
         let xScale = d3.scaleBand()
-            .domain(index.slice(this.props.graphMin, this.props.graphMax))
+            .domain(index)
             .range([this.config.margin.left, this.config.width - this.config.margin.right]);
         
         let xMap = function(d) {
@@ -79,7 +79,7 @@ class DepthOverview extends React.Component<any, any> {
         let g = svg.append("g");
         
         g.selectAll(".bar")
-            .data(data.slice(this.props.graphMin, this.props.graphMax))
+            .data(data)
             .enter() 
             .append("rect")
             .attr("class", "bar")
@@ -99,7 +99,7 @@ class DepthOverview extends React.Component<any, any> {
             .attr("height", function(this,d) {return (this.config.graphHeight - this.config.margin.top - yScale(d.depth))}.bind(this));
         
         g.selectAll(".depth-text")
-            .data(data.slice(this.props.graphMin, this.props.graphMax))
+            .data(data)
             .enter()
             .append("text")
             .style("font-size", "18px")

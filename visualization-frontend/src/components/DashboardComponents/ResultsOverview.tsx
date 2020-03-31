@@ -37,7 +37,7 @@ class ResultsOverview extends React.Component<any, any> {
         };
         let index = d3.map(data,function(d) {return d.index;}).keys();
         let xScale = d3.scaleBand()
-            .domain(index.slice(this.props.graphMin, this.props.graphMax))
+            .domain(index)
             .range([this.config.margin.left, this.config.width - this.config.margin.right]);
 
         let xMap = function(d) {
@@ -50,7 +50,7 @@ class ResultsOverview extends React.Component<any, any> {
             return d.SPACER_num_invariants;
         };
         let yScale = d3.scaleLinear()
-            .domain([d3.min(data.slice(this.props.graphMin, this.props.graphMax), yValue), d3.max(data.slice(this.props.graphMin, this.props.graphMax), yValue)])
+            .domain([d3.min(data, yValue), d3.max(data, yValue)])
             .range([this.config.graphHeight - this.config.margin.top, this.config.margin.bottom]);
 
         let yMap = function(d) {
@@ -81,7 +81,7 @@ class ResultsOverview extends React.Component<any, any> {
             .call(yAxis);
         let g = svg.append("g");
         g.selectAll(".dot")
-            .data(data.slice(this.props.graphMin, this.props.graphMax))
+            .data(data)
             .enter()
             .append('circle')
             .attr('r', 10)
@@ -100,7 +100,7 @@ class ResultsOverview extends React.Component<any, any> {
             .on("click", this.props.selectBenchmark)
             .style("fill", function(d) {return colour(d.result)});
         g.selectAll(".result-text")
-            .data(data.slice(this.props.graphMin, this.props.graphMax))
+            .data(data)
             .enter()
             .append("text")
             .attr("class", "label")
