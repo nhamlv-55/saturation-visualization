@@ -33,7 +33,7 @@ class TimeOverview extends React.Component<any, any> {
         };
         let index = d3.map(data,function(d) {return d.index;}).keys();
         let xScale = d3.scaleBand()
-            .domain(index.slice(this.props.graphMin, this.props.graphMax))
+            .domain(index)
             .range([this.config.margin.left, this.config.width - this.config.margin.right]);
 
         let xMap = function(d) {
@@ -46,7 +46,7 @@ class TimeOverview extends React.Component<any, any> {
             return d.time;
         };
         let yScale = d3.scaleLinear()
-            .domain([d3.min(data.slice(this.props.graphMin,this.props.graphMax), yValue), d3.max(data.slice(this.props.graphMin, this.props.graphMax), yValue)])
+            .domain([d3.min(data, yValue), d3.max(data, yValue)])
             .range([this.config.graphHeight - this.config.margin.top, this.config.margin.bottom]);
 
         let yMap = function(d) {
@@ -78,7 +78,7 @@ class TimeOverview extends React.Component<any, any> {
         let g = svg.append("g");
 
         g.selectAll(".bar")
-            .data(data.slice(this.props.graphMin, this.props.graphMax))
+            .data(data)
             .enter()
             .append("rect")
             .attr("class", "bar")
@@ -98,7 +98,7 @@ class TimeOverview extends React.Component<any, any> {
             .attr("height", function(this,d) {return (this.config.graphHeight - this.config.margin.top - yScale(d.time))}.bind(this));
 
         g.selectAll(".time-text")
-            .data(data.slice(this.props.graphMin,this.props.graphMax))
+            .data(data)
             .enter()
             .append("text")
             .style("font-size", "18px")

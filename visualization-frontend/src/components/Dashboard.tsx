@@ -153,14 +153,16 @@ class Dashboard extends React.Component<any, any> {
                 });
             }
         }
+        
     }
-    
+
     filterDictionary(keys){
+        let data = this.state.data.slice(this.state.graphMin, this.state.graphMax);
         let result:Object[] = [];
-        for (let i = 0; i < this.state.data.length; i++){
+        for (let i = 0; i < data.length; i++){
             result.push({});
             for (let j = 0; j < keys.length; j ++){
-                result[i][keys[j]] = this.state.data[i][keys[j]];
+                result[i][keys[j]] = data[i][keys[j]];
             }
         }
         return result;
@@ -185,31 +187,24 @@ class Dashboard extends React.Component<any, any> {
                   })}
               </div>
               <div className="visual">
-                  {this.state.selectedBenchmark !== "" && 
+                  {this.state.selectedBenchmark !== "" &&
                   <IndividualBenchmark 
                       data={this.state.data.filter(function(d) {return d.index === selectedBenchmark})[0]}
                   />}
-                  {this.state.selectedBenchmark === "" && <div className="dashboard">
+                  {this.state.selectedBenchmark === "" &&
+                      <div className="dashboard">
                       <DepthOverview
                           data={depthData}
-                          graphMin={this.state.graphMin}
-                          graphMax={this.state.graphMax}
                       />
                       <ResultsOverview
                           data={resultsData}
-                          graphMin={this.state.graphMin}
-                          graphMax={this.state.graphMax}
                           selectBenchmark={this.handleSidebarClick.bind(this, "dot")}
                       />
                       <MemoryOverview
                           data={memoryData}
-                          graphMin={this.state.graphMin}
-                          graphMax={this.state.graphMax}
                       />
                       <TimeOverview
                           data={timeData}
-                          graphMin={this.state.graphMin}
-                          graphMax={this.state.graphMax}
                       />
                       <img className="left-arrow" src={arrow} alt="left-arrow" onClick={this.handleGraphTranslation.bind(this)}/>
                       <img className="right-arrow" src={arrow} alt="right-arrow" onClick={this.handleGraphTranslation.bind(this)}/>
