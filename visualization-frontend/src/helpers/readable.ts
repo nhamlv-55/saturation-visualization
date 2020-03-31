@@ -21,7 +21,6 @@ export function toReadable(expr, varList) {
     if (varList.length === 0 ){
         return parsedResult;
     }
-    console.log(equivalence(parsedResult, 0));
     return replaceVarNames(parsedResult, varList);
 }
 
@@ -97,6 +96,62 @@ function replaceVarNames(expr, varList) {
     return expr;
 }
 
+export function reorder(expr, rhs, lhs, op){
+    if (typeof expr !== "string") return expr;
+    let rhsFinal:Number[] = [];
+    let lhsFinal:Number[] = [];
+    let exprList = expr.split(op);
+    let result = "";
+    for (let i = 0; i < exprList.length; i++){
+        if (lhs.indexOf(i) > -1) {
+            if (lhsFinal.length === 0){
+               result = result + " -> " + exprList[i];  
+            }
+            else {
+                result = result + " " + op + " " + exprList[i]
+            }
+            lhsFinal.push(i);
+            
+        }
+        else {
+            if (i === exprList.length - 1 && lhsFinal.length === 0) {
+                result = result + " -> " + exprList[i];
+                lhsFinal.push(i);
+            }
+            else {
+                if (rhsFinal.length === 0) {
+                    result = negate(exprList[i]) + result;
+                }
+                else {
+                    result = negate(exprList[i]) + " " + negateMap[op] + " " + result;
+                }
+               rhsFinal.push(i); 
+            }
+        }
+    }
+    return result;
+}
+
+function detectReorderPattern(expr, userExpr){
+    if (userExpr.includes("->")) {
+        let userExprClauses = userExpr.split("->");
+        let leftSideExprs = getLiterals(userExprClauses[0]);
+        let rightSideExprs = getLiterals(userExprClauses[1]);
+        
+        
+        
+        let exprList
+    }
+}
+
+function getLiterals(expr) {
+    for (let sym in logSym){
+        if (expr.includes(sym)) {
+            return expr.split(sym);
+        }
+    }
+}
+
 function equivalence(expr, reorder:number) {
     let sym = "";
     for (let i = 0; i < logSym.length; i++) {
@@ -131,5 +186,14 @@ function equivalence(expr, reorder:number) {
 function negate(expr) {
     let exprList = expr.split(" ");
     return expr.replace(exprList[1], negateMap[exprList[1]]);
+}
+
+export function getOp(expr) {
+    if (expr.includes("&&")) {
+        return "&&";
+    }
+    else {
+        return "||";
+    }
 }
 

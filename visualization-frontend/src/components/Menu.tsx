@@ -147,15 +147,4 @@ export class Menu extends React.Component<Props, {}> {
             reader.readAsText(file);
         }
     }
-
-    changeSpacerUserOptions(event: React.ChangeEvent<HTMLInputElement>) {
-        const newValue = event.target.value;
-        this.props.onChangeSpacerUserOptions(newValue);
-    }
-
-    changeTextArea(event: React.ChangeEvent<HTMLTextAreaElement>) {
-        const newValue = event.target.value;
-        this.props.onChangeProblem(newValue);
-    }
-
 }
