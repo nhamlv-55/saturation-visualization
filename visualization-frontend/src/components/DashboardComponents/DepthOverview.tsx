@@ -23,10 +23,10 @@ class DepthOverview extends React.Component<any, any> {
         this.createDepthOverview();
     }
     createDepthOverview() {
+        d3.selectAll("svg").remove();
         if (this.props.data.length === 0) {
             return;
         }
-        d3.selectAll("svg").remove(); 
         let data = this.props.data;
         
         let xValue = function(d) {
@@ -77,7 +77,6 @@ class DepthOverview extends React.Component<any, any> {
             .style("font-size", "20px")
             .call(yAxis);
         let g = svg.append("g");
-        
         g.selectAll(".bar")
             .data(data)
             .enter() 

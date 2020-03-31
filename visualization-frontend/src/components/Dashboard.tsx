@@ -15,7 +15,12 @@ class Dashboard extends React.Component<any, any> {
             data: "",
             selectedBenchmark: "",
             graphMin: 0,
-            graphMax: 10
+            graphMax: 10,
+            customMode: false,
+            depthData: [],
+            resultData: [],
+            memoryData: [],
+            timeData: []
         };
     }
     componentDidMount() {
@@ -98,9 +103,6 @@ class Dashboard extends React.Component<any, any> {
     }
     
     handleSidebarClick(origin, e) {
-        console.log(e);
-        console.log(origin);
-        console.log(origin === "sidebar");
         if (origin === "sidebar"){
             this.setState({
                 selectedBenchmark: e.target.innerText
@@ -116,7 +118,21 @@ class Dashboard extends React.Component<any, any> {
     
     handleHomeClick() {
         this.setState({
-            selectedBenchmark: ""
+            selectedBenchmark: "",
+            customMode: false,
+            depthData: [],
+            timeData: [],
+            memoryData: [],
+            resultData: []
+        });
+    }
+    
+    handleClearClick() {
+        this.setState({
+            depthData: [],
+            timeData: [],
+            memoryData: [],
+            resultData: []
         });
     }
     
@@ -137,7 +153,7 @@ class Dashboard extends React.Component<any, any> {
                 });
             }
         }
-        else if (e.keyCode === 38) {
+        else if (e.keyCode === 40) {
             if (this.state.graphMax + 10 < this.state.data.length){
                 this.setState({
                     graphMin: this.state.graphMin + 10,
@@ -145,7 +161,7 @@ class Dashboard extends React.Component<any, any> {
                 });
             }
         }
-        else if (e.keyCode === 40) {
+        else if (e.keyCode === 38) {
             if (this.state.graphMin - 10 >= 0 ){
                 this.setState({
                     graphMin: this.state.graphMin - 10,
@@ -155,9 +171,27 @@ class Dashboard extends React.Component<any, any> {
         }
         
     }
+    
+    handleCustomClick() {
+        this.setState({
+            customMode: !this.state.customMode
+        });
+        if (this.state.customMode === true){
+            this.setState({
+                depthData: [],
+                timeData: [],
+                memoryData: [],
+                resultData: []
+            });
+        }
+    }
 
-    filterDictionary(keys){
+    filterDictionary(keys, custom=false, index=""){
         let data = this.state.data.slice(this.state.graphMin, this.state.graphMax);
+        if (custom) {
+            data = this.state.data.filter(function(d) {return d.index === index})
+        }
+        console.log(data);
         let result:Object[] = [];
         for (let i = 0; i < data.length; i++){
             result.push({});
@@ -165,27 +199,67 @@ class Dashboard extends React.Component<any, any> {
                 result[i][keys[j]] = data[i][keys[j]];
             }
         }
+        console.log(result);
         return result;
     }
     
+    addToCustomData(e) {
+        let depthData = this.state.depthData.concat(this.filterDictionary(["index", "depth"], true, e.target.innerHTML));
+        let resultData = this.state.resultData.concat(this.filterDictionary(["index", "result", "SPACER_num_invariants"], true, e.target.innerHTML));
+        let memoryData = this.state.memoryData.concat(this.filterDictionary(["index", "memory"], true, e.target.innerHTML));
+        let timeData = this.state.timeData.concat(this.filterDictionary(["index", "time"], true, e.target.innerHTML)); 
+        
+        if (depthData.length > 10){
+            depthData.splice(0,1);
+            resultData.splice(0,1);
+            memoryData.splice(0,1);
+            timeData.splice(0,1);
+        }
+        this.setState({
+            depthData: depthData,
+            resultData: resultData,
+            memoryData: memoryData,
+            timeData: timeData
+        });
+    }
+    
     render() {
-        console.log(this.state.selectedBenchmark);
         let benchmarks = d3.map(this.state.data, function(d) {return d.index;}).keys();
         let selectedBenchmark = this.state.selectedBenchmark;
-        let depthData = this.filterDictionary(["index", "depth"]);
-        let resultsData = this.filterDictionary(["index", "result", "SPACER_num_invariants"]);
-        let memoryData = this.filterDictionary(["index", "memory"]);
-        let timeData = this.filterDictionary(["index", "time"]);
+        let depthData, resultsData, memoryData, timeData;
+        if (!this.state.customMode) {
+            depthData = this.filterDictionary(["index", "depth"]);
+            resultsData = this.filterDictionary(["index", "result", "SPACER_num_invariants"]);
+            memoryData = this.filterDictionary(["index", "memory"]);
+            timeData = this.filterDictionary(["index", "time"]);
+        }
+        else {
+            console.log("hello");
+            depthData = this.state.depthData;
+            resultsData = this.state.resultData;
+            memoryData = this.state.memoryData;
+            timeData = this.state.timeData;
+        }
         return (
           <div className="page">
-              <div className="sidebar" id="sidebar">
+              {!this.state.customMode && 
+                  <div className="sidebar" id="sidebar">
                   {benchmarks.map((name, key ) => {
                       if (key >= this.state.graphMin && key < this.state.graphMax){
                           return (<li className="selected" key={key} onClick={this.handleSidebarClick.bind(this, "sidebar")}>{name}</li>);
                       }
                       return (<li key={key} onClick={this.handleSidebarClick.bind(this, "sidebar")}>{name}</li>);
                   })}
-              </div>
+              </div>}
+              {this.state.customMode &&
+              <div className="sidebar" id="sidebar">
+                  {benchmarks.map((name, key ) => {
+                      if (this.state.depthData.filter(d => d.index === name).length > 0){
+                          return (<li className="selected" key={key} onClick={this.addToCustomData.bind(this)}>{name}</li>);
+                      }
+                      return (<li key={key} onClick={this.addToCustomData.bind(this)}>{name}</li>);
+                  })}
+              </div>}
               <div className="visual">
                   {this.state.selectedBenchmark !== "" &&
                   <IndividualBenchmark 
@@ -214,6 +288,8 @@ class Dashboard extends React.Component<any, any> {
               </div>
               
               <button className="home-button" onClick={this.handleHomeClick.bind(this)}>Home</button>
+              <button className="custom-button" onClick={this.handleCustomClick.bind(this)}>Custom</button>
+              {this.state.customMode && <button className="clear-button" onClick={this.handleClearClick.bind(this)}>Clear</button>}
               
           </div>  
         );
