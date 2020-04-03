@@ -58,7 +58,8 @@ class TimeOverview extends React.Component<any, any> {
         let svg = d3.select(".time-overview")
             .append("svg")
             .attr("width", this.config.width)
-            .attr("height", this.config.height);
+            .attr("height", this.config.height)
+            .on("click", this.props.timeZoom);
         svg.append("text")
             .attr("x", this.config.width / 2)
             .attr("y", this.config.margin.top)

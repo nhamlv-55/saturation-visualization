@@ -1,3 +1,5 @@
+import {toReadable} from "./readable";
+
 const styleTemplates = require('../resources/styleTemplates');
 
 export const lemmaColours = [
@@ -63,11 +65,16 @@ export function buildPobLemmasMap(tree: any): any{
 
 
 //BUILD EXPR MAP////////////////////////
-export function buildExprMap(tree: any): any{
-    let ExprMap = new Map<number, string>();
+export function buildExprMap(tree: any, varList: string[]): any{
+    let ExprMap = new Map<number, Object>();
     for (const nodeID in tree) {
         const node = tree[nodeID];
-        ExprMap[node.exprID] = node.expr;
+        ExprMap[node.exprID] = {
+            sexpr: node.expr,
+            readable: toReadable(node.expr, varList),
+            rhs: [],
+            lhs: []
+        };
     }
     return ExprMap
 

@@ -69,7 +69,7 @@ function parseResult(lst, sep) {
 
     //actual place where logical symbol gets placed between clauses
     if (sep !== "") {
-        return parseResult(lst[0], "") + " " + sep + "\n" + parseResult(lst.splice(1), sep);
+        return parseResult(lst[0], "") + " " + sep + parseResult(lst.splice(1), sep);
     }
 
     //handler for negative numbers which come in the form (- x)
@@ -103,29 +103,29 @@ export function reorder(expr, rhs, lhs, op){
     let exprList = expr.split(op);
     let result = "";
     for (let i = 0; i < exprList.length; i++){
-        if (lhs.indexOf(i) > -1) {
-            if (lhsFinal.length === 0){
-               result = result + " -> " + exprList[i];  
+        if (rhs.indexOf(i) > -1) {
+            if (rhsFinal.length === 0){
+                result = negate(exprList[i]) + result;
             }
             else {
-                result = result + " " + op + " " + exprList[i]
+                result = negate(exprList[i]) + " " + negateMap[op] + " " + result;
             }
-            lhsFinal.push(i);
+            rhsFinal.push(i);
             
         }
         else {
-            if (i === exprList.length - 1 && lhsFinal.length === 0) {
-                result = result + " -> " + exprList[i];
-                lhsFinal.push(i);
+            if (i === exprList.length - 1 && rhsFinal.length === 0) {
+                result = negate(exprList[i]) + result;
+                rhsFinal.push(i);
             }
             else {
-                if (rhsFinal.length === 0) {
-                    result = negate(exprList[i]) + result;
+                if (lhsFinal.length === 0) {
+                    result = result + " -> " + exprList[i];
                 }
                 else {
-                    result = negate(exprList[i]) + " " + negateMap[op] + " " + result;
+                    result = result + " " + op + " " + exprList[i]
                 }
-               rhsFinal.push(i); 
+               lhsFinal.push(i); 
             }
         }
     }
@@ -197,3 +197,34 @@ export function getOp(expr) {
     }
 }
 
+export function getIndexOfLiteral(exprList, literal){
+    for (let i = 0; i < exprList.length; i++){
+        if (literal === exprList[i]){
+            return i;            
+        }
+    }
+}
+
+export function getCleanExprList(expr){
+    let exprList = expr.split(getOp(expr));
+    for (let i = 0; i < exprList.length; i++){
+        exprList[i] = exprList[i].trim();
+    }
+    
+    return exprList;
+}
+
+export function getVariables(literal) {
+    let regex = /([a-zA-Z])+/g;
+    return literal.match(regex);
+}
+
+export function getProcesses(literal) {
+    let regex = /(\[[0-9]+\])/g;
+    return literal.match(regex);
+}
+
+export function getProcessVariables(literal) {
+    let regex = /([a-zA-Z]+\[[0-9]+\])/g;
+    return literal.match(regex);
+}
