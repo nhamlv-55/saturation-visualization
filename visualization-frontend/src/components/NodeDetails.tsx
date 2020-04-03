@@ -3,7 +3,14 @@ import * as React from 'react';
 import '../styles/NodeDetails.css';
 import {toDiff} from "../helpers/diff";
 import {lemmaColours} from "../helpers/network";
-import {getOp, reorder} from "../helpers/readable";
+import {
+    getCleanExprList,
+    getIndexOfLiteral,
+    getOp,
+    getProcesses, getProcessVariables,
+    getVariables,
+    reorder
+} from "../helpers/readable";
 type Props = {
     nodes: any,
     PobLemmasMap: {},
@@ -27,7 +34,7 @@ export default class NodeDetails extends React.Component<Props, {}> {
         "GE": ">= ",
         "SYMBOL": "",
         "0_REAL_CONSTANT": ""
-    }
+    };
 
     node_to_string(n: Object, is_root: Boolean):string{
         let result = ""
@@ -60,18 +67,37 @@ export default class NodeDetails extends React.Component<Props, {}> {
             if (node.exprID in this.props.PobLemmasMap){
                 let lemmas = this.props.PobLemmasMap[node.exprID];
                 for (const lemma of lemmas){
-                    let colorIndex = (lemma_list.length - 1) / 2;
+                    let colorIndex = lemmas.indexOf(lemma);
                     let lemmaStyle = {
                         color: lemmaColours[colorIndex]
                     };
                     lemma_list.push(<h3 style={lemmaStyle} key={"lemma-header-"+ lemma[0]}>ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h3>);
-                    let expr = this.props.ExprMap[lemma[0]];
-                    expr = reorder(expr, [0], [1], getOp(expr));
-                    lemma_list.push(<pre  key={"lemma-expr-"+lemma[0]}>{expr}</pre>);
+                    let expr = this.props.ExprMap[lemma[0]].readable;
+                    let exprOp = getOp(expr);
+                    let exprList = getCleanExprList(expr);
+                    exprList.map((literal, key) => {
+                        if (key !== exprList.length - 1) {
+                            lemma_list.push(<pre onClick={this.addLemma.bind(this, lemma[0])} key={"lemma-expr-"+lemma[0] + key}>{literal + " " + exprOp}</pre>);
+                        }
+                        else {
+                            lemma_list.push(<pre onClick={this.addLemma.bind(this, lemma[0])}
+                                                 key={"lemma-expr-" + lemma[0] + key}>{literal}</pre>);
+                        }
+                    });
                 }
             }
         }
         return lemma_list;
+    }
+    
+    addLemma(lemmaId, e) {
+        let exprInfo = this.props.ExprMap[lemmaId];
+        let exprOp = getOp(exprInfo.readable);
+        let literal = e.target.innerText.replace(exprOp, "");
+        literal = literal.trim();
+        let index = getIndexOfLiteral(getCleanExprList(exprInfo.readable), literal);
+        
+        
     }
     
     render() {
@@ -97,7 +123,7 @@ export default class NodeDetails extends React.Component<Props, {}> {
                     let additional_info ="type:" + node.event_type + " level:" + node.level;
                     let lemma_list = this.getLemmaList(node);
 
-                    let expr = ""
+                    let expr = "";
                     if(this.props.expr_layout==="SMT"){
                         expr = node.expr
                     }else{

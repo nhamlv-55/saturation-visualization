@@ -7,6 +7,7 @@ import MemoryOverview from "./DashboardComponents/MemoryOverview";
 import ResultsOverview from "./DashboardComponents/ResultsOverview";
 import TimeOverview from "./DashboardComponents/TimeOverview";
 import arrow from './../resources/icons/singles/angle-arrow-down.svg'
+import TimeZoom from "./DashboardComponents/TimeZoom";
 
 class Dashboard extends React.Component<any, any> {
     constructor(props: any) {
@@ -20,7 +21,8 @@ class Dashboard extends React.Component<any, any> {
             depthData: [],
             resultData: [],
             memoryData: [],
-            timeData: []
+            timeData: [],
+            zoomMode: ""
         };
     }
     componentDidMount() {
@@ -191,7 +193,6 @@ class Dashboard extends React.Component<any, any> {
         if (custom) {
             data = this.state.data.filter(function(d) {return d.index === index})
         }
-        console.log(data);
         let result:Object[] = [];
         for (let i = 0; i < data.length; i++){
             result.push({});
@@ -199,7 +200,6 @@ class Dashboard extends React.Component<any, any> {
                 result[i][keys[j]] = data[i][keys[j]];
             }
         }
-        console.log(result);
         return result;
     }
     
@@ -223,10 +223,20 @@ class Dashboard extends React.Component<any, any> {
         });
     }
     
+    setZoomView(type: string) {
+        this.setState({
+            zoomMode: type
+        });
+    }
+    
     render() {
         let benchmarks = d3.map(this.state.data, function(d) {return d.index;}).keys();
         let selectedBenchmark = this.state.selectedBenchmark;
-        let depthData, resultsData, memoryData, timeData;
+        let depthData, resultsData, memoryData, timeData, timeZoomData;
+        if (this.state.zoomMode === "time") {
+            let timeKeys = Object.keys(this.state.data[0]).filter(x => x.includes("time_"));
+            timeZoomData = this.filterDictionary(timeKeys);
+        }
         if (!this.state.customMode) {
             depthData = this.filterDictionary(["index", "depth"]);
             resultsData = this.filterDictionary(["index", "result", "SPACER_num_invariants"]);
@@ -234,7 +244,6 @@ class Dashboard extends React.Component<any, any> {
             timeData = this.filterDictionary(["index", "time"]);
         }
         else {
-            console.log("hello");
             depthData = this.state.depthData;
             resultsData = this.state.resultData;
             memoryData = this.state.memoryData;
@@ -265,7 +274,7 @@ class Dashboard extends React.Component<any, any> {
                   <IndividualBenchmark 
                       data={this.state.data.filter(function(d) {return d.index === selectedBenchmark})[0]}
                   />}
-                  {this.state.selectedBenchmark === "" &&
+                  {this.state.selectedBenchmark === "" && this.state.zoomMode === "" && 
                       <div className="dashboard">
                       <DepthOverview
                           data={depthData}
@@ -279,18 +288,23 @@ class Dashboard extends React.Component<any, any> {
                       />
                       <TimeOverview
                           data={timeData}
+                          timeZoom={this.setZoomView.bind(this, "time")}
                       />
                       <img className="left-arrow" src={arrow} alt="left-arrow" onClick={this.handleGraphTranslation.bind(this)}/>
                       <img className="right-arrow" src={arrow} alt="right-arrow" onClick={this.handleGraphTranslation.bind(this)}/>
                       <div className="overview-tooltip">
                       </div>
                   </div>}
+                  {this.state.zoomMode === "time" &&
+                  <TimeZoom
+                      data={timeZoomData}
+                      
+                  />}
               </div>
               
               <button className="home-button" onClick={this.handleHomeClick.bind(this)}>Home</button>
               <button className="custom-button" onClick={this.handleCustomClick.bind(this)}>Custom</button>
               {this.state.customMode && <button className="clear-button" onClick={this.handleClearClick.bind(this)}>Clear</button>}
-              
           </div>  
         );
     }
