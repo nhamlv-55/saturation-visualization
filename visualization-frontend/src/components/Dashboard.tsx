@@ -22,7 +22,19 @@ class Dashboard extends React.Component<any, any> {
             resultData: [],
             memoryData: [],
             timeData: [],
-            zoomMode: ""
+            zoomMode: "",
+            dashboardConfig: {
+                height: 112.5,
+                width: 200,
+                graphHeight: 100,
+                margin: {
+                    top: 20,
+                    right: 20,
+                    bottom: 50,
+                    left: 60
+                },
+                barNum: 10
+            }
         };
     }
     componentDidMount() {
@@ -234,7 +246,7 @@ class Dashboard extends React.Component<any, any> {
         let selectedBenchmark = this.state.selectedBenchmark;
         let depthData, resultsData, memoryData, timeData, timeZoomData;
         if (this.state.zoomMode === "time") {
-            let timeKeys = Object.keys(this.state.data[0]).filter(x => x.includes("time_"));
+            let timeKeys = Object.keys(this.state.data[0]).filter(x => x.includes("time"));
             timeZoomData = this.filterDictionary(timeKeys);
         }
         if (!this.state.customMode) {
@@ -249,6 +261,8 @@ class Dashboard extends React.Component<any, any> {
             memoryData = this.state.memoryData;
             timeData = this.state.timeData;
         }
+
+
         return (
           <div className="page">
               {!this.state.customMode && 
@@ -278,17 +292,21 @@ class Dashboard extends React.Component<any, any> {
                       <div className="dashboard">
                       <DepthOverview
                           data={depthData}
-                      />
-                      <ResultsOverview
-                          data={resultsData}
-                          selectBenchmark={this.handleSidebarClick.bind(this, "dot")}
+                          config={this.state.dashboardConfig}
                       />
                       <MemoryOverview
                           data={memoryData}
+                          config={this.state.dashboardConfig}
                       />
                       <TimeOverview
                           data={timeData}
+                          config={this.state.dashboardConfig}
                           timeZoom={this.setZoomView.bind(this, "time")}
+                      />
+                      <ResultsOverview
+                          data={resultsData}
+                          config={this.state.dashboardConfig}
+                          selectBenchmark={this.handleSidebarClick.bind(this, "dot")}
                       />
                       <img className="left-arrow" src={arrow} alt="left-arrow" onClick={this.handleGraphTranslation.bind(this)}/>
                       <img className="right-arrow" src={arrow} alt="right-arrow" onClick={this.handleGraphTranslation.bind(this)}/>

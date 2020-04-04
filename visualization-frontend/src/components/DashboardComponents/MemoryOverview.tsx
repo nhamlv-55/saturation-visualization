@@ -2,21 +2,8 @@ import * as React from 'react';
 import * as d3 from 'd3';
 
 class MemoryOverview extends React.Component<any, any> {
-    private config: { margin: { top: number; left: number; bottom: number; right: number }; barNum: number; width: number; graphHeight: number; height: number };
     constructor(props) {
         super(props);
-        this.config = {
-            height: 450,
-            width: 800,
-            graphHeight: 400,
-            margin: {
-                top: 20,
-                right: 20,
-                bottom: 50,
-                left: 60
-            },
-            barNum: 10
-        };
     }
 
     componentDidMount() {
@@ -35,7 +22,7 @@ class MemoryOverview extends React.Component<any, any> {
         let index = d3.map(data,function(d) {return d.index;}).keys();
         let xScale = d3.scaleBand()
             .domain(index)
-            .range([this.config.margin.left, this.config.width - this.config.margin.right]);
+            .range([this.props.config.margin.left, this.props.config.width - this.props.config.margin.right]);
 
         let xMap = function(d) {
             return xScale(xValue(d))
@@ -48,7 +35,7 @@ class MemoryOverview extends React.Component<any, any> {
         };
         let yScale = d3.scaleLinear()
             .domain([d3.min(data, yValue), d3.max(data, yValue)])
-            .range([this.config.graphHeight - this.config.margin.top, this.config.margin.bottom]);
+            .range([this.props.config.graphHeight - this.props.config.margin.top, this.props.config.margin.bottom]);
 
         let yMap = function(d) {
             return yScale(yValue(d))
@@ -58,22 +45,22 @@ class MemoryOverview extends React.Component<any, any> {
 
         let svg = d3.select(".memory-overview")
             .append("svg")
-            .attr("width", this.config.width)
-            .attr("height", this.config.height);
+            .attr("width", this.props.config.width)
+            .attr("height", this.props.config.height);
         svg.append("text")
-            .attr("x", this.config.width / 2)
-            .attr("y", this.config.margin.top)
+            .attr("x", this.props.config.width / 2)
+            .attr("y", this.props.config.margin.top)
             .attr("text-anchor", "middle")
             .style("font-size", "20px")
             .style("text-decoration", "underline")
             .text("Index x Memory");
         svg.append("g")
             .attr("class", "x-axis")
-            .attr("transform", "translate(0," + (this.config.graphHeight - this.config.margin.top) + ")")
+            .attr("transform", "translate(0," + (this.props.config.graphHeight - this.props.config.margin.top) + ")")
             .call(xAxis);
         svg.append("g")
             .attr("class", "y-axis")
-            .attr("transform", "translate(" + this.config.margin.left + ",0)")
+            .attr("transform", "translate(" + this.props.config.margin.left + ",0)")
             .style("font-size", "20px")
             .call(yAxis);
         let g = svg.append("g");
@@ -86,7 +73,7 @@ class MemoryOverview extends React.Component<any, any> {
             .attr("x", xMap)
             .attr("y", yMap)
             .attr("width", xScale.bandwidth() - 1)
-            .attr("height", function(this,d) {return (this.config.graphHeight - this.config.margin.top - yScale(d.memory))}.bind(this))
+            .attr("height", function(this,d) {return (this.props.config.graphHeight - this.props.config.margin.top - yScale(d.memory))}.bind(this))
             .on("mouseenter", function(d) {
                 d3.select(".overview-tooltip")
                     .append("text")

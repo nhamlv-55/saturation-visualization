@@ -24,7 +24,7 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
         nonStrictForNegatedStrictInequalities: true,
         orientClauses: true,
         varNames: ""
-    }
+    };
 
     render() {
         return (
