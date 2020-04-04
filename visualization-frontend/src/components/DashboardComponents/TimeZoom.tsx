@@ -3,22 +3,28 @@ import * as d3 from 'd3';
 import TimeChart from "./TimeChart";
 
 class TimeZoom extends React.Component<any, any> {
-    filterTimeData() {
-        return Object.keys(this.props.data)
-            .filter(function(d) {return d.includes("time")})
-            .reduce((obj, key) => {
-                obj[key] = this.props.data[key];
-                return obj;
-            }, {});
+    constructor(props) {
+        super(props);
+        this.state = {
+            data: []
+        }
+    }
+    componentDidMount() {
     }
     
     render() {
         return (
             <div>
                 {this.props.data.map((instance, key) => {
+                    console.log(instance);
                     return (
                         <TimeChart
-                        data={this.props.data}
+                            key={key}
+                            data={instance}
+                            height={200}
+                            width={200}
+                            className={"timezoom" + key}
+                            type={"timezoom"}
                         />
                     );
                 })}

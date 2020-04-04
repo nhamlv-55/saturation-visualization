@@ -24,7 +24,12 @@ class IndividualBenchmark extends React.Component<any, any> {
               {dataDisplay.map((dataKey, key) => (
                   <p className="data-details" key={key}>{potholeToNormal(dataKey)}: {this.props.data[dataKey]}</p>
               ))}
-              <TimeChart data={timeData}/>
+              <TimeChart 
+                  data={timeData}
+                  height={600}
+                  width={600}
+                  className={"time"}
+              />
           </div>  
         );
     }

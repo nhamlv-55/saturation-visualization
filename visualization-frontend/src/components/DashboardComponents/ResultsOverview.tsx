@@ -2,21 +2,8 @@ import * as React from 'react';
 import * as d3 from 'd3';
 
 class ResultsOverview extends React.Component<any, any> {
-    private config: { margin: { top: number; left: number; bottom: number; right: number }; barNum: number; width: number; graphHeight: number; height: number };
     constructor(props) {
         super(props);
-        this.config = {
-            height: 450,
-            width: 800,
-            graphHeight: 400,
-            margin: {
-                top: 20,
-                right: 20,
-                bottom: 50,
-                left: 60
-            },
-            barNum: 10
-        };
     }
 
     componentDidMount() {
@@ -38,7 +25,7 @@ class ResultsOverview extends React.Component<any, any> {
         let index = d3.map(data,function(d) {return d.index;}).keys();
         let xScale = d3.scaleBand()
             .domain(index)
-            .range([this.config.margin.left, this.config.width - this.config.margin.right]);
+            .range([this.props.config.margin.left, this.props.config.width - this.props.config.margin.right]);
 
         let xMap = function(d) {
             return xScale(xValue(d))
@@ -51,7 +38,7 @@ class ResultsOverview extends React.Component<any, any> {
         };
         let yScale = d3.scaleLinear()
             .domain([d3.min(data, yValue), d3.max(data, yValue)])
-            .range([this.config.graphHeight - this.config.margin.top, this.config.margin.bottom]);
+            .range([this.props.config.graphHeight - this.props.config.margin.top, this.props.config.margin.bottom]);
 
         let yMap = function(d) {
             return yScale(yValue(d))
@@ -61,22 +48,22 @@ class ResultsOverview extends React.Component<any, any> {
 
         let svg = d3.select(".results-overview")
             .append("svg")
-            .attr("width", this.config.width)
-            .attr("height", this.config.height);
+            .attr("width", this.props.config.width)
+            .attr("height", this.props.config.height);
         svg.append("text")
-            .attr("x", this.config.width / 2)
-            .attr("y", this.config.margin.top)
+            .attr("x", this.props.config.width / 2)
+            .attr("y", this.props.config.margin.top)
             .attr("text-anchor", "middle")
             .style("font-size", "20px")
             .style("text-decoration", "underline")
             .text("Index x Result x Num of Invariants");
         svg.append("g")
             .attr("class", "x-axis")
-            .attr("transform", "translate(0," + (this.config.graphHeight - this.config.margin.top) + ")")
+            .attr("transform", "translate(0," + (this.props.config.graphHeight - this.props.config.margin.top) + ")")
             .call(xAxis);
         svg.append("g")
             .attr("class", "y-axis")
-            .attr("transform", "translate(" + this.config.margin.left + ",0)")
+            .attr("transform", "translate(" + this.props.config.margin.left + ",0)")
             .style("font-size", "20px")
             .call(yAxis);
         let g = svg.append("g");
@@ -123,16 +110,16 @@ class ResultsOverview extends React.Component<any, any> {
             .data(results)
             .enter()
             .append("circle")
-            .attr("cx", function(this,d,i) {return this.config.margin.left + i*100}.bind(this))
-            .attr("cy", this.config.graphHeight + 15)
+            .attr("cx", function(this,d,i) {return this.props.config.margin.left + i*100}.bind(this))
+            .attr("cy", this.props.config.graphHeight + 15)
             .attr("r", 5)
             .style("fill", function(d){return colour(d)});
         g.selectAll("legendText")
             .data(results)
             .enter()
             .append("text")
-            .attr("x", function(this,d,i){return this.config.margin.left + 10 + i*100}.bind(this))
-            .attr("y", this.config.graphHeight + 20)
+            .attr("x", function(this,d,i){return this.props.config.margin.left + 10 + i*100}.bind(this))
+            .attr("y", this.props.config.graphHeight + 20)
             .text(function(d){return d})
 
 

@@ -2,6 +2,18 @@ body {
     font-family: 'Arial', 'Helvetica', sans-serif;
 }
 
+.visual {
+    height: 100vh;
+    width: 90%;
+    position: absolute;
+    left: 10%;
+    top: 0;
+}
+
+[class*="timezoom"] {
+    display: inline-block;
+}
+
 .sidebar {
     height: 100vh;
     overflow: scroll;
@@ -34,7 +46,7 @@ body {
 
 .time {
     position: absolute;
-    right: 5%;
+    right: 25%;
     bottom: 5%;
 }
 
@@ -74,28 +86,14 @@ body {
     width: 5%;
 }
 
-.depth-overview {
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 400px 400px;
+    width: 85%;
+    left: 10%;
+    top: 0%;
     position: absolute;
-    top: 3%;
-    left: 12%;
-}
-
-.memory-overview {
-    position: absolute;
-    top: 3%;
-    right: 5%;
-}
-
-.time-overview {
-    position: absolute;
-    bottom: 1%;
-    left: 12%;
-}
-
-.results-overview {
-    position: absolute;
-    bottom: 1%;
-    right: 5%;
 }
 
 .bar {
