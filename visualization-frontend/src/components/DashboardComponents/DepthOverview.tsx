@@ -2,15 +2,15 @@ import * as React from 'react';
 import * as d3 from 'd3';
 
 class DepthOverview extends React.Component<any, any> {
-    constructor(props) {
-        super(props);
-    }
-    
     componentDidMount() {
         this.createDepthOverview();
     }
+    componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): void {
+        this.createDepthOverview();
+    }
+
     createDepthOverview() {
-        d3.selectAll("svg").remove();
+        d3.select(".depth-overview svg").remove();
         if (this.props.data.length === 0) {
             return;
         }
@@ -108,9 +108,6 @@ class DepthOverview extends React.Component<any, any> {
 
     }
     render() {
-        console.log(window.innerWidth);
-        console.log(window.innerHeight);
-        this.createDepthOverview();
         return (
             <div className="depth-overview">
             </div>
