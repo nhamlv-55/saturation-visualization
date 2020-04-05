@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as d3 from 'd3';
 import TimeChart from "./TimeChart";
 
 class TimeZoom extends React.Component<any, any> {
@@ -25,6 +24,7 @@ class TimeZoom extends React.Component<any, any> {
                             width={200}
                             className={"timezoom" + key}
                             type={"timezoom"}
+                            index={instance["index"]}
                         />
                     );
                 })}

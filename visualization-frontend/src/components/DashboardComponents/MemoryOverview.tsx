@@ -2,15 +2,16 @@ import * as React from 'react';
 import * as d3 from 'd3';
 
 class MemoryOverview extends React.Component<any, any> {
-    constructor(props) {
-        super(props);
-    }
-
     componentDidMount() {
+        this.createMemoryOverview();
+    }
+    
+    componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): void {
         this.createMemoryOverview();
     }
 
     createMemoryOverview() {
+        d3.select(".memory-overview svg").remove();
         if (this.props.data.length === 0) {
             return;
         }
@@ -108,7 +109,6 @@ class MemoryOverview extends React.Component<any, any> {
 
     }
     render() {
-        this.createMemoryOverview();
         return (
             <div className="memory-overview">
 

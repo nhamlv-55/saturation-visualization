@@ -20,10 +20,12 @@ class IndividualBenchmark extends React.Component<any, any> {
         let timeData = this.filterTimeData();
         return (
           <div className="overview">
-              <h1>{this.props.data.index}</h1>
-              {dataDisplay.map((dataKey, key) => (
-                  <p className="data-details" key={key}>{potholeToNormal(dataKey)}: {this.props.data[dataKey]}</p>
-              ))}
+              <div className="details">
+                  <h1>{this.props.data.index}</h1>
+                  {dataDisplay.map((dataKey, key) => (
+                      <p className="data-details" key={key}>{potholeToNormal(dataKey)}: {this.props.data[dataKey]}</p>
+                  ))}
+              </div>
               <TimeChart 
                   data={timeData}
                   height={600}

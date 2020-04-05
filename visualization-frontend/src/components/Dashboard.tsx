@@ -16,7 +16,7 @@ class Dashboard extends React.Component<any, any> {
             data: "",
             selectedBenchmark: "",
             graphMin: 0,
-            graphMax: 10,
+            graphMax: 30,
             customMode: false,
             depthData: [],
             resultData: [],
@@ -24,9 +24,9 @@ class Dashboard extends React.Component<any, any> {
             timeData: [],
             zoomMode: "",
             dashboardConfig: {
-                height: 112.5,
-                width: 200,
-                graphHeight: 100,
+                height: 450,
+                width: 1500,
+                graphHeight: 400,
                 margin: {
                     top: 20,
                     right: 20,
@@ -137,7 +137,10 @@ class Dashboard extends React.Component<any, any> {
             depthData: [],
             timeData: [],
             memoryData: [],
-            resultData: []
+            resultData: [],
+            zoomMode: "", 
+            graphMin: 0,
+            graphMax: 30
         });
     }
     
@@ -216,10 +219,10 @@ class Dashboard extends React.Component<any, any> {
     }
     
     addToCustomData(e) {
-        let depthData = this.state.depthData.concat(this.filterDictionary(["index", "depth"], true, e.target.innerHTML));
+        let depthData = this.state.depthData.concat(this.filterDictionary(["index", "depth"],true, e.target.innerHTML));
         let resultData = this.state.resultData.concat(this.filterDictionary(["index", "result", "SPACER_num_invariants"], true, e.target.innerHTML));
-        let memoryData = this.state.memoryData.concat(this.filterDictionary(["index", "memory"], true, e.target.innerHTML));
-        let timeData = this.state.timeData.concat(this.filterDictionary(["index", "time"], true, e.target.innerHTML)); 
+        let memoryData = this.state.memoryData.concat(this.filterDictionary(["index", "memory"],true, e.target.innerHTML));
+        let timeData = this.state.timeData.concat(this.filterDictionary(["index", "time"],true, e.target.innerHTML)); 
         
         if (depthData.length > 10){
             depthData.splice(0,1);
@@ -237,7 +240,9 @@ class Dashboard extends React.Component<any, any> {
     
     setZoomView(type: string) {
         this.setState({
-            zoomMode: type
+            zoomMode: type, 
+            graphMin: 0,
+            graphMax: 21
         });
     }
     
@@ -247,6 +252,7 @@ class Dashboard extends React.Component<any, any> {
         let depthData, resultsData, memoryData, timeData, timeZoomData;
         if (this.state.zoomMode === "time") {
             let timeKeys = Object.keys(this.state.data[0]).filter(x => x.includes("time"));
+            timeKeys.push("index");
             timeZoomData = this.filterDictionary(timeKeys);
         }
         if (!this.state.customMode) {
@@ -261,8 +267,6 @@ class Dashboard extends React.Component<any, any> {
             memoryData = this.state.memoryData;
             timeData = this.state.timeData;
         }
-
-
         return (
           <div className="page">
               {!this.state.customMode && 
@@ -288,8 +292,8 @@ class Dashboard extends React.Component<any, any> {
                   <IndividualBenchmark 
                       data={this.state.data.filter(function(d) {return d.index === selectedBenchmark})[0]}
                   />}
-                  {this.state.selectedBenchmark === "" && this.state.zoomMode === "" && 
-                      <div className="dashboard">
+                  {this.state.selectedBenchmark === "" && this.state.zoomMode === "" &&
+                  <div className="dashboard">
                       <DepthOverview
                           data={depthData}
                           config={this.state.dashboardConfig}
@@ -308,10 +312,10 @@ class Dashboard extends React.Component<any, any> {
                           config={this.state.dashboardConfig}
                           selectBenchmark={this.handleSidebarClick.bind(this, "dot")}
                       />
-                      <img className="left-arrow" src={arrow} alt="left-arrow" onClick={this.handleGraphTranslation.bind(this)}/>
-                      <img className="right-arrow" src={arrow} alt="right-arrow" onClick={this.handleGraphTranslation.bind(this)}/>
                       <div className="overview-tooltip">
                       </div>
+                      <img className="left-arrow" src={arrow} alt="left-arrow" onClick={this.handleGraphTranslation.bind(this)}/>
+                      <img className="right-arrow" src={arrow} alt="right-arrow" onClick={this.handleGraphTranslation.bind(this)}/>
                   </div>}
                   {this.state.zoomMode === "time" &&
                   <TimeZoom

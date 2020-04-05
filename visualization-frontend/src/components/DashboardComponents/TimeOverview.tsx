@@ -2,16 +2,16 @@ import * as React from 'react';
 import * as d3 from 'd3';
 
 class TimeOverview extends React.Component<any, any> {
-    constructor(props) {
-        super(props);
-    }
-
     componentDidMount() {
         this.createTimeOverview();
     }
-
+    
+    componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): void {
+        this.createTimeOverview();
+    }
 
     createTimeOverview() {
+        d3.select(".time-overview svg").remove();
         if (this.props.data.length === 0) return;
         let data = this.props.data;
 
@@ -109,7 +109,6 @@ class TimeOverview extends React.Component<any, any> {
 
     }
     render() {
-        this.createTimeOverview();
         return (
             <div className="time-overview">
 

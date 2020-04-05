@@ -59,7 +59,6 @@ class TimeChart extends React.Component<any, any> {
             }
         }
         
-        let ret = [];
         let resultKeys = Object.keys(result);
         for (let i = 0; i < resultKeys.length; i++){
             if (result[resultKeys[i]].children){
@@ -85,6 +84,10 @@ class TimeChart extends React.Component<any, any> {
             .color(x => colour(x.name))
             .label(x => x.name + ": " + x.value)
             .tooltipTitle(x => x.name + ": " + x.value);
+        
+        if (this.props.type){
+            myChart.showLabels(false);
+        }
     }
 
 
@@ -92,8 +95,8 @@ class TimeChart extends React.Component<any, any> {
         this.totalTime = this.props.data["time"];
         return (
           <div className={this.props.className} id={this.props.className}>
-              {!this.props.type && <h1>Total Time: {this.totalTime}</h1>}
-              {this.props.type && <h4></h4>}
+              {!this.props.type && <h2>Total Time: {this.totalTime}</h2>}
+              {this.props.type && <p>{this.props.index}</p>}
               
           </div>  
         );

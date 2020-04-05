@@ -2,15 +2,15 @@ import * as React from 'react';
 import * as d3 from 'd3';
 
 class ResultsOverview extends React.Component<any, any> {
-    constructor(props) {
-        super(props);
-    }
-
     componentDidMount() {
+        this.createResultsOverview();
+    }
+    componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): void {
         this.createResultsOverview();
     }
 
     createResultsOverview() {
+        d3.select(".results-overview svg").remove();
         let data = this.props.data;
         
         let results = d3.map(data, function(d) {return d.result;}).keys();
@@ -127,12 +127,9 @@ class ResultsOverview extends React.Component<any, any> {
     }
 
     render() {
-        this.createResultsOverview();
         return (
             <div className="results-overview">
-
             </div>
-
         );
     }
 }

@@ -12,10 +12,15 @@ body {
 
 [class*="timezoom"] {
     display: inline-block;
+    margin: 10px;
+}
+[class*="timezoom"] p {
+    text-align: center;
+    font-size: 13px;
 }
 
 .sidebar {
-    height: 100vh;
+    height: 215vh;
     overflow: scroll;
     width: 10%;
 }
@@ -24,7 +29,6 @@ body {
     font-size: 14px;
     padding: 10px;
     width: 100%;
-    
 }
 
 .selected {
@@ -37,20 +41,17 @@ body {
 }
 
 .overview {
-    position: absolute; 
-    top: 2%;
-    left: 13%;
-    width: 87%;
-    height: 98%;
+    margin: 1%;
 }
-
+.details {
+    display: inline-block;
+    vertical-align: top;
+}
 .time {
-    position: absolute;
-    right: 25%;
-    bottom: 5%;
+    display: inline-block;
 }
 
-.time h1 {
+.time h2 {
     text-align: center;
 }
 
@@ -87,13 +88,8 @@ body {
 }
 
 .dashboard {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 400px 400px;
-    width: 85%;
-    left: 10%;
-    top: 0%;
-    position: absolute;
+    width: 90%;
+    height: 1vh;
 }
 
 .bar {
@@ -110,17 +106,11 @@ body {
 }
 
 .left-arrow {
-    position: absolute;
-    left: 10%;
-    top: 50%;
     transform: translate(0%, -50%) rotate(90deg);
     height: 5%;
     
 }
 .right-arrow {
-    position: absolute;
-    right: 1%;
-    top: 50%;
     transform: translate(0%, -50%) rotate(-90deg);
     height: 5%;
 }
@@ -136,3 +126,8 @@ body {
 .data-details {
     font-size: 30px;
 }
+
+.depth-overview, .results-overview, 
+.memory-overview, .time-overview {
+    display: inline-block;
+} 
