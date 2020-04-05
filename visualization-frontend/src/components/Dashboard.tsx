@@ -8,20 +8,25 @@ import ResultsOverview from "./DashboardComponents/ResultsOverview";
 import TimeOverview from "./DashboardComponents/TimeOverview";
 import arrow from './../resources/icons/singles/angle-arrow-down.svg'
 import TimeZoom from "./DashboardComponents/TimeZoom";
+import BarGraphOverview from "./DashboardComponents/BarGraphOverview";
 
 class Dashboard extends React.Component<any, any> {
+    private overviewMetrics: string[];
     constructor(props: any) {
         super(props);
-        this.state = {
+        this.overviewMetrics = ["depth", "memory", "time", "result"];
+            this.state = {
             data: "",
             selectedBenchmark: "",
             graphMin: 0,
             graphMax: 30,
             customMode: false,
-            depthData: [],
-            resultData: [],
-            memoryData: [],
-            timeData: [],
+            customData: {
+                depth: [],
+                result: [],
+                memory: [],
+                time: []
+            },
             zoomMode: "",
             dashboardConfig: {
                 height: 450,
@@ -134,10 +139,12 @@ class Dashboard extends React.Component<any, any> {
         this.setState({
             selectedBenchmark: "",
             customMode: false,
-            depthData: [],
-            timeData: [],
-            memoryData: [],
-            resultData: [],
+            customData: {
+                depth: [],
+                time: [],
+                memory: [],
+                result: []
+            },
             zoomMode: "", 
             graphMin: 0,
             graphMax: 30
@@ -146,10 +153,12 @@ class Dashboard extends React.Component<any, any> {
     
     handleClearClick() {
         this.setState({
-            depthData: [],
-            timeData: [],
-            memoryData: [],
-            resultData: []
+            customData: {
+                depth: [],
+                time: [],
+                memory: [],
+                result: []
+            }
         });
     }
     
@@ -195,10 +204,12 @@ class Dashboard extends React.Component<any, any> {
         });
         if (this.state.customMode === true){
             this.setState({
-                depthData: [],
-                timeData: [],
-                memoryData: [],
-                resultData: []
+                customData: {
+                    depth: [],
+                    time: [],
+                    memory: [],
+                    result: []
+                }
             });
         }
     }
@@ -219,23 +230,23 @@ class Dashboard extends React.Component<any, any> {
     }
     
     addToCustomData(e) {
-        let depthData = this.state.depthData.concat(this.filterDictionary(["index", "depth"],true, e.target.innerHTML));
-        let resultData = this.state.resultData.concat(this.filterDictionary(["index", "result", "SPACER_num_invariants"], true, e.target.innerHTML));
-        let memoryData = this.state.memoryData.concat(this.filterDictionary(["index", "memory"],true, e.target.innerHTML));
-        let timeData = this.state.timeData.concat(this.filterDictionary(["index", "time"],true, e.target.innerHTML)); 
-        
-        if (depthData.length > 10){
-            depthData.splice(0,1);
-            resultData.splice(0,1);
-            memoryData.splice(0,1);
-            timeData.splice(0,1);
+        for (let i = 0; i < this.overviewMetrics.length; i++){
+            let metric = this.overviewMetrics[i];
+            let metricDataKeys = [metric].concat(["index"]);
+            if (metric === "result") {
+                metricDataKeys.push("SPACER_num_invariants");
+            }
+            let totalData = this.state.customData[metric].concat(this.filterDictionary(metricDataKeys, true, e.target.innerHTML));
+            
+            if (totalData.length > (this.state.graphMax - this.state.graphMin)){
+                totalData.splice(0,1);
+            }
+            let customDataCopy = this.state.customData;
+            customDataCopy[metric] = totalData;
+            this.setState({
+                customData: customDataCopy
+            });
         }
-        this.setState({
-            depthData: depthData,
-            resultData: resultData,
-            memoryData: memoryData,
-            timeData: timeData
-        });
     }
     
     setZoomView(type: string) {
@@ -249,23 +260,11 @@ class Dashboard extends React.Component<any, any> {
     render() {
         let benchmarks = d3.map(this.state.data, function(d) {return d.index;}).keys();
         let selectedBenchmark = this.state.selectedBenchmark;
-        let depthData, resultsData, memoryData, timeData, timeZoomData;
+        let timeZoomData;
         if (this.state.zoomMode === "time") {
             let timeKeys = Object.keys(this.state.data[0]).filter(x => x.includes("time"));
             timeKeys.push("index");
             timeZoomData = this.filterDictionary(timeKeys);
-        }
-        if (!this.state.customMode) {
-            depthData = this.filterDictionary(["index", "depth"]);
-            resultsData = this.filterDictionary(["index", "result", "SPACER_num_invariants"]);
-            memoryData = this.filterDictionary(["index", "memory"]);
-            timeData = this.filterDictionary(["index", "time"]);
-        }
-        else {
-            depthData = this.state.depthData;
-            resultsData = this.state.resultData;
-            memoryData = this.state.memoryData;
-            timeData = this.state.timeData;
         }
         return (
           <div className="page">
@@ -281,7 +280,7 @@ class Dashboard extends React.Component<any, any> {
               {this.state.customMode &&
               <div className="sidebar" id="sidebar">
                   {benchmarks.map((name, key ) => {
-                      if (this.state.depthData.filter(d => d.index === name).length > 0){
+                      if (this.state.customData.depth.filter(d => d.index === name).length > 0){
                           return (<li className="selected" key={key} onClick={this.addToCustomData.bind(this)}>{name}</li>);
                       }
                       return (<li key={key} onClick={this.addToCustomData.bind(this)}>{name}</li>);
@@ -294,24 +293,47 @@ class Dashboard extends React.Component<any, any> {
                   />}
                   {this.state.selectedBenchmark === "" && this.state.zoomMode === "" &&
                   <div className="dashboard">
-                      <DepthOverview
-                          data={depthData}
-                          config={this.state.dashboardConfig}
-                      />
-                      <MemoryOverview
-                          data={memoryData}
-                          config={this.state.dashboardConfig}
-                      />
-                      <TimeOverview
-                          data={timeData}
-                          config={this.state.dashboardConfig}
-                          timeZoom={this.setZoomView.bind(this, "time")}
-                      />
-                      <ResultsOverview
-                          data={resultsData}
-                          config={this.state.dashboardConfig}
-                          selectBenchmark={this.handleSidebarClick.bind(this, "dot")}
-                      />
+                      {this.overviewMetrics.map((type, key) => {
+                          let data;
+                          if (this.state.customMode) {
+                              data = this.state.customData[type];
+                              if (type === "result"){
+                                  return (
+                                      <ResultsOverview
+                                          key={key}
+                                          data={data}
+                                          config={this.state.dashboardConfig}
+                                          selectBenchmark={this.handleSidebarClick.bind(this, "dot")}
+                                      />
+                                  );
+                                  
+                              }
+                          }
+                          else if (type === "result"){
+                              data = this.filterDictionary([type].concat(["index", "SPACER_num_invariants"]));
+                              return (
+                                  <ResultsOverview
+                                      key={key}
+                                      data={data}
+                                      config={this.state.dashboardConfig}
+                                      selectBenchmark={this.handleSidebarClick.bind(this, "dot")}
+                                  />
+                              );
+                          }
+                          else {
+                              data = this.filterDictionary(["index"].concat([type]));
+                          }
+                          return (
+                              <BarGraphOverview
+                                  key={key}
+                                  data={data}
+                                  config={this.state.dashboardConfig}
+                                  className={type + "-overview"}
+                                  classText={type + "-text"}
+                                  yValue={type}
+                              />
+                          );
+                      })}
                       <div className="overview-tooltip">
                       </div>
                       <img className="left-arrow" src={arrow} alt="left-arrow" onClick={this.handleGraphTranslation.bind(this)}/>
