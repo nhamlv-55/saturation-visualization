@@ -1,4 +1,4 @@
-import {toReadable} from "./readable";
+import {getOp, reorder, replaceVarNames, toReadable} from "./readable";
 
 const styleTemplates = require('../resources/styleTemplates');
 
@@ -69,9 +69,11 @@ export function buildExprMap(tree: any, varList: string[]): any{
     let ExprMap = new Map<number, Object>();
     for (const nodeID in tree) {
         const node = tree[nodeID];
+        let readable = toReadable(node.expr, varList);
         ExprMap[node.exprID] = {
-            sexpr: node.expr,
-            readable: toReadable(node.expr, varList),
+            sexpr: replaceVarNames(node.expr, varList),
+            readable: readable,
+            edited: reorder(readable, [], [], getOp(readable)),
             rhs: [],
             lhs: []
         };

@@ -21,7 +21,14 @@ type Props = {
     layout: string,
     expr_layout: "SMT"|"JSON"
 };
-class Aside extends React.Component<Props, {}> {
+class Aside extends React.Component<Props, any> {
+    constructor(props) {
+        super(props);
+        this.state = {
+            userPreferences: [[], []]
+        }
+    }
+    
 
     createButton(title, onClick, svg) {
         return <button
@@ -33,6 +40,21 @@ class Aside extends React.Component<Props, {}> {
             </svg>
         </button>;
     }
+    updateUserPreferences(index) {
+        let rhs = this.state.userPreferences[0];
+        let lhs = this.state.userPreferences[1];
+        if (rhs.includes(index)){
+            rhs.splice(rhs.indexOf(index), 1);
+        } 
+        else {
+            rhs.push(index);
+        }
+        
+        this.setState({
+            userPreferences: [rhs, lhs]
+        });
+        
+    } 
 
     getNodeDetails() {
         if (this.props.nodeSelection.length >= 1  && this.props.tree != null) {
@@ -46,6 +68,8 @@ class Aside extends React.Component<Props, {}> {
                        ExprMap = { this.props.ExprMap }
                        layout = { this.props.layout }
                        expr_layout ={this.props.expr_layout}
+                       userPreferences={this.state.userPreferences}
+                       updateUserPreferences={this.updateUserPreferences.bind(this)}
             />;
         } else {
             return <section className={ 'component-node-details overview' }>
@@ -57,7 +81,7 @@ class Aside extends React.Component<Props, {}> {
     }
 
     render() {
-        console.log(this.props.mode)
+        console.log(this.props.mode);
         return(
             <aside>
                 <article>
