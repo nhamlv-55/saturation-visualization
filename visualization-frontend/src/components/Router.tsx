@@ -4,6 +4,7 @@ import { AppWrapper } from './AppWrapper'
 import { Menu } from './Menu';
 import { RouteComponentProps } from 'react-router';
 import Dashboard from "./Dashboard";
+import DashboardLanding from "./DashboardLanding";
 type State = {
     problem: string,
     problemName: string,
@@ -12,6 +13,7 @@ type State = {
     nonStrictForNegatedStrictInequalities: boolean,
     orientClauses: boolean
     varNames: string
+    rawData: Object[]
 }
 
 export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, State> {
@@ -23,7 +25,8 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
         hideBracketsAssoc: true,
         nonStrictForNegatedStrictInequalities: true,
         orientClauses: true,
-        varNames: ""
+        varNames: "",
+        rawData: []
     };
 
     render() {
@@ -52,11 +55,13 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
                 <Route path="/iterative/" render={() => 
                     this.appComponent("iterative", "")
                 }/>
-                <Route path="/dashboard/" render={() =>
+                <Route exact path="/dashboard/" render={() =>
                     <Dashboard />
                 }/>
-                <Route path="/dashboard/benchmarks" render={() =>
-                    <Dashboard />
+                <Route exact path="/dashboard/test" render={() =>
+                    <DashboardLanding 
+                        updateData={this.changeRawData.bind(this)}
+                    />
                 }/>
             </HashRouter>
         );
@@ -98,6 +103,15 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
     changeVariables(newValue: string){
         this.setState({
             varNames: newValue
+        });
+    }
+    
+    changeRawData(newValue: Object){
+        console.log(newValue);
+        let currentList = this.state.rawData;
+        let newList = currentList.concat([newValue]);
+        this.setState({
+            rawData: newList
         });
     }
 }

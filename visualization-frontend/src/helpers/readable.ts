@@ -11,7 +11,7 @@ const negateMap = {
     "||": "&&"
 };
 
-const logSym = ["&&", "||"];
+const logSym = ["&&", "||", "->"];
 
 export function toReadable(expr, varList) {
     if (expr[0] !== "("){
@@ -69,7 +69,7 @@ function parseResult(lst, sep) {
 
     //actual place where logical symbol gets placed between clauses
     if (sep !== "") {
-        return parseResult(lst[0], "") + " " + sep + parseResult(lst.splice(1), sep);
+        return parseResult(lst[0], "") + " " + sep + "\n" + parseResult(lst.splice(1), sep);
     }
 
     //handler for negative numbers which come in the form (- x)
@@ -85,7 +85,7 @@ function parseResult(lst, sep) {
     return lst;
 }
 
-function replaceVarNames(expr, varList) {
+export function replaceVarNames(expr, varList) {
     if (typeof expr === "string") {
         let newList = varList.split(" ");
         for (let i = 0; i < newList.length; i++) {
@@ -108,7 +108,7 @@ export function reorder(expr, rhs, lhs, op){
                 result = negate(exprList[i]) + result;
             }
             else {
-                result = negate(exprList[i]) + " " + negateMap[op] + " " + result;
+                result = negate(exprList[i]) + " " + negateMap[op] + "\n" + result;
             }
             rhsFinal.push(i);
             
@@ -120,63 +120,12 @@ export function reorder(expr, rhs, lhs, op){
             }
             else {
                 if (lhsFinal.length === 0) {
-                    result = result + " -> " + exprList[i];
+                    result = result + " ->\n" + exprList[i];
                 }
                 else {
                     result = result + " " + op + " " + exprList[i]
                 }
                lhsFinal.push(i); 
-            }
-        }
-    }
-    return result;
-}
-
-function detectReorderPattern(expr, userExpr){
-    if (userExpr.includes("->")) {
-        let userExprClauses = userExpr.split("->");
-        let leftSideExprs = getLiterals(userExprClauses[0]);
-        let rightSideExprs = getLiterals(userExprClauses[1]);
-        
-        
-        
-        let exprList
-    }
-}
-
-function getLiterals(expr) {
-    for (let sym in logSym){
-        if (expr.includes(sym)) {
-            return expr.split(sym);
-        }
-    }
-}
-
-function equivalence(expr, reorder:number) {
-    let sym = "";
-    for (let i = 0; i < logSym.length; i++) {
-        if (expr.includes(logSym[i])){
-            sym = logSym[i];
-            break;
-        }
-    }
-    let result = "";
-    if (typeof expr === "string") {
-        let exprList = expr.split(sym);
-        if (reorder >= 0 && reorder < exprList.length) {
-            for (let i = 0; i < exprList.length; i++) {
-                if (i < reorder) {
-                    result += negate(exprList[i]) + " " + negateMap[sym] + " ";
-                }
-                else if (i === reorder){
-                    result += negate(exprList[i]) + " -> ";
-                }
-                else if (i === exprList.length - 1){
-                    result += exprList[i];
-                }
-                else {
-                    result += exprList[i] + " " + sym + " ";
-                }
             }
         }
     }
@@ -199,16 +148,22 @@ export function getOp(expr) {
 
 export function getIndexOfLiteral(exprList, literal){
     for (let i = 0; i < exprList.length; i++){
-        if (literal === exprList[i]){
+        exprList[i] = exprList[i].trim();
+        if (literal === exprList[i] || literal === negate(exprList[i])){
             return i;            
         }
     }
+    return -1;
 }
 
-export function getCleanExprList(expr){
-    let exprList = expr.split(getOp(expr));
+export function getCleanExprList(expr, sep) {
+    let exprList = expr.split(sep);
+    let resultExprList = [];
     for (let i = 0; i < exprList.length; i++){
-        exprList[i] = exprList[i].trim();
+        if (exprList[i] === "") {
+            // @ts-ignore
+            resultExprList.push(exprList[i].trim());
+        }
     }
     
     return exprList;
@@ -227,4 +182,11 @@ export function getProcesses(literal) {
 export function getProcessVariables(literal) {
     let regex = /([a-zA-Z]+\[[0-9]+\])/g;
     return literal.match(regex);
+}
+
+export function cleanExprOperators(expr) {
+    for (let i = 0; i < logSym.length; i++){
+       expr = expr.replace(logSym[i], ""); 
+    }
+    return expr;
 }

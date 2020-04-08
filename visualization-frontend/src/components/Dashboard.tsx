@@ -2,16 +2,13 @@ import * as React from 'react';
 import './../styles/Dashboard.css';
 import * as d3 from 'd3';
 import IndividualBenchmark from "./DashboardComponents/IndividualBenchmark";
-import DepthOverview from "./DashboardComponents/DepthOverview";
-import MemoryOverview from "./DashboardComponents/MemoryOverview";
 import ResultsOverview from "./DashboardComponents/ResultsOverview";
-import TimeOverview from "./DashboardComponents/TimeOverview";
 import arrow from './../resources/icons/singles/angle-arrow-down.svg'
 import TimeZoom from "./DashboardComponents/TimeZoom";
 import BarGraphOverview from "./DashboardComponents/BarGraphOverview";
 
 class Dashboard extends React.Component<any, any> {
-    private overviewMetrics: string[];
+    private readonly overviewMetrics: string[];
     constructor(props: any) {
         super(props);
         this.overviewMetrics = ["depth", "memory", "time", "result"];
