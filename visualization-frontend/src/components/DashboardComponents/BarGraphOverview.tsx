@@ -11,7 +11,7 @@ class BarGraphOverview extends React.Component<any, any> {
     }
     
     createGraph() {
-        d3. select("." + this.props.className + "svg").remove();
+        d3. select("." + this.props.className + " svg").remove();
         
         if (this.props.data.length === 0) return;
         let data = this.props.data;
@@ -46,7 +46,7 @@ class BarGraphOverview extends React.Component<any, any> {
             .attr("x", this.props.config.width / 2)
             .attr("y", this.props.config.margin.top)
             .attr("text-anchor", "middle")
-            .style("font-size", "20px")
+            .style("font-size", this.props.config.font.title)
             .style("text-decoration", "underline")
             .text("Index x " + potholeToNormal(this.props.yValue));
         svg.append("g")
@@ -56,10 +56,10 @@ class BarGraphOverview extends React.Component<any, any> {
         svg.append("g")
             .attr("class", "y-axis")
             .attr("transform", "translate(" + this.props.config.margin.left + ",0)")
-            .style("font-size", "20px")
+            .style("font-size", this.props.config.font.axis)
             .call(yAxis);
         let g = svg.append("g");
-        console.log(this.props.yValue);
+        
         g.selectAll(".bar")
             .data(data)
             .enter()
@@ -68,37 +68,17 @@ class BarGraphOverview extends React.Component<any, any> {
             .attr("x", xMap)
             .attr("y", yMap)
             .attr("width", xScale.bandwidth() - 1)
-            .on("mouseenter", function(d) {
-                d3.select(".overview-tooltip")
-                    .append("text")
-                    .text(d.index);
-            })
-            .on("mouseout", function(d) {
-                d3.select(".overview-tooltip")
-                    .select("text")
-                    .remove();
-            })
             .attr("height", function(this,d) {return (this.props.config.graphHeight - this.props.config.margin.top - yScale(d[this.props.yValue]))}.bind(this));
 
         g.selectAll("." + this.props.classText)
             .data(data)
             .enter()
             .append("text")
-            .style("font-size", "18px")
+            .style("font-size", this.props.config.font.label)
             .attr("class", "label")
             .attr("x", function(d) {return xMap(d)})
             .attr("y", function(d) {return yMap(d) - 15})
             .attr("dy", ".75em")
-            .on("mouseenter", function(d) {
-                d3.select(".overview-tooltip")
-                    .append("text")
-                    .text(d.index);
-            })
-            .on("mouseout", function(d) {
-                d3.select(".overview-tooltip")
-                    .select("text")
-                    .remove();
-            })
             .text(function(this,d) {return d[this.props.yValue]}.bind(this));
     }
     render() {
