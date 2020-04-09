@@ -96,15 +96,6 @@ body {
     fill: steelblue;     
 }
 
-.overview-tooltip {
-    position: absolute;
-    left: 55%;
-    top: 3%;
-    transform: translate(-50%);
-    font-weight: bold;
-    font-size: 20px;
-}
-
 .left-arrow {
     transform: translate(0%, -50%) rotate(90deg);
     height: 5%;

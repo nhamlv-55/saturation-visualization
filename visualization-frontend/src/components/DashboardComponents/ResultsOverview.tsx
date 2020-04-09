@@ -54,7 +54,7 @@ class ResultsOverview extends React.Component<any, any> {
             .attr("x", this.props.config.width / 2)
             .attr("y", this.props.config.margin.top)
             .attr("text-anchor", "middle")
-            .style("font-size", "20px")
+            .style("font-size", this.props.config.font.title)
             .style("text-decoration", "underline")
             .text("Index x Result x Num of Invariants");
         svg.append("g")
@@ -64,7 +64,7 @@ class ResultsOverview extends React.Component<any, any> {
         svg.append("g")
             .attr("class", "y-axis")
             .attr("transform", "translate(" + this.props.config.margin.left + ",0)")
-            .style("font-size", "20px")
+            .style("font-size", this.props.config.font.axis)
             .call(yAxis);
         let g = svg.append("g");
         g.selectAll(".dot")
@@ -91,20 +91,10 @@ class ResultsOverview extends React.Component<any, any> {
             .enter()
             .append("text")
             .attr("class", "label")
-            .style("font-size", "18px")
+            .style("font-size", this.props.config.font.label)
             .attr("x", function(d) {return xMap(d) + (xScale.bandwidth() / 4)})
             .attr("y", function(d) {return yMap(d) - 25})
             .attr("dy", ".75em")
-            .on("mouseenter", function(d) {
-                d3.select(".overview-tooltip")
-                    .append("text")
-                    .text(d.index);
-            })
-            .on("mouseout", function(d) {
-                d3.select(".overview-tooltip")
-                    .select("text")
-                    .remove();
-            })
             .text(function(d) {return d.SPACER_num_invariants});
         g.selectAll("legendDots")
             .data(results)

@@ -35,6 +35,11 @@ class Dashboard extends React.Component<any, any> {
                     bottom: 50,
                     left: 60
                 },
+                font: {
+                    title: "20px",
+                    axis: "20px",
+                    label: "14px"
+                },
                 barNum: 10
             }
         };
@@ -331,8 +336,6 @@ class Dashboard extends React.Component<any, any> {
                               />
                           );
                       })}
-                      <div className="overview-tooltip">
-                      </div>
                       <img className="left-arrow" src={arrow} alt="left-arrow" onClick={this.handleGraphTranslation.bind(this)}/>
                       <img className="right-arrow" src={arrow} alt="right-arrow" onClick={this.handleGraphTranslation.bind(this)}/>
                   </div>}
