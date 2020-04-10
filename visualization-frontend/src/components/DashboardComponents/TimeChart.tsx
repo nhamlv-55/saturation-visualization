@@ -71,11 +71,11 @@ class TimeChart extends React.Component<any, any> {
     
     createSunburst() {
         if (!this.props.type) d3.select(".sunburst-viz").remove();
+        if (this.props.type) d3.select("." + this.props.className + " .sunburst-viz").remove();
         let colour = d3.scaleOrdinal()
             .domain(Object.keys(this.props.data))
             .range(this.palette);
         let data = this.getData(this.prepareData());
-        console.log(data);
         // @ts-ignore
         const myChart = SunburstChart();
         myChart.data(data[0])(document.getElementById(this.props.className))

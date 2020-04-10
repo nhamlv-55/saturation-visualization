@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { NavigationBar } from "./NavigationBar";
 import App from "./App";
 import '../styles/AppWrapper.css';
 

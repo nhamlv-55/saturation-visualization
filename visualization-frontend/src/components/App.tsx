@@ -5,7 +5,6 @@ import Main from './Main';
 import Aside from './Aside';
 import '../styles/App.css';
 import { assert } from '../model/util';
-import {toReadable} from "../helpers/readable";
 import {buildExprMap, buildPobLemmasMap} from "../helpers/network";
 
 type Props = {

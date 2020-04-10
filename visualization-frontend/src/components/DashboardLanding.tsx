@@ -2,10 +2,6 @@ import * as React from 'react';
 
 class DashboardLanding extends React.Component<any, any> {
     private fileReader: any;
-    constructor(props) {
-        super(props);
-        
-    }
     handleFileRead(file) {
         const content = this.fileReader.result;
         let returnObject = {

@@ -27,7 +27,7 @@ class Dashboard extends React.Component<any, any> {
             zoomMode: "",
             dashboardConfig: {
                 height: 450,
-                width: 1500,
+                width: 1600,
                 graphHeight: 400,
                 margin: {
                     top: 20,
@@ -166,6 +166,7 @@ class Dashboard extends React.Component<any, any> {
     
     handleGraphTranslation(e) {
         if (e.target.alt === "left-arrow" || e.keyCode === 37){
+            e.preventDefault();
             if (this.state.graphMin > 0){
                 this.setState({
                     graphMin: this.state.graphMin - 1,
@@ -174,6 +175,7 @@ class Dashboard extends React.Component<any, any> {
             }
         }
         else if (e.target.alt === "right-arrow" || e.keyCode === 39) {
+            e.preventDefault();
             if (this.state.graphMax < this.state.data.length - 1 ){
                 this.setState({
                     graphMin: this.state.graphMin + 1,
@@ -182,6 +184,7 @@ class Dashboard extends React.Component<any, any> {
             }
         }
         else if (e.keyCode === 40) {
+            e.preventDefault();
             if (this.state.graphMax + 10 < this.state.data.length){
                 this.setState({
                     graphMin: this.state.graphMin + 10,
@@ -190,6 +193,7 @@ class Dashboard extends React.Component<any, any> {
             }
         }
         else if (e.keyCode === 38) {
+            e.preventDefault();
             if (this.state.graphMin - 10 >= 0 ){
                 this.setState({
                     graphMin: this.state.graphMin - 10,
@@ -255,7 +259,7 @@ class Dashboard extends React.Component<any, any> {
         this.setState({
             zoomMode: type, 
             graphMin: 0,
-            graphMax: 21
+            graphMax: 49
         });
     }
     
@@ -270,24 +274,31 @@ class Dashboard extends React.Component<any, any> {
         }
         return (
           <div className="page">
-              {!this.state.customMode && 
                   <div className="sidebar" id="sidebar">
                   {benchmarks.map((name, key ) => {
-                      if (key >= this.state.graphMin && key < this.state.graphMax){
-                          return (<li className="selected" key={key} onClick={this.handleSidebarClick.bind(this, "sidebar")}>{name}</li>);
+                      if (this.state.customMode){
+                          if (this.state.customData.depth.filter(d => d.index === name).length > 0){
+                              return (<li className="selected" key={key} onClick={this.addToCustomData.bind(this)}>{name}</li>);
+                          }
+                          return (<li key={key} onClick={this.addToCustomData.bind(this)}>{name}</li>);
                       }
-                      return (<li key={key} onClick={this.handleSidebarClick.bind(this, "sidebar")}>{name}</li>);
-                  })}
-              </div>}
-              {this.state.customMode &&
-              <div className="sidebar" id="sidebar">
-                  {benchmarks.map((name, key ) => {
-                      if (this.state.customData.depth.filter(d => d.index === name).length > 0){
-                          return (<li className="selected" key={key} onClick={this.addToCustomData.bind(this)}>{name}</li>);
+                      else if (selectedBenchmark) {
+                          if (name === selectedBenchmark) {
+                              return (<li className="selected" key={key}
+                                          onClick={this.handleSidebarClick.bind(this, "sidebar")}>{name}</li>);
+                          }
+                          return (<li key={key} onClick={this.handleSidebarClick.bind(this, "sidebar")}>{name}</li>);
+                          
                       }
-                      return (<li key={key} onClick={this.addToCustomData.bind(this)}>{name}</li>);
+                      else {
+                          if (key >= this.state.graphMin && key < this.state.graphMax) {
+                              return (<li className="selected" key={key}
+                                          onClick={this.handleSidebarClick.bind(this, "sidebar")}>{name}</li>);
+                          }
+                          return (<li key={key} onClick={this.handleSidebarClick.bind(this, "sidebar")}>{name}</li>);
+                      }
                   })}
-              </div>}
+              </div>
               <div className="visual">
                   {this.state.selectedBenchmark !== "" &&
                   <IndividualBenchmark 
@@ -333,6 +344,7 @@ class Dashboard extends React.Component<any, any> {
                                   className={type + "-overview"}
                                   classText={type + "-text"}
                                   yValue={type}
+                                  updateZoomView={this.setZoomView.bind(this, type === "time" ? "time" : "")}
                               />
                           );
                       })}
