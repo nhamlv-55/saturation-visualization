@@ -107,7 +107,6 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
     }
     
     changeRawData(newValue: Object){
-        console.log(newValue);
         let currentList = this.state.rawData;
         let newList = currentList.concat([newValue]);
         this.setState({

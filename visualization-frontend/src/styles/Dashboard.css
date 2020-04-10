@@ -20,7 +20,7 @@ body {
 }
 
 .sidebar {
-    height: 215vh;
+    height: 200vh;
     overflow: scroll;
     width: 10%;
 }
@@ -97,13 +97,19 @@ body {
 }
 
 .left-arrow {
-    transform: translate(0%, -50%) rotate(90deg);
+    position: absolute;
+    transform: rotate(90deg);
     height: 5%;
+    right: 4%;
+    top: 15%;
     
 }
 .right-arrow {
-    transform: translate(0%, -50%) rotate(-90deg);
+    position: absolute;
+    transform: rotate(-90deg);
     height: 5%;
+    top: 15%;
+    right: 1%;
 }
 
 .left-arrow:hover {

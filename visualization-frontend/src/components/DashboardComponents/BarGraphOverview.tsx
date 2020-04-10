@@ -41,7 +41,8 @@ class BarGraphOverview extends React.Component<any, any> {
         let svg = d3.select("." + this.props.className)
             .append("svg")
             .attr("width", this.props.config.width)
-            .attr("height", this.props.config.height);
+            .attr("height", this.props.config.height)
+            .on ("click", this.props.updateZoomView);
         svg.append("text")
             .attr("x", this.props.config.width / 2)
             .attr("y", this.props.config.margin.top)

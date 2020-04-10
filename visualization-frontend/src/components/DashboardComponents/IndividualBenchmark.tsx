@@ -4,8 +4,12 @@ import {potholeToNormal} from "../../helpers/naming";
 
 class IndividualBenchmark extends React.Component<any, any> {
     componentDidMount() {
+        console.log(this.props.data);
     }
-    
+    componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any): void {
+        console.log(this.props.data);
+    }
+
     filterTimeData() {
         return Object.keys(this.props.data)
             .filter(function(d) {return d.includes("time")})

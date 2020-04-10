@@ -15,7 +15,6 @@ class TimeZoom extends React.Component<any, any> {
         return (
             <div>
                 {this.props.data.map((instance, key) => {
-                    console.log(instance);
                     return (
                         <TimeChart
                             key={key}
