@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import '../styles/NodeMenu.css';
 import NodeDetails from './NodeDetails';
+import {getProcessVariables} from "../helpers/readable";
 const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
@@ -21,11 +22,18 @@ type Props = {
     layout: string,
     expr_layout: "SMT"|"JSON"
 };
-class Aside extends React.Component<Props, any> {
+
+type State = {
+    userPreferences: {lhs: string[], rhs: string[]}
+}
+class Aside extends React.Component<Props, State> {
     constructor(props) {
         super(props);
         this.state = {
-            userPreferences: [[], []]
+            userPreferences: {
+                lhs: [], 
+                rhs: []
+            }
         }
     }
     
@@ -40,18 +48,24 @@ class Aside extends React.Component<Props, any> {
             </svg>
         </button>;
     }
-    updateUserPreferences(index) {
-        let rhs = this.state.userPreferences[0];
-        let lhs = this.state.userPreferences[1];
-        if (rhs.includes(index)){
-            rhs.splice(rhs.indexOf(index), 1);
-        } 
-        else {
-            rhs.push(index);
-        }
+    updateUserPreferences(literal: string) {
+        let lhs = this.state.userPreferences.lhs;
+        let variables = getProcessVariables(literal);
         
+        for (let i = 0; i < variables.length; i++) {
+            if (lhs.includes(variables[i])){
+                lhs.splice(lhs.indexOf(variables[i]), 1);
+            }
+            else {
+                lhs.push(variables[i]);
+            }
+        }
+        let userPreferences = {
+            lhs: lhs,
+            rhs: this.state.userPreferences.rhs
+        };
         this.setState({
-            userPreferences: [rhs, lhs]
+            userPreferences: userPreferences
         });
         
     } 

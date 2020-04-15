@@ -96,36 +96,39 @@ export function replaceVarNames(expr, varList) {
     return expr;
 }
 
-export function reorder(expr, rhs, lhs, op){
+export function reorder(expr, lhs, rhs, op){
     if (typeof expr !== "string") return expr;
-    let rhsFinal:Number[] = [];
     let lhsFinal:Number[] = [];
+    let rhsFinal:Number[] = [];
     let exprList = expr.split(op);
     let result = "";
     for (let i = 0; i < exprList.length; i++){
-        if (rhs.indexOf(i) > -1) {
-            if (rhsFinal.length === 0){
+        if (lhs.indexOf(i) > -1) {
+            if (lhsFinal.length === 0){
                 result = negate(exprList[i]) + result;
             }
             else {
                 result = negate(exprList[i]) + " " + negateMap[op] + "\n" + result;
             }
-            rhsFinal.push(i);
+            lhsFinal.push(i);
             
         }
         else {
-            if (i === exprList.length - 1 && rhsFinal.length === 0) {
-                result = negate(exprList[i]) + result;
-                rhsFinal.push(i);
+            if (rhsFinal.length === 0) {
+                result = result + " ->\n" + exprList[i];
             }
             else {
-                if (lhsFinal.length === 0) {
-                    result = result + " ->\n" + exprList[i];
-                }
-                else {
-                    result = result + " " + op + " " + exprList[i]
-                }
-               lhsFinal.push(i); 
+                result = result + " " + op + " " + exprList[i]
+            }
+           rhsFinal.push(i); 
+        }
+        
+        if (i === exprList.length - 1) {
+            if (lhsFinal.length === 0) {
+                result = "true " + result
+            }
+            if (rhsFinal.length === 0) {
+                result = result + " ->\nfalse"
             }
         }
     }
@@ -189,4 +192,17 @@ export function cleanExprOperators(expr) {
        expr = expr.replace(logSym[i], ""); 
     }
     return expr;
+}
+
+export function getVarIndices(varList: string[], exprList: string[]) {
+    let result:number[] = [];
+    for (let i = 0; i < varList.length; i++){
+        for (let j = 0; j < exprList.length; j++){
+            if (exprList[j].includes(varList[i])){
+                result.push(j);
+            }
+        }
+    }
+    return result;
+    
 }

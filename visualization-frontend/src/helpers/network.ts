@@ -16,7 +16,7 @@ export const lemmaColours = [
 ];
 
 //BUILD POB LEMMAS MAP////////////////////
-export function buildPobLemmasMap(tree: any): any{
+export function buildPobLemmasMap(tree: any, varList: string[]): any{
     // construct exprID->expr map
     let ExprMap = new Map<number, string>();
     for (const nodeID in tree) {
@@ -69,14 +69,7 @@ export function buildExprMap(tree: any, varList: string[]): any{
     let ExprMap = new Map<number, Object>();
     for (const nodeID in tree) {
         const node = tree[nodeID];
-        let readable = toReadable(node.expr, varList);
-        ExprMap[node.exprID] = {
-            sexpr: replaceVarNames(node.expr, varList),
-            readable: readable,
-            edited: reorder(readable, [], [], getOp(readable)),
-            rhs: [],
-            lhs: []
-        };
+        ExprMap[node.exprID] = node.expr;
     }
     return ExprMap
 

@@ -128,3 +128,13 @@ body {
 .memory-overview, .time-overview {
     display: inline-block;
 } 
+
+.file-list {
+    width: 30%;
+    padding: 10px;
+    margin: 10px;
+}
+
+.file-list li {
+    list-style: none;
+}

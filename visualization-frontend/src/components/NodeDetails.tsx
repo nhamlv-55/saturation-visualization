@@ -6,8 +6,7 @@ import {lemmaColours} from "../helpers/network";
 import {
     cleanExprOperators,
     getCleanExprList,
-    getIndexOfLiteral,
-    getOp, reorder
+    getOp, getVarIndices, reorder
 } from "../helpers/readable";
 type Props = {
     nodes: any,
@@ -15,8 +14,8 @@ type Props = {
     ExprMap: {},
     layout: string,
     expr_layout: "SMT"|"JSON",
-    userPreferences: number[][],
-    updateUserPreferences: (index: number) => void,
+    userPreferences: {lhs: string[], rhs: string[]}
+    updateUserPreferences: (literal: string) => void,
     
 };
 
@@ -74,19 +73,25 @@ export default class NodeDetails extends React.Component<Props, {}> {
                     };
                     lemma_list.push(<h3 style={lemmaStyle} key={"lemma-header-"+ lemma[0]}>ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h3>);
                     let expr = this.props.ExprMap[lemma[0]].readable;
-                    let rhs = this.props.userPreferences[0];
-                    let lhs = this.props.userPreferences[1];
-                    expr = reorder(expr, rhs, lhs, getOp(expr));
-                    let exprList = getCleanExprList(expr, "\n");
-                    exprList.map((literal, key) => {
-                        if (key !== exprList.length - 1) {
-                            lemma_list.push(<pre onClick={this.addLemma.bind(this, lemma[0])} key={"lemma-expr-"+lemma[0] + key}>{literal}</pre>);
-                        }
-                        else {
-                            lemma_list.push(<pre onClick={this.addLemma.bind(this, lemma[0])}
-                                                 key={"lemma-expr-" + lemma[0] + key}>{literal}</pre>);
-                        }
-                    });
+                    if (typeof expr === "string"){
+                        let initialExprList = getCleanExprList(expr, "\n");
+                        let varLHS = this.props.userPreferences.lhs;
+                        let lhs = getVarIndices(varLHS, initialExprList);
+                        expr = reorder(expr, lhs, [], getOp(expr));
+                        let exprList = getCleanExprList(expr, "\n");
+                        exprList.map((literal, key) => {
+                            if (key !== exprList.length - 1) {
+                                lemma_list.push(<pre onClick={this.addLemma.bind(this, lemma[0])} key={"lemma-expr-"+lemma[0] + key}>{literal}</pre>);
+                            }
+                            else {
+                                lemma_list.push(<pre onClick={this.addLemma.bind(this, lemma[0])}
+                                                     key={"lemma-expr-" + lemma[0] + key}>{literal}</pre>);
+                            }
+                        });
+                    }
+                    else {
+                        lemma_list.push(<pre>{expr}</pre>);
+                    }
                 }
             }
         }
@@ -94,14 +99,9 @@ export default class NodeDetails extends React.Component<Props, {}> {
     }
     
     addLemma(lemmaId, e) {
-        let exprInfo = this.props.ExprMap[lemmaId];
-        let exprOp = getOp(exprInfo.readable);
         let literal = (cleanExprOperators(e.target.innerText));
         literal = literal.trim();
-        let index = getIndexOfLiteral(getCleanExprList(exprInfo.readable, exprOp), literal);
-        console.log(index);
-        console.log(literal);
-        this.props.updateUserPreferences(index);
+        this.props.updateUserPreferences(literal);
         
     }
     
@@ -130,7 +130,8 @@ export default class NodeDetails extends React.Component<Props, {}> {
 
                     let expr = "";
                     if (this.props.expr_layout==="SMT") {
-                        expr = node.expr
+                        console.log(node.expr);
+                        expr = node.expr.readable;
                     }
                     else {
                         /* expr = JSON.stringify(this.props.node.ast_json, null, 2); */

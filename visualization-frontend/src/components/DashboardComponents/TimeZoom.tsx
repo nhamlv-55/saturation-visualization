@@ -8,8 +8,6 @@ class TimeZoom extends React.Component<any, any> {
             data: []
         }
     }
-    componentDidMount() {
-    }
     
     render() {
         return (

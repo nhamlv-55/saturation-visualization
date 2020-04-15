@@ -6,6 +6,7 @@ import Aside from './Aside';
 import '../styles/App.css';
 import { assert } from '../model/util';
 import {buildExprMap, buildPobLemmasMap} from "../helpers/network";
+import {toReadable} from "../helpers/readable";
 
 type Props = {
     name: string,
@@ -83,11 +84,21 @@ class App extends Component<Props, State> {
 
         try {
             const json = await fetchedJSON.json();
-            console.log("backend response:", json)
+            console.log("backend response:", json);
             if (json.status === "success") {
                 let tree = json.nodes_list;
+                for (let i = 0; i < Object.keys(tree).length; i++){
+                    let readable = toReadable(tree[i].expr, json.var_names);
+                    tree[i].expr = {
+                        raw: tree[i].expr,
+                        readable: readable,
+                        edited: readable,
+                        rhs: [],
+                        lhs: []
+                    };
+                }
                 const state = "loaded";
-                const PobLemmasMap = buildPobLemmasMap(tree);
+                const PobLemmasMap = buildPobLemmasMap(tree, json.var_names);
                 // NOTE: use varNames in state, not in props. The one in state is returned by the backend.
                 const ExprMap = buildExprMap(tree, json.var_names);
                 this.setState({
@@ -180,8 +191,7 @@ class App extends Component<Props, State> {
             this.setState({nodeSelection: nodeSelection});
         }
     }
-
-
+    
     updateCurrentTime(currentTime: number) {
         const trees = this.state.trees
         assert(trees.length > 0);
