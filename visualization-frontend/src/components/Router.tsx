@@ -13,7 +13,7 @@ type State = {
     nonStrictForNegatedStrictInequalities: boolean,
     orientClauses: boolean
     varNames: string
-    rawData: Object[]
+    rawData: {name: string, id: string, content: string}[]
 }
 
 export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, State> {
@@ -56,12 +56,13 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
                     this.appComponent("iterative", "")
                 }/>
                 <Route exact path="/dashboard/" render={() =>
-                    <Dashboard />
-                }/>
-                <Route exact path="/dashboard/test" render={() =>
                     <DashboardLanding 
+                        rawData={this.state.rawData}
                         updateData={this.changeRawData.bind(this)}
                     />
+                }/>
+                <Route path="/dashboard/:fileId" render={({match}) => 
+                    this.displayVisualization(match.params.fileId)
                 }/>
             </HashRouter>
         );
@@ -80,6 +81,17 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
         orientClauses={this.state.orientClauses}
         varNames={this.state.varNames}
         />
+    }
+    
+    displayVisualization(fileId: string) {
+        let rawData = this.state.rawData.filter(x => x.id === fileId)[0];
+        if (rawData) {
+            return (
+                <Dashboard
+                    rawData={rawData.content}
+                />
+            );
+        }
     }
 
     changeProblem(problem: string) {
@@ -106,7 +118,7 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
         });
     }
     
-    changeRawData(newValue: Object){
+    changeRawData(newValue: {name:string, id:string, content:string}){
         let currentList = this.state.rawData;
         let newList = currentList.concat([newValue]);
         this.setState({

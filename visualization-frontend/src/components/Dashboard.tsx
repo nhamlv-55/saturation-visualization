@@ -48,10 +48,11 @@ class Dashboard extends React.Component<any, any> {
         this.loadData();
         document.addEventListener("keydown", this.handleGraphTranslation.bind(this));
     }
+    
 
     loadData() {
-        let file = require("./../resources/files/benchmark-summary.csv");
-        d3.csv(file, function (d) {
+        let file = this.props.rawData;
+        let parsedData = d3.csvParse(file, function (d) {
             d.SPACER_cluster_out_of_gas = +d.SPACER_cluster_out_of_gas;
             d.SPACER_expand_pob_undef = +d.SPACER_expand_pob_undef;
             d.SPACER_inductive_level = +d.SPACER_inductive_level;
@@ -115,12 +116,11 @@ class Dashboard extends React.Component<any, any> {
             d.time_spacer_solve_reach_gen_wide = +d.time_spacer_solve_reach_gen_wide;
             d.time_spacer_solve_reach_is_reach = +d.time_spacer_solve_reach_is_reach;
             return d;
-        }).then(function(this, data)
-        {
-            this.setState({
-                data: data
-            });
-        }.bind(this));
+        });
+        this.setState({
+            data: parsedData
+        })
+        
     }
     
     handleSidebarClick(origin, e) {
@@ -264,6 +264,7 @@ class Dashboard extends React.Component<any, any> {
     }
     
     render() {
+        console.log(this.state.data);
         let benchmarks = d3.map(this.state.data, function(d) {return d.index;}).keys();
         let selectedBenchmark = this.state.selectedBenchmark;
         let timeZoomData;
