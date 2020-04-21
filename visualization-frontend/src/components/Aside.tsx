@@ -2,7 +2,6 @@ import * as React from 'react';
 
 import '../styles/NodeMenu.css';
 import NodeDetails from './NodeDetails';
-import {getProcessVariables} from "../helpers/readable";
 const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
@@ -20,23 +19,11 @@ type Props = {
     PobLemmasMap: {},
     ExprMap: {},
     layout: string,
-    expr_layout: "SMT"|"JSON"
+    expr_layout: "SMT"|"JSON",
+    saveExprs: () => void
 };
 
-type State = {
-    userPreferences: {lhs: string[], rhs: string[]}
-}
-class Aside extends React.Component<Props, State> {
-    constructor(props) {
-        super(props);
-        this.state = {
-            userPreferences: {
-                lhs: [], 
-                rhs: []
-            }
-        }
-    }
-    
+class Aside extends React.Component<Props, any> {
 
     createButton(title, onClick, svg) {
         return <button
@@ -48,28 +35,6 @@ class Aside extends React.Component<Props, State> {
             </svg>
         </button>;
     }
-    updateUserPreferences(literal: string) {
-        let lhs = this.state.userPreferences.lhs;
-        let variables = getProcessVariables(literal);
-        
-        for (let i = 0; i < variables.length; i++) {
-            if (lhs.includes(variables[i])){
-                lhs.splice(lhs.indexOf(variables[i]), 1);
-            }
-            else {
-                lhs.push(variables[i]);
-            }
-        }
-        let userPreferences = {
-            lhs: lhs,
-            rhs: this.state.userPreferences.rhs
-        };
-        this.setState({
-            userPreferences: userPreferences
-        });
-        
-    } 
-
     getNodeDetails() {
         if (this.props.nodeSelection.length >= 1  && this.props.tree != null) {
             let nodes: any[] = [];
@@ -82,8 +47,7 @@ class Aside extends React.Component<Props, State> {
                        ExprMap = { this.props.ExprMap }
                        layout = { this.props.layout }
                        expr_layout ={this.props.expr_layout}
-                       userPreferences={this.state.userPreferences}
-                       updateUserPreferences={this.updateUserPreferences.bind(this)}
+                       saveExprs = {this.props.saveExprs}
             />;
         } else {
             return <section className={ 'component-node-details overview' }>

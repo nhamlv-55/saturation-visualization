@@ -59,7 +59,7 @@ class App extends Component<Props, State> {
             // call Spacer on given input problem
             await this.runSpacer(this.props.problem, this.props.spacerUserOptions, this.props.mode);
         }
-        else{
+        else {
             await this.poke();
         }
     }
@@ -92,15 +92,18 @@ class App extends Component<Props, State> {
                     tree[i].expr = {
                         raw: tree[i].expr,
                         readable: readable,
-                        edited: readable,
-                        rhs: [],
-                        lhs: []
                     };
                 }
                 const state = "loaded";
                 const PobLemmasMap = buildPobLemmasMap(tree, json.var_names);
                 // NOTE: use varNames in state, not in props. The one in state is returned by the backend.
-                const ExprMap = buildExprMap(tree, json.var_names);
+                let ExprMap;
+                if (json.expr_map === "") {
+                    ExprMap = buildExprMap(tree, json.var_names);
+                }
+                else {
+                    ExprMap = JSON.parse(json.expr_map);
+                }
                 this.setState({
                     trees: [tree],
                     runCmd: json.run_cmd,
@@ -130,6 +133,20 @@ class App extends Component<Props, State> {
             });
         }
     }
+    
+    async saveExprMap() {
+        const fetchedJSON = await fetch('http://localhost:5000/spacer/save_exprs', {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }, body : JSON.stringify({
+                exp_path: this.state.exp_path,
+                expr_map: JSON.stringify(this.state.ExprMap)
+            })
+        });
+    }
 
     async runSpacer(problem: string, spacerUserOptions: string, mode: "proof" | "replay" | "iterative") {
         this.setState({
@@ -154,7 +171,7 @@ class App extends Component<Props, State> {
 
         try {
             const json = await fetchedJSON.json();
-            console.log("backend response:", json)
+            console.log("backend response:", json);
             if (json.status === "success") {
                 const state = (mode === "iterative" && json.spacer_state === "running") ? "loaded iterative" : "loaded";
                 const message = "Hit Poke to update graph";
@@ -193,7 +210,7 @@ class App extends Component<Props, State> {
     }
     
     updateCurrentTime(currentTime: number) {
-        const trees = this.state.trees
+        const trees = this.state.trees;
         assert(trees.length > 0);
         this.setState({
             currentTime: currentTime
@@ -292,6 +309,7 @@ class App extends Component<Props, State> {
                     ExprMap = { ExprMap }
                     layout = { layout }
                     expr_layout ={expr_layout}
+                    saveExprs = {this.saveExprMap.bind(this)}
                 />
                 </div>
         );
