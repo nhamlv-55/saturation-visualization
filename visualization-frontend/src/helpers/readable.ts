@@ -96,7 +96,7 @@ export function replaceVarNames(expr, varList) {
     return expr;
 }
 
-export function reorder(expr, lhs, rhs, op){
+export function reorder(expr, lhs, op){
     if (typeof expr !== "string") return expr;
     let lhsFinal:Number[] = [];
     let rhsFinal:Number[] = [];
@@ -141,11 +141,8 @@ function negate(expr) {
 }
 
 export function getOp(expr) {
-    if (expr.includes("&&")) {
-        return "&&";
-    }
-    else {
-        return "||";
+    for (let i = 0; i < logSym.length; i++) {
+        if (expr.includes(logSym[i])) return logSym[i];
     }
 }
 
@@ -204,5 +201,4 @@ export function getVarIndices(varList: string[], exprList: string[]) {
         }
     }
     return result;
-    
 }
