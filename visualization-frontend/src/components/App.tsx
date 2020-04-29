@@ -310,6 +310,7 @@ class App extends Component<Props, State> {
                     layout = { layout }
                     expr_layout ={expr_layout}
                     saveExprs = {this.saveExprMap.bind(this)}
+                    name = {this.state.exp_path}
                 />
                 </div>
         );

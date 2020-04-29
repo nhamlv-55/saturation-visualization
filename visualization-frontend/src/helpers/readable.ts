@@ -202,3 +202,9 @@ export function getVarIndices(varList: string[], exprList: string[]) {
     }
     return result;
 }
+
+
+export function getProblemName(fileName) {
+    let regex = /.*.smt2/
+    return fileName.match(regex);
+}

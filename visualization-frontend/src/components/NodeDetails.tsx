@@ -136,10 +136,9 @@ export default class NodeDetails extends React.Component<Props, {}> {
                     let additional_info ="type:" + node.event_type + " level:" + node.level;
                     let lemma_list = this.getLemmaList(node);
 
-                    let expr = "";
+                    let expr = node.expr.readable;
                     if (this.props.expr_layout==="SMT") {
                         console.log(node.expr);
-                        expr = node.expr.readable;
                     }
                     else {
                         /* expr = JSON.stringify(this.props.node.ast_json, null, 2); */

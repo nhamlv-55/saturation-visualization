@@ -129,7 +129,7 @@ export function PobVisLayout(tree): any{
     return treeCloned
 }
 
-export function toVisNode(node: any, style: string, nodeSelection, color:number = -1): any {
+export function toVisNode(node: any, style: string, nodeSelection, finalInv: number, color:number = -1): any {
     const styleData = styleTemplates[style];
     const isMarked = nodeSelection.includes(node.nodeID);
 
@@ -154,7 +154,7 @@ export function toVisNode(node: any, style: string, nodeSelection, color:number 
     }
     return {
         id: node.nodeID,
-        shape: styleData.shape,
+        shape: finalInv > 0 ? finalInv > 1 ? "hexagon" : "star" : styleData.shape,
         fixed: true,
         color: finalColor
     };
