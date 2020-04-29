@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import '../styles/NodeMenu.css';
 import NodeDetails from './NodeDetails';
+import ExprMapSelector from "./ExprMapSelector";
 const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
@@ -20,7 +21,8 @@ type Props = {
     ExprMap: {},
     layout: string,
     expr_layout: "SMT"|"JSON",
-    saveExprs: () => void
+    saveExprs: () => void,
+    name: string
 };
 
 class Aside extends React.Component<Props, any> {
@@ -88,6 +90,9 @@ class Aside extends React.Component<Props, any> {
                     </section>
                 </article>
                 { this.getNodeDetails() }
+                <ExprMapSelector
+                    name = {this.props.name}
+                />
             </aside>
         );
     }

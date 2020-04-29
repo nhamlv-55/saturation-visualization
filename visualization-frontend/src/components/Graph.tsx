@@ -104,29 +104,38 @@ export default class Graph extends React.Component<Props, {}> {
     visLayout(ATree){
         let nodeHasBeenSelected = this.props.nodeSelection.length > 0;
         let currentNodeExprID = Number.MIN_SAFE_INTEGER;
-        let InvList:string[] = [];
+        let InvList:{id: string, start: string, end: string}[] = [];
         if(nodeHasBeenSelected) {
             currentNodeExprID = ATree[this.props.nodeSelection[0]].exprID;
-            InvList = currentNodeExprID in this.props.PobLemmasMap ? this.props.PobLemmasMap[currentNodeExprID].map(exprInfo => exprInfo[0]): []
+            InvList = currentNodeExprID in this.props.PobLemmasMap ? this.props.PobLemmasMap[currentNodeExprID].map((exprInfo) => {
+                return {
+                    id: exprInfo[0],
+                    start: exprInfo[1],
+                    end: exprInfo[2]
+                }
+            }): [];
         }
         const visNodes = new Array<Node>();
         const visEdges = new Array<Edge>();
         let edgeId = 0;
+        
 
 
         for (const nodeID in ATree){
             let node = ATree[nodeID];
             if(!node.to_be_vis) continue;
             let visNode;
+            let FinalInvList = node.exprID in this.props.PobLemmasMap ? this.props.PobLemmasMap[node.exprID].filter(exprInfo => exprInfo[2] === "oo") : [];
+            let finalInv = (FinalInvList.filter(x => x[1] == node.level.toString()).length);
             //Prioritize related nodes
             if (node.exprID === currentNodeExprID) {
-                visNode = toVisNode(node, "sameExprID", this.props.nodeSelection)
-            } else if (InvList.length > 0 && InvList.indexOf(node.exprID) >= 0){
-                visNode = toVisNode(node, "lemma", this.props.nodeSelection, InvList.indexOf((node.exprID)) % 10);
+                visNode = toVisNode(node, "sameExprID", this.props.nodeSelection, finalInv)
+            } else if (InvList.length > 0 && InvList.filter(exprInfo => exprInfo.id === node.exprID).length > 0){
+                visNode = toVisNode(node, "lemma", this.props.nodeSelection, finalInv, InvList.findIndex(x => x.id === node.exprID) % 10);
             } else if (node.nodeID > this.props.currentTime) {
-                visNode = toVisNode(node, "activated", this.props.nodeSelection);
+                visNode = toVisNode(node, "activated", this.props.nodeSelection, finalInv);
             } else {
-                visNode = toVisNode(node, "passive", this.props.nodeSelection);
+                visNode = toVisNode(node, "passive", this.props.nodeSelection, finalInv);
             }
 
             visNodes.push(visNode);
