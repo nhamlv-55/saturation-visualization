@@ -1,5 +1,3 @@
-import {getOp, reorder, replaceVarNames, toReadable} from "./readable";
-
 const styleTemplates = require('../resources/styleTemplates');
 
 export const lemmaColours = [

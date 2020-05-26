@@ -13,8 +13,9 @@ type Props = {
     PobLemmasMap: {},
     ExprMap: {},
     layout: string,
-    expr_layout: "SMT"|"JSON",
+    expr_layout: "SMT" | "JSON",
     saveExprs: () => void
+    relatedExprMap: any
 };
 
 export default class NodeDetails extends React.Component<Props, {}> {
@@ -59,7 +60,7 @@ export default class NodeDetails extends React.Component<Props, {}> {
     }
     getLemmaList(node) {
         let lemma_list: JSX.Element[] = [];
-        if (node.event_type === "EType.EXP_POB"){
+        if (node.event_type === "EType.EXP_POB") {
             lemma_list.push(<h2 key ="lemma-title"> Lemmas summarization </h2>);
             if (node.exprID in this.props.PobLemmasMap){
                 let lemmas = this.props.PobLemmasMap[node.exprID];
@@ -70,8 +71,19 @@ export default class NodeDetails extends React.Component<Props, {}> {
                     };
                     lemma_list.push(<h3 style={lemmaStyle} key={"lemma-header-"+ lemma[0]}>ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h3>);
                     let expr = this.props.ExprMap[lemma[0]].readable;
+                    let lhs = this.props.ExprMap[lemma[0]].lhs;
                     if (typeof expr === "string"){
-                        let lhs = this.props.ExprMap[lemma[0]].lhs;
+                        if (Object.keys(this.props.relatedExprMap).length > 0){
+                            console.log(this.props.relatedExprMap);
+                            let keys = Object.keys(this.props.relatedExprMap);
+                            for (let i = 0; i < keys.length; i++){
+                                let exprData = this.props.relatedExprMap[keys[i]];
+                               if (expr === exprData.readable) {
+                                   lhs = exprData.lhs;
+                                   break;
+                               }
+                            }
+                        }
                         let exprList = getCleanExprList(reorder(expr, lhs, getOp(expr)), "\n");
                         exprList.map((literal, key) => {
                             if (key !== exprList.length - 1) {

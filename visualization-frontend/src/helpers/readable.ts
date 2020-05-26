@@ -1,12 +1,12 @@
 import {parse} from "s-exify";
 
 const negateMap = {
-    "<": ">=",
-    ">": "<=",
-    "=": "!=",
     "<=": ">",
     ">=": "<",
     "!=": "=",
+    "<": ">=",
+    ">": "<=",
+    "=": "!=",
     "&&": "||",
     "||": "&&"
 };
@@ -89,7 +89,7 @@ export function replaceVarNames(expr, varList) {
     if (typeof expr === "string") {
         let newList = varList.split(" ");
         for (let i = 0; i < newList.length; i++) {
-            let regex = new RegExp("Inv_" + i + "_n", "gi");
+            let regex = new RegExp( "[a-zA-z]+_"+ i + "_n", "gi");
             expr = expr.replace(regex, newList[i]);
         }
     }
@@ -136,8 +136,20 @@ export function reorder(expr, lhs, op){
 }
 
 function negate(expr) {
-    let exprList = expr.split(" ");
-    return expr.replace(exprList[1], negateMap[exprList[1]]);
+    let compOp = getCompOp(expr);
+    
+    return expr.replace(compOp, negateMap[compOp]);
+}
+
+function getCompOp(expr: string) {
+    let keys = Object.keys(negateMap);
+    for (let i = 0; i < keys.length; i++){
+        if (expr.includes(keys[i])){
+            return keys[i];
+        } 
+    }
+    
+    return keys[0];
 }
 
 export function getOp(expr) {

@@ -3,31 +3,40 @@ import {getProblemName} from "../helpers/readable";
 
 type Props = {
     name: string
+    updateRelatedExprMap: (exprMap) => void
 }
 
-class ExprMapSelector extends React.Component<Props, any> {
+type State = {
+    matchingFiles: any[],
+    exps: any[],
+    selected: string
+}
+
+class ExprMapSelector extends React.Component<Props, State> {
     constructor(props: Props){
         super(props);
         this.state = {
             matchingFiles: [],
             exps: [],
-            selected: "",
-            exprMap: []
+            selected: ""
         }
     }
     
     async componentDidMount() {
         await this.fetchExps();
         this.getMatchingFiles();
+        await this.getMatchingExprMap();
     }
 
     getMatchingFiles() {
         let data = this.state.exps.filter(exp => exp.name.includes(getProblemName(this.props.name)) && exp.name !== this.props.name);
         
-        this.setState({
-            matchingFiles: data,
-            selected: data[0].name
-        });
+        if (data.length > 0){
+            this.setState({
+                matchingFiles: data,
+                selected: data[0].name
+            });
+        }
     }
     
     async getMatchingExprMap() {
@@ -44,7 +53,7 @@ class ExprMapSelector extends React.Component<Props, any> {
 
         try {
             const json = await fetchedJSON.json();
-            this.setState({exprMap: JSON.parse(json.expr_map)})
+            this.props.updateRelatedExprMap(JSON.parse(json.expr_map));
         } catch (error) {
             if (error.name === "SatVisAssertionError") {
                 throw error;
@@ -85,7 +94,6 @@ class ExprMapSelector extends React.Component<Props, any> {
     } 
     
     render() {
-        console.log(this.state.exprMap);
         return (
             <section className={"component-node-details details-top-right"}>
                 <select id="exps" onChange={this.updateSelected.bind(this)}>
