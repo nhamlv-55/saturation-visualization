@@ -135,7 +135,7 @@ class App extends Component<Props, State> {
     }
     
     async saveExprMap() {
-        const fetchedJSON = await fetch('http://localhost:5000/spacer/save_exprs', {
+        await fetch('http://localhost:5000/spacer/save_exprs', {
             method: 'POST',
             mode: 'cors',
             headers: {

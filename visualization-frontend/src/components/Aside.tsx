@@ -25,7 +25,17 @@ type Props = {
     name: string
 };
 
-class Aside extends React.Component<Props, any> {
+type State = {
+    relatedExprMap: any
+}
+
+class Aside extends React.Component<Props, State> {
+    constructor(props: Props){
+        super(props);
+        this.state = {
+            relatedExprMap: []
+        }
+    }
 
     createButton(title, onClick, svg) {
         return <button
@@ -50,6 +60,7 @@ class Aside extends React.Component<Props, any> {
                        layout = { this.props.layout }
                        expr_layout ={this.props.expr_layout}
                        saveExprs = {this.props.saveExprs}
+                       relatedExprMap = {this.state.relatedExprMap}
             />;
         } else {
             return <section className={ 'component-node-details overview' }>
@@ -58,6 +69,12 @@ class Aside extends React.Component<Props, any> {
             </section>
         }
         
+    }
+    
+    updateRelatedExprMap(exprMap) {
+        this.setState({
+            relatedExprMap: exprMap 
+        });
     }
 
     render() {
@@ -92,6 +109,7 @@ class Aside extends React.Component<Props, any> {
                 { this.getNodeDetails() }
                 <ExprMapSelector
                     name = {this.props.name}
+                    updateRelatedExprMap = {this.updateRelatedExprMap.bind(this)}
                 />
             </aside>
         );
