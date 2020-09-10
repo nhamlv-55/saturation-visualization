@@ -20,7 +20,7 @@
     "react-dom": "^16.8.5",
     "react-modal": "^3.10.1",
     "react-router-dom": "^5.0.1",
-    "react-scripts": "^3.3.0",
+    "react-scripts": "^3.4.3",
     "react-sortablejs": "^1.5.1",
     "s-exify": "^0.3.2",
     "sortablejs": "1.6.1",
