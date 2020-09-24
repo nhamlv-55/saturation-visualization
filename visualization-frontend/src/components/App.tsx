@@ -6,7 +6,7 @@ import Aside from './Aside';
 import '../styles/App.css';
 import { assert } from '../model/util';
 import {buildExprMap, buildPobLemmasMap} from "../helpers/network";
-import {toReadable} from "../helpers/readable";
+import {replaceVarNames, toReadable} from "../helpers/readable";
 
 type Props = {
     name: string,
@@ -88,9 +88,10 @@ class App extends Component<Props, State> {
             if (json.status === "success") {
                 let tree = json.nodes_list;
                 for (let i = 0; i < Object.keys(tree).length; i++){
-                    let readable = toReadable(tree[i].expr, json.var_names);
+                    let rawWithVars = replaceVarNames(tree[i].expr, json.var_names);
+                    let readable = toReadable(rawWithVars);
                     tree[i].expr = {
-                        raw: tree[i].expr,
+                        raw: rawWithVars,
                         readable: readable,
                     };
                 }
@@ -147,6 +148,7 @@ class App extends Component<Props, State> {
             })
         });
     }
+    
 
     async runSpacer(problem: string, spacerUserOptions: string, mode: "proof" | "replay" | "iterative") {
         this.setState({

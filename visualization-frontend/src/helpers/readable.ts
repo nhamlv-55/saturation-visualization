@@ -13,15 +13,11 @@ const negateMap = {
 
 const logSym = ["&&", "||", "->"];
 
-export function toReadable(expr, varList) {
+export function toReadable(expr) {
     if (expr[0] !== "("){
         expr = "(" + expr + ")";
     }
-    let parsedResult = parseResult(parse(expr), "");
-    if (varList.length === 0 ){
-        return parsedResult;
-    }
-    return replaceVarNames(parsedResult, varList);
+    return parseResult(parse(expr), "");
 }
 
 function parseResult(lst, sep) {
@@ -86,6 +82,7 @@ function parseResult(lst, sep) {
 }
 
 export function replaceVarNames(expr, varList) {
+    if (varList === "") return expr;
     if (typeof expr === "string") {
         let newList = varList.split(" ");
         for (let i = 0; i < newList.length; i++) {
