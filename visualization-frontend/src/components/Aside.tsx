@@ -55,12 +55,14 @@ class Aside extends React.Component<Props, State> {
             }
             return <NodeDetails
                        nodes={nodes}
+                       name={this.props.name}
                        PobLemmasMap = { this.props.PobLemmasMap }
                        ExprMap = { this.props.ExprMap }
                        layout = { this.props.layout }
                        expr_layout ={this.props.expr_layout}
                        saveExprs = {this.props.saveExprs}
                        relatedExprMap = {this.state.relatedExprMap}
+                       
             />;
         } else {
             return <section className={ 'component-node-details overview' }>
