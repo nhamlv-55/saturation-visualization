@@ -71,7 +71,8 @@ export function buildExprMap(tree: any, varList: string[]): any{
             raw: node.expr.raw,
             readable: node.expr.readable,
             lhs: [], 
-            edited: node.expr.readable
+            edited: node.expr.readable,
+            changed: false
         };
         ExprMap[node.exprID] = exprMapItem;
     }

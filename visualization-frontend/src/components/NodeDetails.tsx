@@ -119,6 +119,7 @@ export default class NodeDetails extends React.Component<Props, {}> {
         
         this.props.ExprMap[lemmaId].lhs = lhs;
         this.props.ExprMap[lemmaId].edited = reorder(expr, lhs, getOp(expr));
+        this.props.ExprMap[lemmaId].changed = true;
         this.props.saveExprs();
         this.forceUpdate();
         
@@ -140,7 +141,9 @@ export default class NodeDetails extends React.Component<Props, {}> {
         let tExprMap = responseData["t_expr_map"]
         Object.keys(tExprMap).forEach((key) => {
             this.props.ExprMap[key].edited = tExprMap[key]['Edited'];
+            this.props.ExprMap[key].lhs = tExprMap[key]['Lhs'];
         });
+        this.props.saveExprs();
         this.forceUpdate();
         
 
