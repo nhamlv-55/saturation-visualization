@@ -112,7 +112,7 @@ export function reorder(expr, lhs, op){
         }
         else {
             if (rhsFinal.length === 0) {
-                result = result + " ->\n" + exprList[i];
+                result = result + " =>\n" + exprList[i];
             }
             else {
                 result = result + " " + op + " " + exprList[i]
@@ -125,7 +125,7 @@ export function reorder(expr, lhs, op){
                 result = "true " + result
             }
             if (rhsFinal.length === 0) {
-                result = result + " ->\nfalse"
+                result = result + " =>\nfalse"
             }
         }
     }
