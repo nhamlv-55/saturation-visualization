@@ -11,7 +11,7 @@ const negateMap = {
     "||": "&&"
 };
 
-const logSym = ["&&", "||", "->"];
+const logSym = ["&&", "||", "=>"];
 
 export function toReadable(expr) {
     if (expr[0] !== "("){
