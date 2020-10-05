@@ -126,7 +126,7 @@ export default class Graph extends React.Component<Props, {}> {
             if(!node.to_be_vis) continue;
             let visNode;
             let FinalInvList = node.exprID in this.props.PobLemmasMap ? this.props.PobLemmasMap[node.exprID].filter(exprInfo => exprInfo[2] === "oo") : [];
-            let finalInv = (FinalInvList.filter(x => x[1] == node.level.toString()).length);
+            let finalInv = (FinalInvList.filter(x => x[1] === node.level.toString()).length);
             //Prioritize related nodes
             if (node.exprID === currentNodeExprID) {
                 visNode = toVisNode(node, "sameExprID", this.props.nodeSelection, finalInv)

@@ -84,12 +84,27 @@ export default class NodeDetails extends React.Component<Props, {}> {
                             }
                         }
                         let exprList = getCleanExprList(expr, "\n");
+                        let implies = -1;
+                        for (let i = 0; i < exprList.length; i++){
+                            if (exprList[i].includes("=>")){
+                                implies = i;
+                                break;
+                            }
+                        }
                         exprList.map((literal, key) => {
+                            let lemmaColour = {
+                                color: "black"
+                            }
+                            if (implies !== -1){
+                                if (key > implies){
+                                    lemmaColour.color = "darkblue";
+                                }
+                            }
                             if (key !== exprList.length - 1) {
-                                lemma_list.push(<pre onClick={this.addLemma.bind(this, lemma[0])} key={"lemma-expr-"+lemma[0] + key}>{literal}</pre>);
+                                lemma_list.push(<pre style={lemmaColour} onClick={this.addLemma.bind(this, lemma[0])} key={"lemma-expr-"+lemma[0] + key}>{literal}</pre>);
                             }
                             else {
-                                lemma_list.push(<pre onClick={this.addLemma.bind(this, lemma[0])}
+                                lemma_list.push(<pre style={lemmaColour} onClick={this.addLemma.bind(this, lemma[0])}
                                                      key={"lemma-expr-" + lemma[0] + key}>{literal}</pre>);
                             }
                         });
