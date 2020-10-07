@@ -86,7 +86,7 @@ export function replaceVarNames(expr, varList) {
     if (typeof expr === "string") {
         let newList = varList.split(" ");
         for (let i = 0; i < newList.length; i++) {
-            let regex = new RegExp( "[a-zA-z]+_"+ i + "_n", "gi");
+            let regex = new RegExp( "[a-zA-z0-9@$:]+_"+ i + "_n", "gi");
             expr = expr.replace(regex, newList[i]);
         }
     }
