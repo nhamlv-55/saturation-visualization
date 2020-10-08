@@ -54,7 +54,9 @@ function parseResult(lst, sep) {
 
     //Adds not symbol (!) to beginning of clause
     if (lst[0] === "not") {
-        lst[1][0] = negateMap[lst[1][0]];
+        if (lst[1][0] in negateMap){
+            lst[1][0] = negateMap[lst[1][0]];
+        }
         return parseResult(lst[1], "")
     }
 
@@ -86,7 +88,7 @@ export function replaceVarNames(expr, varList) {
     if (typeof expr === "string") {
         let newList = varList.split(" ");
         for (let i = 0; i < newList.length; i++) {
-            let regex = new RegExp( "[a-zA-z0-9@$:]+_"+ i + "_n", "gi");
+            let regex = new RegExp( "[a-zA-z0-9@$:!]+_"+ i + "_n", "gi");
             expr = expr.replace(regex, newList[i]);
         }
     }
