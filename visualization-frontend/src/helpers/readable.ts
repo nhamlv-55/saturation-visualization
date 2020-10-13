@@ -8,7 +8,8 @@ const negateMap = {
     ">": "<=",
     "=": "!=",
     "&&": "||",
-    "||": "&&"
+    "||": "&&",
+    "not": ""
 };
 
 const logSym = ["&&", "||", "=>"];
@@ -99,7 +100,7 @@ export function reorder(expr, lhs, op){
     if (typeof expr !== "string") return expr;
     let lhsFinal:Number[] = [];
     let rhsFinal:Number[] = [];
-    let exprList = expr.split(op);
+    let exprList = getCleanExprList(expr, op);
     let result = "";
     for (let i = 0; i < exprList.length; i++){
         if (lhs.indexOf(i) > -1) {
@@ -117,7 +118,7 @@ export function reorder(expr, lhs, op){
                 result = result + " =>\n" + exprList[i];
             }
             else {
-                result = result + " " + op + " " + exprList[i]
+                result = result + " " + op + "\n" + exprList[i]
             }
            rhsFinal.push(i); 
         }
@@ -136,7 +137,9 @@ export function reorder(expr, lhs, op){
 
 function negate(expr) {
     let compOp = getCompOp(expr);
-    
+    if (compOp === "not"){
+        return compOp + " " + expr
+    }
     return expr.replace(compOp, negateMap[compOp]);
 }
 
@@ -148,7 +151,7 @@ function getCompOp(expr: string) {
         } 
     }
     
-    return keys[0];
+    return "not";
 }
 
 export function getOp(expr) {
@@ -159,7 +162,6 @@ export function getOp(expr) {
 
 export function getIndexOfLiteral(exprList, literal){
     for (let i = 0; i < exprList.length; i++){
-        exprList[i] = exprList[i].trim();
         if (literal === exprList[i] || literal === negate(exprList[i])){
             return i;            
         }
@@ -169,15 +171,14 @@ export function getIndexOfLiteral(exprList, literal){
 
 export function getCleanExprList(expr, sep) {
     let exprList = expr.split(sep);
-    let resultExprList = [];
+    let resultExprList:string[] = [];
     for (let i = 0; i < exprList.length; i++){
-        if (exprList[i] === "") {
-            // @ts-ignore
+        if (exprList[i] !== "") {
             resultExprList.push(exprList[i].trim());
         }
     }
     
-    return exprList;
+    return resultExprList;
 }
 
 export function getVariables(literal) {
