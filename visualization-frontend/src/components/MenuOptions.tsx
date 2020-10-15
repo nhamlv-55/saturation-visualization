@@ -2,26 +2,69 @@ import * as React from 'react';
 import {options} from "../helpers/spacerOptions";
 import eye from "./../resources/icons/singles/eye.svg"
 
-class MenuOptions extends React.Component<any, any> {
+type Props = {
+    spacerUserOptions: string,
+    onChangeVariables: (e: React.ChangeEvent<HTMLInputElement>) => void,
+    changeSpacerUserOptions: (spacerUserOptions: string) => void,
+}
+
+type State = {
+    optionTypeHTML: JSX.Element,
+    optionValue: string,
+    optionName: string,
+    optionType: string,
+    allOptions: {type:string, name: string, value:string}[],
+    showOptions: boolean
+}
+
+class MenuOptions extends React.Component<Props, State> {
     state = {
-        typeOfOption: "",
+        optionTypeHTML: <div />,
+        optionType: "",
         optionValue: "",
-        optionName: ""
+        optionName: "",
+        allOptions: [],
+        showOptions: true
     };
     
-    storeSpacerOptions() {
-        if (this.state.optionValue === "" || this.state.optionName === "") return;
-        let fullOptionString = this.props.spacerUserOptions +  " "  + this.state.optionName + "=" + this.state.optionValue + " ";
+    updateSpacerOptions() {
+        let allOptions: {type:string, name: string, value:string}[] = this.state.allOptions;
+        let fullOptionString = "";
+        for (let option of allOptions) {
+            if (option.type === "flag") {
+                fullOptionString += "-" + option.name + " ";
+            }
+            else {
+                fullOptionString += option.name + "=" + option.value + " ";
+            }
+        }
         this.props.changeSpacerUserOptions(fullOptionString);
+    }
+    
+    storeSpacerOptions(e) {
+        e.preventDefault();
+        e.target.reset();
+        if (this.state.optionName === "" || (this.state.optionType !== "custom" && this.state.optionValue === "")) return;
+        let allOptions: {type:string, name: string, value:string}[] = this.state.allOptions;
+        allOptions.push({
+            name: this.state.optionName,
+            value: this.state.optionValue,
+            type: this.state.optionValue === "" ? "flag" : this.state.optionType
+        });
+        this.setState({
+            allOptions: allOptions
+        });
         this.setState({
             optionName: "",
-            optionValue: ""
-        })
+            optionValue: "",
+            optionType: ""
+        });
+        this.updateSpacerOptions();
     }
     
     displaySpacerOptions() {
         if (this.props.spacerUserOptions !== "") {
-            return this.props.spacerUserOptions.split(" ");
+            return this.props.spacerUserOptions.trim().split(" ");
         }
         return []
     }
@@ -32,41 +75,62 @@ class MenuOptions extends React.Component<any, any> {
         });
     }
     
-    getOptions(name, type) {
+    getOptions(name:string, type:string) {
         if (type === "bool") {
             this.setState({
-                typeOfOption:
-                    <form className="tfradio">
+                optionTypeHTML:
+                    <React.Fragment>
                         <input type="radio" name={name} value="true" onClick={this.updateOptionValue.bind(this)}/>True
                         <input type="radio" name={name} value="false" onClick={this.updateOptionValue.bind(this)}/>False
-                        <button className="fake-button" type="button" value="Submit" onClick={this.storeSpacerOptions.bind(this)}>+</button>
-                    </form>
+                        <button className="fake-button" type="submit" value="Submit">+</button>
+                    </React.Fragment>
             });
         } else {
             this.setState({
-                typeOfOption:
-                    <form className="tfradio">
-                        <input type="text" name={name} placeholder={type} onChange={this.updateOptionValue.bind(this)}/>
-                        <button className="fake-button" type="button" value="Submit" onClick={this.storeSpacerOptions.bind(this)}>+</button>
-                    </form>
+                optionTypeHTML:
+                    <React.Fragment>
+                        <input type="text" name={name} placeholder={type} defaultValue={this.state.optionValue} onChange={this.updateOptionValue.bind(this)}/>
+                        <button className="fake-button" type="submit" value="Submit">+</button>
+                    </React.Fragment>
             });
         }
     }
     
-    changeOptionType(e){
+    changeOptionType(e: React.ChangeEvent<HTMLInputElement>){
         let tempList = options.filter(option => option.name === e.target.value);
         let type = "custom";
         if (tempList.length > 0) {
             type = tempList[0].type;
         }
         this.setState({
-            optionName: e.target.value
+            optionName: e.target.value,
+            optionType: type
         });
         this.getOptions(e.target.value, type);
+    }
+    
+    removeOption(name:string, value:string){
+        let allOptions: {type:string, name: string, value:string}[] = this.state.allOptions;
+        let rIndex = -1;
+        for (let i = 0; i < allOptions.length; i++){
+            if (allOptions[i].name === name && allOptions[i].value === value){
+                rIndex = i;
+                break;
+            }
+        }
+        if (rIndex === -1) return;
+        allOptions.splice(rIndex, 1);
+        this.updateSpacerOptions();
     }
     changeSpacerManualUserOptions(event: React.ChangeEvent<HTMLInputElement>) {
         const newValue = event.target.value;
         this.props.changeSpacerUserOptions(newValue);
+    }
+    
+    showHideOptions() {
+        this.setState({
+            showOptions: !this.state.showOptions
+        });
     }
     render() {
         let selectedOptions = this.displaySpacerOptions();
@@ -77,28 +141,31 @@ class MenuOptions extends React.Component<any, any> {
                     <ul>
                         <li>
                             <label htmlFor="userOptions" className="form-label">Additional Spacer options</label>
-                            <button className="showHideButton" title={"showHide"}><img className="eyeImage" src={eye} alt="eye"/></button>
-                            {selectedOptions.length !== 0 && selectedOptions.map((option, key) => {
+                            <button onClick={this.showHideOptions.bind(this)} className="showHideButton" title={"showHide"}><img className="eyeImage" src={eye} alt="eye"/></button>
+                            {selectedOptions.length !== 0 && this.state.showOptions && selectedOptions.map((option, key) => {
                                 if (option !== "") {
                                     let kvp = option.split("=");
                                     let name = kvp[0];
                                     let value = kvp[1];
+                                    let displayValue = value ? name + ": " + value : name;
                                     return (
-                                        <div className="displaySpacerOption">
-                                            <span key={key}>{name}: {value}</span>
-                                            <button className="fake-button" type="button">x</button>
+                                        <div className="displaySpacerOption" key={key}>
+                                            <span>{displayValue}</span>
+                                            <button className="fake-button" type="button" onClick={this.removeOption.bind(this, name, value)}>x</button>
                                         </div>
                                     );
                                 }
                                 return "";
                             })}
-                            <input className="optionsList" list="spacerOptions" name="spacerOptions" onChange={this.changeOptionType.bind(this)}/>
-                            <datalist id="spacerOptions">
-                                {options.map((part, key) => (
-                                    <option value={part.name} key={key}/>
-                                ))}
-                            </datalist>
-                            {this.state.typeOfOption}
+                            <form className="tfradio" name="tfradio" onSubmit={this.storeSpacerOptions.bind(this)}>
+                                <input type="text" className="optionsList" list="spacerOptions" name="spacerOptions" onChange={this.changeOptionType.bind(this)}/>
+                                <datalist id="spacerOptions">
+                                    {options.map((part, key) => (
+                                        <option value={part.name} key={key}/>
+                                    ))}
+                                </datalist>
+                                {this.state.optionTypeHTML}
+                            </form>
                         </li>
                         <label>Or using manual run parameters</label>
                         <input type="text" name="manualRun" onChange={this.changeSpacerManualUserOptions.bind(this)}/>

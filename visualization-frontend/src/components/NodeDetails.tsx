@@ -144,7 +144,7 @@ export default class NodeDetails extends React.Component<Props, State> {
         
         this.props.ExprMap[lemmaId].lhs = lhs;
         this.props.ExprMap[lemmaId].edited = reorder(expr, lhs, getOp(expr));
-        this.props.ExprMap[lemmaId].changed = lhs.length != 0;
+        this.props.ExprMap[lemmaId].changed = lhs.length !== 0;
         this.props.saveExprs();
         this.forceUpdate();
         
