@@ -30,7 +30,7 @@
 }
 .component-node-details.details-top-right {
     position: fixed;
-    top: 10rem;
+    top: 5rem;
     right: 10rem;
     background: #f8f9fb;
     overflow: auto;
