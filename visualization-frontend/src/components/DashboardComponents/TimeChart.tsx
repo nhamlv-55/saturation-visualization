@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as d3 from 'd3';
-import SunburstChart from "sunburst-chart";
-
+/* import SunburstChart from "sunburst-chart"; */
+import SunburstChart, {Node} from "sunburst-chart";
 class TimeChart extends React.Component<any, any> {
     private totalTime: string;
     private readonly palette: string[];
@@ -34,8 +34,8 @@ class TimeChart extends React.Component<any, any> {
         return tmp;
     }
     
-    getData(input){
-        let result = {};
+    /* getData(input){ */
+        getData(input): Node[]{        let result = {};
         let last = "zzzzzzz";
         
         for (let i = 0; i < input.length; i++){
@@ -75,15 +75,15 @@ class TimeChart extends React.Component<any, any> {
         let colour = d3.scaleOrdinal()
             .domain(Object.keys(this.props.data))
             .range(this.palette);
-        let data = this.getData(this.prepareData());
+        let data:Node[] = this.getData(this.prepareData());
         // @ts-ignore
         const myChart = SunburstChart();
         myChart.data(data[0])(document.getElementById(this.props.className))
-            .width(this.props.width)
-            .height(this.props.height)
-            .color(x => colour(x.name))
-            .label(x => x.name + ": " + x.value)
-            .tooltipTitle(x => x.name + ": " + x.value);
+               .width(this.props.width)
+               .height(this.props.height)
+               .color(x => colour(x.name))
+               .label((x: { name: string; value: string; }) => x.name + ": " + x.value)
+               .tooltipTitle((x: { name: string; value: string; }) => x.name + ": " + x.value);
         
         if (this.props.type){
             myChart.showLabels(false);
