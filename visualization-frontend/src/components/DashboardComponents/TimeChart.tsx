@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as d3 from 'd3';
-/* import SunburstChart from "sunburst-chart"; */
 import SunburstChart, {Node} from "sunburst-chart";
 class TimeChart extends React.Component<any, any> {
     private totalTime: string;
@@ -26,7 +25,7 @@ class TimeChart extends React.Component<any, any> {
         for (let i = 0; i < keys.length; i++){
             tmp.push({
                 name: keys[i], 
-                value: this.props.data[keys[i]],
+                size: this.props.data[keys[i]],
                 children: []
             });
         }
@@ -34,25 +33,25 @@ class TimeChart extends React.Component<any, any> {
         return tmp;
     }
     
-    /* getData(input){ */
-        getData(input): Node[]{        let result = {};
+    getData(input): Node[] {        
+        let result = {};
         let last = "zzzzzzz";
         
         for (let i = 0; i < input.length; i++){
             let key = input[i].name;
-            let value = input[i].value;
+            let value = input[i].size;
             
             if (key.includes(last)){
                 result[last].children.push({
                     name: key,
-                    value: value,
+                    size: value,
                     children: []
                 });
             }
             else {
                 result[key] = {
                     name: key,
-                    value: value,
+                    size: value,
                     children: []
                 };
                 last = key
@@ -75,15 +74,15 @@ class TimeChart extends React.Component<any, any> {
         let colour = d3.scaleOrdinal()
             .domain(Object.keys(this.props.data))
             .range(this.palette);
-        let data:Node[] = this.getData(this.prepareData());
-        // @ts-ignore
+        let data: Node[] = this.getData(this.prepareData());
         const myChart = SunburstChart();
-        myChart.data(data[0])(document.getElementById(this.props.className))
+        myChart.data(data[0])(document.getElementById(this.props.className)!)
                .width(this.props.width)
                .height(this.props.height)
                .color(x => colour(x.name))
-               .label((x: { name: string; value: string; }) => x.name + ": " + x.value)
-               .tooltipTitle((x: { name: string; value: string; }) => x.name + ": " + x.value);
+               .label(x => x.name!)
+               .size('size')
+               .tooltipTitle(x => x.name!);
         
         if (this.props.type){
             myChart.showLabels(false);

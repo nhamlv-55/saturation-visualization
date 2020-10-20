@@ -144,7 +144,7 @@ export default class NodeDetails extends React.Component<Props, State> {
         
         this.props.ExprMap[lemmaId].lhs = lhs;
         this.props.ExprMap[lemmaId].edited = reorder(expr, lhs, getOp(expr));
-        this.props.ExprMap[lemmaId].changed = lhs.length != 0;
+        this.props.ExprMap[lemmaId].changed = lhs.length !== 0;
         this.props.saveExprs();
         this.forceUpdate();
         
@@ -192,7 +192,7 @@ export default class NodeDetails extends React.Component<Props, State> {
                 {this.props.nodes.length > 1 && <section className='component-node-details details-diff'>
                     <article>
                         <h2>Diff (Node: <strong>{node1.nodeID}</strong> vs. Node: <strong>{node2.nodeID}</strong>)</h2>
-                        {toDiff(node1.expr, node2.expr).map((part, key) => (
+                        {toDiff(node1.expr.readable, node2.expr.readable).map((part, key) => (
                             <span key={key} className={part.added ? "green" : part.removed ? "red" : "black"}>
                                 {part.value}
                             </span>
