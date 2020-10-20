@@ -33,13 +33,13 @@ class TimeChart extends React.Component<any, any> {
         return tmp;
     }
     
-    getData(input): Node[]{        
+    getData(input): Node[] {        
         let result = {};
         let last = "zzzzzzz";
         
         for (let i = 0; i < input.length; i++){
             let key = input[i].name;
-            let value = input[i].value;
+            let value = input[i].size;
             
             if (key.includes(last)){
                 result[last].children.push({
@@ -76,16 +76,13 @@ class TimeChart extends React.Component<any, any> {
             .range(this.palette);
         let data: Node[] = this.getData(this.prepareData());
         const myChart = SunburstChart();
-        let chartElement = document.getElementById(this.props.className)
-        if (chartElement !== null) {
-        myChart.data(data[0])(chartElement)
+        myChart.data(data[0])(document.getElementById(this.props.className)!)
                .width(this.props.width)
                .height(this.props.height)
                .color(x => colour(x.name))
                .label(x => x.name!)
-               .size('size');
-               //.tooltipTitle(x => x.name + ": " + x.value);
-        }
+               .size('size')
+               .tooltipTitle(x => x.name!);
         
         if (this.props.type){
             myChart.showLabels(false);
