@@ -1,12 +1,12 @@
 import * as React from 'react';
 import * as d3 from 'd3';
-import {dashboardConfig} from "../dashboardTypes";
+import {dashboardConfig, resultItem} from "../dashboardTypes";
 
 type Props = {
     key: number,
-    data: any,
+    data: resultItem [],
     config: dashboardConfig,
-    selectBenchmark: any
+    selectBenchmark: (e: resultItem) => void
 }
 
 type State = {}

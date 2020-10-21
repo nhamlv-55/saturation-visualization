@@ -30,7 +30,7 @@ type Props = {
 
 class Dashboard extends React.Component<Props, State> {
     private readonly overviewMetrics: string[];
-    constructor(props: any) {
+    constructor(props: Props) {
         super(props);
         this.overviewMetrics = ["depth", "memory", "time", "result"];
             this.state = {
@@ -151,8 +151,7 @@ class Dashboard extends React.Component<Props, State> {
         });
     }
     
-    handleSidebarClickDot(e){
-        console.log(e);
+    handleSidebarClickDot(e: resultItem){
         this.setState({
             selectedBenchmark: e.index
         });

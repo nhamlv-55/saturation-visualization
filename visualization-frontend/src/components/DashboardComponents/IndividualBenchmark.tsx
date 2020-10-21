@@ -7,7 +7,9 @@ type Props = {
     data: dataItem
 }
 
-class IndividualBenchmark extends React.Component<Props, any> {
+type State = {}
+
+class IndividualBenchmark extends React.Component<Props, State> {
     componentDidMount() {
         console.log(this.props.data);
     }
