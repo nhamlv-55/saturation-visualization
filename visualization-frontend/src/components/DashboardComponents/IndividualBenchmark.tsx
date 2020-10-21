@@ -1,8 +1,13 @@
 import * as React from 'react';
 import TimeChart from "./TimeChart";
 import {potholeToNormal} from "../../helpers/naming";
+import {dataItem} from "../dashboardTypes";
 
-class IndividualBenchmark extends React.Component<any, any> {
+type Props = {
+    data: dataItem
+}
+
+class IndividualBenchmark extends React.Component<Props, any> {
     componentDidMount() {
         console.log(this.props.data);
     }
@@ -35,6 +40,8 @@ class IndividualBenchmark extends React.Component<any, any> {
                   height={600}
                   width={600}
                   className={"time"}
+                  type={""}
+                  index={""}
               />
           </div>  
         );

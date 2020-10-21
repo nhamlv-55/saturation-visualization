@@ -1,12 +1,16 @@
 import * as React from 'react';
 import TimeChart from "./TimeChart";
+import {timeDetailedItem} from "../dashboardTypes";
 
-class TimeZoom extends React.Component<any, any> {
+type State = {}
+
+type Props = {
+    data: timeDetailedItem[]
+}
+
+class TimeZoom extends React.Component<Props, State> {
     constructor(props) {
         super(props);
-        this.state = {
-            data: []
-        }
     }
     
     render() {
@@ -21,7 +25,7 @@ class TimeZoom extends React.Component<any, any> {
                             width={200}
                             className={"timezoom" + key}
                             type={"timezoom"}
-                            index={instance["index"]}
+                            index={instance["index"]!}
                         />
                     );
                 })}
