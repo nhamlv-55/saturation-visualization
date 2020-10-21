@@ -1,7 +1,17 @@
 import * as React from 'react';
 
-class DashboardLanding extends React.Component<any, any> {
-    private fileReader: any;
+type Props = {
+    rawData: {name: string, id: string, content: string}[],
+    updateData: (newValue: {name:string, id:string, content:string}) => void
+}
+
+type State = {
+    rawData: [],
+    file: File | null
+}
+
+class DashboardLanding extends React.Component<Props, State> {
+    private fileReader: FileReader | undefined;
     constructor(props) {
         super(props);
         this.state = {
@@ -10,27 +20,28 @@ class DashboardLanding extends React.Component<any, any> {
         }
     }
     
-    handleFileRead(file) {
-        const content = this.fileReader.result;
+    handleFileRead(file: File) {
+        const content = this.fileReader!.result!.toString();
         let returnObject = {
             name: file.name,
             id: Date.now().toString(),
-            content: content
+            content: content!
         };
         
         this.props.updateData(returnObject);
     }
     
-    handleFileChosen(e) {
+    handleFileChosen(e: React.MouseEvent<HTMLButtonElement>) {
+        e.preventDefault();
         let file = this.state.file;
         this.fileReader = new FileReader();
-        this.fileReader.onloadend = this.handleFileRead.bind(this, file);
-        this.fileReader.readAsText(file);
+        this.fileReader.onloadend = this.handleFileRead.bind(this, file!);
+        this.fileReader.readAsText(file!);
     }
     
-    updateFile(e) {
+    updateFile(e: React.ChangeEvent<HTMLInputElement>) {
         this.setState({
-            file: e.target.files[0]
+            file: e.target.files![0]
         });
     }
     

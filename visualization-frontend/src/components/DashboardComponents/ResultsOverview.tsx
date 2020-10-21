@@ -1,7 +1,17 @@
 import * as React from 'react';
 import * as d3 from 'd3';
+import {dashboardConfig} from "../dashboardTypes";
 
-class ResultsOverview extends React.Component<any, any> {
+type Props = {
+    key: number,
+    data: any,
+    config: dashboardConfig,
+    selectBenchmark: any
+}
+
+type State = {}
+
+class ResultsOverview extends React.Component<Props, State> {
     componentDidMount() {
         this.createResultsOverview();
     }
