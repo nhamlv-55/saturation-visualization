@@ -21,6 +21,8 @@ type Props = {
 
 type State = {
     transformationFlag: boolean
+    transformationErrorFlag: boolean
+    appliedTransformation: string
 }
 
 export default class NodeDetails extends React.Component<Props, State> {
@@ -29,7 +31,9 @@ export default class NodeDetails extends React.Component<Props, State> {
     constructor(props) {
         super(props);
         this.state = {
-            transformationFlag: false
+            transformationFlag: false,
+            transformationErrorFlag: false,
+            appliedTransformation: ""
         }
     }
 
@@ -152,7 +156,8 @@ export default class NodeDetails extends React.Component<Props, State> {
 
     async transformExprs() {
         this.setState({
-            transformationFlag: false
+            transformationFlag: false,
+            transformationErrorFlag: false
         });
         const response = await fetch("http://localhost:5000/spacer/transform_exprs", {
             method: 'POST',
@@ -165,17 +170,27 @@ export default class NodeDetails extends React.Component<Props, State> {
             })
         });
 
-        let responseData = await response.json();
-        let tExprMap = responseData["t_expr_map"]
-        Object.keys(tExprMap).forEach((key) => {
-            this.props.ExprMap[key].edited = tExprMap[key]['Edited'];
-            this.props.ExprMap[key].lhs = tExprMap[key]['Lhs'];
-        });
-        this.props.saveExprs();
-        this.setState({
-            transformationFlag: true
-        });
-        this.forceUpdate();
+        if (response.status === 200){
+            let responseData = await response.json();
+
+            let tExprMap = responseData["response"]["Lemmas"]
+            let finalProgram = responseData["response"]["FinalProgram"]
+            Object.keys(tExprMap).forEach((key) => {
+                this.props.ExprMap[key].edited = tExprMap[key]['Edited'];
+                this.props.ExprMap[key].lhs = tExprMap[key]['Lhs'];
+            });
+            this.props.saveExprs();
+            this.setState({
+                transformationFlag: true,
+                appliedTransformation: finalProgram
+            });
+            this.forceUpdate();
+        }
+        else {
+            this.setState({
+                transformationErrorFlag: true
+            });
+        }
         
 
     }
@@ -230,6 +245,8 @@ export default class NodeDetails extends React.Component<Props, State> {
                                     {lemma_list}
                                     <button onClick={this.transformExprs.bind(this)}>Apply Transform</button>
                                     {this.state.transformationFlag && <p>Transformation Complete</p>}
+                                    {this.state.transformationFlag && <p>Applied Transformation: {this.state.appliedTransformation}</p>}
+                                    {this.state.transformationErrorFlag && <p style={{color: "red"}}>Internal Server Error: Please Try Again</p>}
                                 </article>
                             </section>}
                         </div>
