@@ -170,30 +170,18 @@ export function getIndexOfLiteral(exprList, literal){
 }
 
 export function getCleanExprList(expr, sep) {
-    let exprList = expr.split(sep);
-    let resultExprList:string[] = [];
-    for (let i = 0; i < exprList.length; i++){
-        if (exprList[i] !== "") {
-            resultExprList.push(exprList[i].trim());
+    if (typeof expr === "string") {
+        let exprList = expr.split(sep);
+        let resultExprList:string[] = [];
+        for (let i = 0; i < exprList.length; i++){
+            if (exprList[i] !== "") {
+                resultExprList.push(exprList[i].trim());
+            }
         }
+
+        return resultExprList;
     }
-    
-    return resultExprList;
-}
-
-export function getVariables(literal) {
-    let regex = /([a-zA-Z])+/g;
-    return literal.match(regex);
-}
-
-export function getProcesses(literal) {
-    let regex = /(\[[0-9]+\])/g;
-    return literal.match(regex);
-}
-
-export function getProcessVariables(literal) {
-    let regex = /([a-zA-Z]+\[[0-9]+\])/g;
-    return literal.match(regex);
+    return expr;
 }
 
 export function cleanExprOperators(expr) {

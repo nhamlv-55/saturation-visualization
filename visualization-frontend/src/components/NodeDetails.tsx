@@ -1,5 +1,4 @@
 import * as React from 'react';
-
 import '../styles/NodeDetails.css';
 import {toDiff} from "../helpers/diff";
 import {lemmaColours} from "../helpers/network";
@@ -8,6 +7,9 @@ import {
     getCleanExprList, getIndexOfLiteral,
     getOp, reorder
 } from "../helpers/readable";
+const reactStringReplace = require('react-string-replace');
+const icons = require('../resources/icons/all.svg') as string;
+
 type Props = {
     nodes: any,
     name: string
@@ -73,58 +75,73 @@ export default class NodeDetails extends React.Component<Props, State> {
         }
         return result
     }
+    
     getLemmaList(node) {
         let lemma_list: JSX.Element[] = [];
         if (node.event_type === "EType.EXP_POB") {
             lemma_list.push(<h2 key ="lemma-title"> Lemmas summarization </h2>);
-            if (node.exprID in this.props.PobLemmasMap){
+            if (node.exprID in this.props.PobLemmasMap) {
                 let lemmas = this.props.PobLemmasMap[node.exprID];
-                for (const lemma of lemmas){
+                for (const lemma of lemmas) {
                     let colorIndex = lemmas.indexOf(lemma);
                     let lemmaStyle = {
                         color: lemmaColours[colorIndex]
                     };
-                    lemma_list.push(<h3 style={lemmaStyle} key={"lemma-header-"+ lemma[0]}>ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h3>);
+                    lemma_list.push(<h3 style={lemmaStyle} key={"lemma-header-" + lemma[0]}>ExprID: {lemma[0]},
+                        From: {lemma[1]} to {lemma[2]}</h3>);
                     let expr = this.props.ExprMap[lemma[0]].edited;
-                    if (typeof expr === "string"){
-                        if (Object.keys(this.props.relatedExprMap).length > 0){
+                    if (typeof expr === "string") {
+                        if (Object.keys(this.props.relatedExprMap).length > 0) {
                             let keys = Object.keys(this.props.relatedExprMap);
-                            for (let i = 0; i < keys.length; i++){
-                                let exprData = this.props.relatedExprMap[keys[i]];
-                               if (expr === exprData.readable) {
-                                   expr = exprData.edited;
-                                   break;
-                               }
+                            for (let key of keys) {
+                                let exprData = this.props.relatedExprMap[key];
+                                if (expr === exprData.readable) {
+                                    expr = exprData.edited;
+                                    break;
+                                }
                             }
                         }
                         let exprList = getCleanExprList(expr, "\n");
                         let implies = -1;
-                        for (let i = 0; i < exprList.length; i++){
-                            if (exprList[i].includes("=>")){
+                        for (let i = 0; i < exprList.length; i++) {
+                            if (exprList[i].includes("=>")) {
                                 implies = i;
                                 break;
                             }
                         }
+                        let downIcon = <svg className="icon">
+                            <use xlinkHref={`${icons}#graph-down`}/>
+                        </svg>
+                        let upIcon = <svg className="icon">
+                            <use xlinkHref={`${icons}#graph-up`}/>
+                        </svg>
+                        let literalList = this.props.ExprMap[lemma[0]].literalList;
                         exprList.map((literal, key) => {
+                            let cleanLiteral = cleanExprOperators(literal).trim();
+                            let index = getIndexOfLiteral(literalList, cleanLiteral);
+                            let lhs = this.props.ExprMap[lemma[0]].lhs;
                             let lemmaColour = {
                                 color: "black"
                             }
-                            if (implies !== -1){
-                                if (key > implies){
+                            if (implies !== -1) {
+                                if (key > implies) {
                                     lemmaColour.color = "darkblue";
                                 }
                             }
-                            if (key !== exprList.length - 1) {
-                                lemma_list.push(<pre style={lemmaColour} onClick={this.addLemma.bind(this, lemma[0])} key={"lemma-expr-"+lemma[0] + key}>{literal}</pre>);
-                            }
-                            else {
-                                lemma_list.push(<pre style={lemmaColour} onClick={this.addLemma.bind(this, lemma[0])}
-                                                     key={"lemma-expr-" + lemma[0] + key}>{literal}</pre>);
-                            }
+                            let isBool = literal.includes("true") || literal.includes("false");
+                            lemma_list.push(
+                                <div key={"lemma-expr-" + lemma[0] + key}>
+                                    {!isBool &&
+                                    <button className="move-button" onClick={this.addLemma.bind(this, lemma[0], literal)}>
+                                        {lhs.includes(index) && downIcon}
+                                        {!lhs.includes(index) && upIcon}
+                                    </button>}
+                                    <pre style={lemmaColour}>
+                                        {literal}
+                                    </pre>
+                                </div>
+                            );
                         });
-                    }
-                    else {
-                        lemma_list.push(<pre>{expr}</pre>);
                     }
                 }
             }
@@ -132,11 +149,10 @@ export default class NodeDetails extends React.Component<Props, State> {
         return lemma_list;
     }
     
-    addLemma(lemmaId, e) {
+    addLemma(lemmaId, literal) {
         let expr = this.props.ExprMap[lemmaId].readable;
-        let exprList = getCleanExprList(expr, getOp(expr));
-        let literal = (cleanExprOperators(e.target.innerText));
-        literal = literal.trim();
+        let exprList = this.props.ExprMap[lemmaId].literalList;
+        literal = cleanExprOperators(literal).trim();
         let index = getIndexOfLiteral(exprList, literal);
         let lhs = this.props.ExprMap[lemmaId].lhs;
         if (lhs.includes(index)){
@@ -230,6 +246,7 @@ export default class NodeDetails extends React.Component<Props, State> {
                     }
                     const classNameTop = "component-node-details details-top-" + key;
                     const classNameBottom = "component-node-details details-bottom-" + key;
+                    const classNameBottomRight = "component-node-details details-bottom-" + (key + 1);
                     return (
                         <div key = {key}>
                             <section className={classNameTop}>
@@ -243,12 +260,18 @@ export default class NodeDetails extends React.Component<Props, State> {
                             {lemma_list.length > 0 && <section className={classNameBottom}>
                                 <article>
                                     {lemma_list}
-                                    <button onClick={this.transformExprs.bind(this)}>Apply Transform</button>
+                                    <button className="action-button" onClick={this.transformExprs.bind(this)}>Apply Transform</button>
                                     {this.state.transformationFlag && <p>Transformation Complete</p>}
                                     {this.state.transformationFlag && <p>Applied Transformation: {this.state.appliedTransformation}</p>}
                                     {this.state.transformationErrorFlag && <p style={{color: "red"}}>Internal Server Error: Please Try Again</p>}
                                 </article>
                             </section>}
+                            <section className={classNameBottomRight}>
+                                <article>
+                                    <h2>Variable Designation</h2>
+                                </article>
+                            </section>
+                            
                         </div>
                     );
                 })}

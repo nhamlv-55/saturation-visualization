@@ -88,19 +88,18 @@ class App extends Component<Props, State> {
             if (json.status === "success") {
                 let tree = json.nodes_list;
                 for (let i = 0; i < Object.keys(tree).length; i++){
-                    let rawWithVars = replaceVarNames(tree[i].expr, json.var_names);
-                    let readable = toReadable(rawWithVars);
+                    let readable = toReadable(tree[i].expr);
                     tree[i].expr = {
-                        raw: rawWithVars,
+                        raw: tree[i].expr,
                         readable: readable,
                     };
                 }
                 const state = "loaded";
-                const PobLemmasMap = buildPobLemmasMap(tree, json.var_names);
+                const PobLemmasMap = buildPobLemmasMap(tree);
                 // NOTE: use varNames in state, not in props. The one in state is returned by the backend.
                 let ExprMap;
                 if (json.expr_map === "") {
-                    ExprMap = buildExprMap(tree, json.var_names);
+                    ExprMap = buildExprMap(tree);
                 }
                 else {
                     ExprMap = JSON.parse(json.expr_map);

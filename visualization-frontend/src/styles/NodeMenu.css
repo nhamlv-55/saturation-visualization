@@ -13,6 +13,7 @@
   background-repeat: no-repeat;
   background-position: center;
   color: transparent;
+  cursor: pointer;
 }
 
 .component-node-menu button:hover,

@@ -58,13 +58,54 @@
     overflow: auto;
     width: 30rem;
 }
+
+.component-node-details.details-bottom-0 pre {
+    display: inline-flex;
+    vertical-align: middle;
+    line-height: 20px;
+    margin: 0 0 0.5rem 0;
+}
+
+.component-node-details.details-bottom-0 .move-button {
+    height: 1.5rem;
+    width: 1.5rem;
+    border: none;
+    border-radius: 2px;
+    background-color: #d4d8d9;
+    background-repeat: no-repeat;
+    background-position: center;
+    color: transparent;
+    cursor: pointer;
+    display: inline-flex;
+    padding: 0;
+    margin-right: 10px;
+}
+
+.component-node-details.details-bottom-0 .move-button:hover {
+    box-shadow: 1px 3px 10px 0 rgba(0, 0, 0, .1);
+}
+
+.component-node-details.details-bottom-0 .move-button:focus {
+    outline: none;
+}
+
+.component-node-details.details-bottom-0 .move-button:active {
+    box-shadow: inset 1px 3px 8px 2px rgba(0, 0, 0, .1);
+    outline: none;
+}
+
+.component-node-details.details-bottom-0 .move-button:disabled {
+    background-color: #e6ebef;
+    box-shadow: none;
+    color: transparent;
+}
 .component-node-details.details-bottom-1 {
     position: fixed;
     bottom: 4rem;
     background: #f8f9fb;
     overflow: auto;
     width: 30rem;
-    left: 34rem;
+    right: 2rem;
 }
 .component-node-details.overview {
   background: #fff;
@@ -74,7 +115,7 @@
     padding: 0.5rem 0;
     overflow: auto;
     resize: vertical;
-    height: 500px;
+    height: 34vh;
 }
 
 .component-node-details article h2 {
@@ -89,7 +130,7 @@
 }
 
 .component-node-details h3 {
-  margin: -0.5rem 0 1rem;
+  margin: 0 0 0.5rem;
   padding: 0 5px;
   font-size: 0.833rem;
   font-weight: normal;
@@ -139,5 +180,9 @@ ul#id3 {
 .component-node-details article span {
     font-family: monospace;
     white-space: pre-wrap;
+}
+
+.component-node-details.details-bottom-0 .action-button {
+    display:block;
 }
 
