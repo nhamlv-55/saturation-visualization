@@ -7,7 +7,6 @@ import {
     getCleanExprList, getIndexOfLiteral,
     getOp, reorder
 } from "../helpers/readable";
-const reactStringReplace = require('react-string-replace');
 const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
