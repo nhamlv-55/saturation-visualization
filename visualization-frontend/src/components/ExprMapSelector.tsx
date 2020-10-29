@@ -96,7 +96,7 @@ class ExprMapSelector extends React.Component<Props, State> {
     render() {
         return (
             <section className={"component-node-details details-top-right"}>
-                <select id="exps" onChange={this.updateSelected.bind(this)}>
+                <select id="exprs" onChange={this.updateSelected.bind(this)}>
                 {this.state.matchingFiles.length > 0 && this.state.matchingFiles.map((exp, key) => (
                     <option key={key} value={exp.name}>{exp.name}</option>
                 ))}

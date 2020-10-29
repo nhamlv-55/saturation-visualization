@@ -1,7 +1,7 @@
 {
   "name": "visualization-frontend",
   "version": "0.1.0",
-  "homepage": "https://aishr.github.io/saturation-visualization",
+  "homepage": "https://nhamlv-55.github.io/spacer-visualization",
   "private": true,
   "dependencies": {
     "@types/jest": "^24.0.15",

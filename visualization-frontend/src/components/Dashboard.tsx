@@ -5,15 +5,36 @@ import IndividualBenchmark from "./DashboardComponents/IndividualBenchmark";
 import ResultsOverview from "./DashboardComponents/ResultsOverview";
 import arrow from './../resources/icons/singles/angle-arrow-down.svg'
 import TimeZoom from "./DashboardComponents/TimeZoom";
-import BarGraphOverview from "./DashboardComponents/BarGraphOverview";
+import GeneralGraphOverview from "./DashboardComponents/GeneralGraphOverview";
+import {dashboardConfig, dataItem, depthItem, memoryItem, resultItem, timeItem} from "./dashboardTypes";
 
-class Dashboard extends React.Component<any, any> {
+type State = {
+    data: dataItem[]
+    selectedBenchmark: string,
+    graphMin: number,
+    graphMax: number,
+    customMode: boolean,
+    customData: {
+        depth: depthItem[],
+        result: resultItem[], 
+        memory: memoryItem[], 
+        time: timeItem[]
+    },
+    zoomMode: string,
+    dashboardConfig: dashboardConfig
+}
+
+type Props = {
+    rawData: string
+}
+
+class Dashboard extends React.Component<Props, State> {
     private readonly overviewMetrics: string[];
-    constructor(props: any) {
+    constructor(props: Props) {
         super(props);
         this.overviewMetrics = ["depth", "memory", "time", "result"];
             this.state = {
-            data: "",
+            data: [],
             selectedBenchmark: "",
             graphMin: 0,
             graphMax: 30,
@@ -46,7 +67,7 @@ class Dashboard extends React.Component<any, any> {
     }
     componentDidMount() {
         this.loadData();
-        document.addEventListener("keydown", this.handleGraphTranslation.bind(this));
+        document.addEventListener("keydown", this.handleGraphTranslationKeyboard.bind(this));
     }
     
 
@@ -123,18 +144,17 @@ class Dashboard extends React.Component<any, any> {
         
     }
     
-    handleSidebarClick(origin, e) {
-        if (origin === "sidebar"){
-            this.setState({
-                selectedBenchmark: e.target.innerText
-            });
-        }
-        else if (origin === "dot"){
-            this.setState({
-                selectedBenchmark: e.index
-            });
-        }
-        
+    handleSidebarClick(e:React.MouseEvent<HTMLLIElement>) {
+        let event = e.target as HTMLElement;
+        this.setState({
+            selectedBenchmark: event.innerText
+        });
+    }
+    
+    handleSidebarClickDot(e: resultItem){
+        this.setState({
+            selectedBenchmark: e.index
+        });
     }
     
     handleHomeClick() {
@@ -164,42 +184,66 @@ class Dashboard extends React.Component<any, any> {
         });
     }
     
-    handleGraphTranslation(e) {
-        if (e.target.alt === "left-arrow" || e.keyCode === 37){
-            e.preventDefault();
-            if (this.state.graphMin > 0){
-                this.setState({
-                    graphMin: this.state.graphMin - 1,
-                    graphMax: this.state.graphMax - 1
-                });
-            }
+    moveGraphLeft() {
+        if (this.state.graphMin > 0){
+            this.setState({
+                graphMin: this.state.graphMin - 1,
+                graphMax: this.state.graphMax - 1
+            });
         }
-        else if (e.target.alt === "right-arrow" || e.keyCode === 39) {
-            e.preventDefault();
-            if (this.state.graphMax < this.state.data.length - 1 ){
-                this.setState({
-                    graphMin: this.state.graphMin + 1,
-                    graphMax: this.state.graphMax + 1
-                });
-            }
+    }
+    
+    moveGraphRight() {
+        if (this.state.graphMax < this.state.data.length - 1 ){
+            this.setState({
+                graphMin: this.state.graphMin + 1,
+                graphMax: this.state.graphMax + 1
+            });
         }
-        else if (e.keyCode === 40) {
-            e.preventDefault();
-            if (this.state.graphMax + 10 < this.state.data.length){
-                this.setState({
-                    graphMin: this.state.graphMin + 10,
-                    graphMax: this.state.graphMax + 10
-                });
-            }
+    }
+    
+    moveGraphUp() {
+        if (this.state.graphMin - 10 >= 0 ){
+            this.setState({
+                graphMin: this.state.graphMin - 10,
+                graphMax: this.state.graphMax - 10
+            });
         }
-        else if (e.keyCode === 38) {
-            e.preventDefault();
-            if (this.state.graphMin - 10 >= 0 ){
-                this.setState({
-                    graphMin: this.state.graphMin - 10,
-                    graphMax: this.state.graphMax - 10
-                });
-            }
+    }
+
+    moveGraphDown() {
+        if (this.state.graphMax + 10 < this.state.data.length){
+            this.setState({
+                graphMin: this.state.graphMin + 10,
+                graphMax: this.state.graphMax + 10
+            });
+        }
+    }
+
+    handleGraphTranslationClick(e:React.MouseEvent) {
+        e.preventDefault();
+        let clickEvent = e.target as HTMLImageElement;
+        if (clickEvent.alt === "left-arrow"){
+            this.moveGraphLeft();
+        }
+        else if (clickEvent.alt === "right-arrow"){
+            this.moveGraphRight();
+        }
+    }
+    
+    handleGraphTranslationKeyboard(e:KeyboardEvent) {
+        e.preventDefault();
+        if  (e.key === "ArrowLeft"){
+            this.moveGraphLeft();
+        }
+        else if (e.key === "ArrowRight") {
+            this.moveGraphRight();
+        }
+        else if (e.key === "ArrowDown") {
+            this.moveGraphDown();
+        }
+        else if (e.key === "ArrowUp") {
+            this.moveGraphUp();
         }
         
     }
@@ -208,7 +252,7 @@ class Dashboard extends React.Component<any, any> {
         this.setState({
             customMode: !this.state.customMode
         });
-        if (this.state.customMode === true){
+        if (this.state.customMode){
             this.setState({
                 customData: {
                     depth: [],
@@ -220,7 +264,7 @@ class Dashboard extends React.Component<any, any> {
         }
     }
 
-    filterDictionary(keys, custom=false, index=""){
+    filterDictionary(keys, custom:boolean=false, index:string=""){
         let data = this.state.data.slice(this.state.graphMin, this.state.graphMax);
         if (custom) {
             data = this.state.data.filter(function(d) {return d.index === index})
@@ -235,14 +279,15 @@ class Dashboard extends React.Component<any, any> {
         return result;
     }
     
-    addToCustomData(e) {
+    addToCustomData(e: React.MouseEvent) {
+        let event = e.target as HTMLLIElement;
         for (let i = 0; i < this.overviewMetrics.length; i++){
             let metric = this.overviewMetrics[i];
             let metricDataKeys = [metric].concat(["index"]);
             if (metric === "result") {
                 metricDataKeys.push("SPACER_num_invariants");
             }
-            let totalData = this.state.customData[metric].concat(this.filterDictionary(metricDataKeys, true, e.target.innerHTML));
+            let totalData = this.state.customData[metric].concat(this.filterDictionary(metricDataKeys, true, event.innerHTML));
             
             if (totalData.length > (this.state.graphMax - this.state.graphMin)){
                 totalData.splice(0,1);
@@ -264,7 +309,6 @@ class Dashboard extends React.Component<any, any> {
     }
     
     render() {
-        console.log(this.state.data);
         let benchmarks = d3.map(this.state.data, function(d) {return d.index;}).keys();
         let selectedBenchmark = this.state.selectedBenchmark;
         let timeZoomData;
@@ -286,17 +330,17 @@ class Dashboard extends React.Component<any, any> {
                       else if (selectedBenchmark) {
                           if (name === selectedBenchmark) {
                               return (<li className="selected" key={key}
-                                          onClick={this.handleSidebarClick.bind(this, "sidebar")}>{name}</li>);
+                                          onClick={this.handleSidebarClick.bind(this)}>{name}</li>);
                           }
-                          return (<li key={key} onClick={this.handleSidebarClick.bind(this, "sidebar")}>{name}</li>);
+                          return (<li key={key} onClick={this.handleSidebarClick.bind(this)}>{name}</li>);
                           
                       }
                       else {
                           if (key >= this.state.graphMin && key < this.state.graphMax) {
                               return (<li className="selected" key={key}
-                                          onClick={this.handleSidebarClick.bind(this, "sidebar")}>{name}</li>);
+                                          onClick={this.handleSidebarClick.bind(this)}>{name}</li>);
                           }
-                          return (<li key={key} onClick={this.handleSidebarClick.bind(this, "sidebar")}>{name}</li>);
+                          return (<li key={key} onClick={this.handleSidebarClick.bind(this)}>{name}</li>);
                       }
                   })}
               </div>
@@ -317,7 +361,7 @@ class Dashboard extends React.Component<any, any> {
                                           key={key}
                                           data={data}
                                           config={this.state.dashboardConfig}
-                                          selectBenchmark={this.handleSidebarClick.bind(this, "dot")}
+                                          selectBenchmark={this.handleSidebarClickDot.bind(this)}
                                       />
                                   );
                                   
@@ -330,7 +374,7 @@ class Dashboard extends React.Component<any, any> {
                                       key={key}
                                       data={data}
                                       config={this.state.dashboardConfig}
-                                      selectBenchmark={this.handleSidebarClick.bind(this, "dot")}
+                                      selectBenchmark={this.handleSidebarClickDot.bind(this)}
                                   />
                               );
                           }
@@ -338,7 +382,7 @@ class Dashboard extends React.Component<any, any> {
                               data = this.filterDictionary(["index"].concat([type]));
                           }
                           return (
-                              <BarGraphOverview
+                              <GeneralGraphOverview
                                   key={key}
                                   data={data}
                                   config={this.state.dashboardConfig}
@@ -349,8 +393,8 @@ class Dashboard extends React.Component<any, any> {
                               />
                           );
                       })}
-                      <img className="left-arrow" src={arrow} alt="left-arrow" onClick={this.handleGraphTranslation.bind(this)}/>
-                      <img className="right-arrow" src={arrow} alt="right-arrow" onClick={this.handleGraphTranslation.bind(this)}/>
+                      <img className="left-arrow" src={arrow} alt="left-arrow" onClick={this.handleGraphTranslationClick.bind(this)}/>
+                      <img className="right-arrow" src={arrow} alt="right-arrow" onClick={this.handleGraphTranslationClick.bind(this)}/>
                   </div>}
                   {this.state.zoomMode === "time" &&
                   <TimeZoom
