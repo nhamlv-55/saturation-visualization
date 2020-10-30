@@ -7,6 +7,5 @@ node_js:
 before_install:
   - sudo apt-get update -qq
   - cd visualization-frontend
-  - npm install
   - npm build
 script: npm deploy
