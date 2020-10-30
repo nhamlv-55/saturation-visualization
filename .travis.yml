@@ -1,0 +1,10 @@
+branches: 
+  only:
+  - master
+language: node_js
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq npm
+  - npm install
+  - npm build
+script: npm deploy
