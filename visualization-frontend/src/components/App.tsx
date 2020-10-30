@@ -108,7 +108,6 @@ class App extends Component<Props, State> {
                 ExprMap = JSON.parse(json.expr_map);
             }
 
-
             this.setState({
                 trees: [tree],
                 runCmd: json.run_cmd,
@@ -125,7 +124,7 @@ class App extends Component<Props, State> {
             }
             this.setState({
                 state: "error",
-                messages_q: [`Error: ${error["messages_q"]}`],
+                messages_q: [`Error: ${error["message"]}`],
             });
         }
     }
@@ -178,11 +177,11 @@ class App extends Component<Props, State> {
                 });
             } else {
                 assert(json.status === "error");
-                const errorMessages = json.message;
-                assert(errorMessages !== undefined && errorMessages !== null);
+                const errorMess = json.message;
+                assert(errorMess !== undefined && errorMess !== null);
                 this.setState({
                     state: "error",
-                    messages_q: errorMessages,
+                    messages_q: [errorMess],
                 });
             }
         } catch (error) {
@@ -191,7 +190,7 @@ class App extends Component<Props, State> {
             }
             this.setState({
                 state: "error",
-                messages_q: [`Error: ${error["messages_q"]}`],
+                messages_q: [`Error: ${error["message"]}`],
             });
         }
     }
