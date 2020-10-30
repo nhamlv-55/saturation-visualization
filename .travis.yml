@@ -1,0 +1,17 @@
+branches: 
+  only:
+  - master
+language: node_js
+node_js:
+  - 14
+before_install:
+  - sudo apt-get update -qq
+  - cd visualization-frontend
+script: yarn build
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+  keep_history: true
+  on:
+    branch: master

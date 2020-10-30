@@ -1,0 +1,241 @@
+{
+    "hidden": {
+        "hidden": true,
+        "markedStyle": {
+            "border": "#ffffff00",
+            "background": "#ffffff00"
+        },
+        "highlightStyle": {
+            "border": "#ffffff00",
+            "background": "#ffffff00"
+        },
+        "shape": "box",
+        "text": "#ffffff00",
+        "defaultStyle": {
+            "border": "#ffffff00",
+            "background": "#ffffff00"
+        }
+    },
+    "preprocessing-deleted": {
+        "hidden": false,
+        "markedStyle": {
+            "border": "#ee3377",
+            "background": "#ffaabb"
+        },
+        "highlightStyle": {
+            "border": "#ee8866",
+            "background": "#ee8866"
+        },
+        "shape": "box",
+        "text": "#000000",
+        "defaultStyle": {
+            "border": "#8cd1c9",
+            "background": "#abe0d1"
+        }
+    },
+    "preprocessing": {
+        "hidden": false,
+        "markedStyle": {
+            "border": "#ee3377",
+            "background": "#ffaabb"
+        },
+        "highlightStyle": {
+            "border": "#ee8866",
+            "background": "#ee8866"
+        },
+        "shape": "box",
+        "text": "#000000",
+        "defaultStyle": {
+            "border": "#8cd1c9",
+            "background": "#abe0d1"
+        }
+    },
+    "conjecture": {
+        "hidden": false,
+        "markedStyle": {
+            "border": "#ee3377",
+            "background": "#ffaabb"
+        },
+        "highlightStyle": {
+            "border": "#ee8866",
+            "background": "#ee8866"
+        },
+        "shape": "box",
+        "text": "#000000",
+        "defaultStyle": {
+            "border": "#009988",
+            "background": "#44bb99"
+        }
+    },
+    "theory-axiom-deleted": {
+        "hidden": false,
+        "markedStyle": {
+            "border": "#f8adc8",
+            "background": "#ffdde3"
+        },
+        "highlightStyle": {
+            "border": "#f8cfc1",
+            "background": "#f8cfc1"
+        },
+        "shape": "box",
+        "text": "#999999",
+        "defaultStyle": {
+            "border": "#b4c8dd",
+            "background": "#c8ddf1"
+        }
+    },
+    "theory-axiom": {
+        "hidden": false,
+        "markedStyle": {
+            "border": "#ee3377",
+            "background": "#ffaabb"
+        },
+        "highlightStyle": {
+            "border": "#ee8866",
+            "background": "#ee8866"
+        },
+        "shape": "box",
+        "text": "#000000",
+        "defaultStyle": {
+            "border": "#4477aa",
+            "background": "#77aadd"
+        }
+    },
+    "deleted": {
+        "hidden": false,
+        "markedStyle": {
+            "border": "#f8adc8",
+            "background": "#ffdde3"
+        },
+        "highlightStyle": {
+            "border": "#f8cfc1",
+            "background": "#f8cfc1"
+        },
+        "shape": "box",
+        "text": "#999999",
+        "defaultStyle": {
+            "border": "#f1f1f1",
+            "background": "#f8f8f8"
+        }
+    },
+    "passive": {
+        "hidden": false,
+        "markedStyle": {
+            "border": "#f8adc8",
+            "background": "#ffdde3"
+        },
+        "highlightStyle": {
+            "border": "#f8cfc1",
+            "background": "#f8cfc1"
+        },
+        "shape": "box",
+        "text": "#000000",
+        "defaultStyle": {
+            "border": "#FF3232",
+            "background": "#FF5959"
+        }
+    },
+    "activated-deleted": {
+        "hidden": false,
+        "markedStyle": {
+            "border": "#ee3377",
+            "background": "#ffaabb"
+        },
+        "highlightStyle": {
+            "border": "#ee8866",
+            "background": "#ee8866"
+        },
+        "shape": "box",
+        "text": "#000000",
+        "defaultStyle": {
+            "border": "#bbbbbb",
+            "background": "#dddddd"
+        }
+    },
+    "activated": {
+        "hidden": false,
+        "markedStyle": {
+            "border": "#ee3377",
+            "background": "#ffaabb"
+        },
+        "highlightStyle": {
+            "border": "#ee8866",
+            "background": "#ee8866"
+        },
+        "shape": "box",
+        "text": "#000000",
+        "defaultStyle": {
+            "border": "#bbbbbb",
+            "background": "#dddddd"
+        }
+    },
+    "lemma": {
+        "hidden": false,
+        "markedStyle": {
+            "border": "#16941c",
+            "background": "#a3f7a7"
+        },
+        "highlightStyle": {
+            "border": "#16941c",
+            "background": "#a3f7a7"
+        },
+        "shape": "star",
+        "text": "#000000",
+        "defaultStyle": {
+            "border": "#16941c",
+            "background": "#a3f7a7"
+        }
+    },
+    "boundary-hidden": {
+        "hidden": false,
+        "markedStyle": {
+            "border": "#ee3377",
+            "background": "#ffaabb"
+        },
+        "highlightStyle": {
+            "border": "#ee8866",
+            "background": "#ee8866"
+        },
+        "shape": "box",
+        "text": "#000000",
+        "defaultStyle": {
+            "border": "#4477aa",
+            "background": "#77aadd"
+        }
+    },
+    "boundary": {
+        "hidden": false,
+        "markedStyle": {
+            "border": "#ee3377",
+            "background": "#ffaabb"
+        },
+        "highlightStyle": {
+            "border": "#ee8866",
+            "background": "#ee8866"
+        },
+        "shape": "box",
+        "text": "#000000",
+        "defaultStyle": {
+            "border": "#4477aa",
+            "background": "#77aadd"
+        }
+    },
+    "sameExprID": {
+        "hidden": false,
+        "markedStyle": {
+            "border": "#ee3377",
+            "background": "#ffaabb"
+        },
+        "highlightStyle": {
+            "border": "#ee8866",
+            "background": "#ee8866"
+        },
+        "shape": "box",
+        "text": "#000000",
+        "defaultStyle": {
+            "border": "#4477aa",
+            "background": "#77aadd"
+        }
+    }
+
+}

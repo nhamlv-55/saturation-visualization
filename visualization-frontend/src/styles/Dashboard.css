@@ -1,0 +1,140 @@
+body {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+}
+
+.visual {
+    height: 100vh;
+    width: 90%;
+    position: absolute;
+    left: 10%;
+    top: 0;
+}
+
+[class*="timezoom"] {
+    display: inline-block;
+    margin: 10px;
+}
+[class*="timezoom"] p {
+    text-align: center;
+    font-size: 13px;
+}
+
+.sidebar {
+    height: 200vh;
+    overflow: scroll;
+    width: 10%;
+}
+
+.sidebar li {
+    font-size: 14px;
+    padding: 10px;
+    width: 100%;
+}
+
+.selected {
+    background-color: #f7cac9;
+}
+
+.sidebar li:hover {
+    background-color: #fce9e9; 
+    cursor: pointer;
+}
+
+.overview {
+    margin: 1%;
+}
+.details {
+    display: inline-block;
+    vertical-align: top;
+}
+.time {
+    display: inline-block;
+}
+
+.time h2 {
+    text-align: center;
+}
+
+.chart {
+    transform: translate(50%, 50%);
+}
+
+.tooltip {
+    color: black;
+    transform: translate(50%,50%);
+    font-size: 22px;
+    border: 1px solid black;
+    background-color: #f7cac9;
+}
+
+.home-button {
+    position:absolute;
+    right: 1%;
+    top: 1%;
+    width: 5%;
+}
+.custom-button {
+    position:absolute;
+    right: 1%;
+    top: 5%;
+    width: 5%;
+}
+
+.clear-button {
+    position:absolute;
+    right: 1%;
+    top: 9%;
+    width: 5%;
+}
+
+.dashboard {
+    width: 90%;
+    height: 1vh;
+}
+
+.bar {
+    fill: steelblue;     
+}
+
+.left-arrow {
+    position: absolute;
+    transform: rotate(90deg);
+    height: 5%;
+    right: 4%;
+    top: 15%;
+    
+}
+.right-arrow {
+    position: absolute;
+    transform: rotate(-90deg);
+    height: 5%;
+    top: 15%;
+    right: 1%;
+}
+
+.left-arrow:hover {
+    cursor: pointer
+}
+
+.right-arrow:hover {
+    cursor: pointer
+}
+
+.data-details {
+    font-size: 30px;
+}
+
+.depth-overview, .results-overview, 
+.memory-overview, .time-overview {
+    display: inline-block;
+} 
+
+.file-list {
+    width: 30%;
+    padding: 10px;
+    margin: 10px;
+}
+
+.file-list li {
+    list-style: none;
+}
