@@ -6,7 +6,7 @@ import ExprMapSelector from "./ExprMapSelector";
 const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
-    message: string,
+    messages_q: string[],
     mode: "proof" | "replay" | "iterative",
     tree: any | null,
     nodeSelection: number[],
@@ -84,7 +84,9 @@ class Aside extends React.Component<Props, State> {
         return(
             <aside>
                 <article>
-                    <section className="component-node-menu">{this.props.message}</section>
+                    {this.props.messages_q.map((mess) => (
+                        <section className="component-node-menu">{mess}</section>
+                    ))}
                     <section className="component-node-menu" >
                         { this.createButton("Poke", this.props.onPoke, "graph-undo") }
                         { this.createButton("SatVis", this.props.SatVisLayout, "node-parents") }
