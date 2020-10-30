@@ -25,7 +25,7 @@ type State = {
     state: "loaded" | "loaded iterative" | "waiting" | "layouting" | "error",
     trees: any[],
     runCmd: string,
-    message: string,
+    messages_q: string[],
     nodeSelection: number[],
     currentTime: number,
     layout: string,
@@ -43,7 +43,7 @@ class App extends Component<Props, State> {
         state: "waiting",
         trees: [],
         runCmd: "Run command:",
-        message: "",
+        messages_q: [""],
         nodeSelection: [],
         currentTime: 0,
         layout: "PobVis",
@@ -65,10 +65,13 @@ class App extends Component<Props, State> {
     }
 
     async poke() {
+        let message_q = ["Poking Spacer..."];
+        
+
         console.log("poking...")
         this.setState({
             state: "waiting",
-            message: "Poking Spacer...",
+            messages_q: message_q,
         });
 
         const fetchedJSON = await fetch('http://localhost:5000/spacer/poke', {
@@ -85,7 +88,8 @@ class App extends Component<Props, State> {
         try {
             const json = await fetchedJSON.json();
             console.log("backend response:", json);
-            if (json.status === "success") {
+            /* if (json.status === "success") { */
+                message_q = ["Get response from Backend."]
                 let tree = json.nodes_list;
                 for (let i = 0; i < Object.keys(tree).length; i++){
                     let rawWithVars = replaceVarNames(tree[i].expr, json.var_names);
@@ -105,32 +109,37 @@ class App extends Component<Props, State> {
                 else {
                     ExprMap = JSON.parse(json.expr_map);
                 }
+
+                
+
                 this.setState({
                     trees: [tree],
                     runCmd: json.run_cmd,
-                    message: "Spacer is "+json.spacer_state,
+                    messages_q: ["Spacer is "+json.spacer_state],
                     state: state,
                     PobLemmasMap: PobLemmasMap,
                     ExprMap: ExprMap,
                     varNames: json.var_names
                 });
                 console.log("state is set")
-            } else {
-                assert(json.status === "error");
-                const errorMessage = json.message;
-                assert(errorMessage !== undefined && errorMessage !== null);
-                this.setState({
-                    state: "error",
-                    message: errorMessage,
-                });
-            }
+                /* }
+                 * else {
+
+                 *     assert(json.status === "error");
+                 *     const errorMessages = json.message;
+                 *     assert(errorMessages !== undefined && errorMessages !== null);
+                 *     this.setState({
+                 *         state: "error",
+                 *         messages_q: errorMessages,
+                 *     });
+                 * } */
         } catch (error) {
             if (error.name === "SatVisAssertionError") {
                 throw error;
             }
             this.setState({
                 state: "error",
-                message: `Error: ${error["message"]}`,
+                messages_q: [`Error: ${error["messages_q"]}`],
             });
         }
     }
@@ -153,7 +162,7 @@ class App extends Component<Props, State> {
     async runSpacer(problem: string, spacerUserOptions: string, mode: "proof" | "replay" | "iterative") {
         this.setState({
             state: "waiting",
-            message: "Waiting for Spacer...",
+            messages_q: ["Waiting for Spacer..."],
         });
 
         const fetchedJSON = await fetch('http://localhost:5000/spacer/start_iterative', {
@@ -176,19 +185,19 @@ class App extends Component<Props, State> {
             console.log("backend response:", json);
             if (json.status === "success") {
                 const state = (mode === "iterative" && json.spacer_state === "running") ? "loaded iterative" : "loaded";
-                const message = "Hit Poke to update graph";
+                const messages_q = ["Hit Poke to update graph"];
                 this.setState({
                     exp_path: json.exp_name,
-                    message: message,
+                    messages_q: messages_q,
                     state: state,
                 });
             } else {
                 assert(json.status === "error");
-                const errorMessage = json.message;
-                assert(errorMessage !== undefined && errorMessage !== null);
+                const errorMessages_Q = json.messages_q;
+                assert(errorMessages_Q !== undefined && errorMessages_Q !== null);
                 this.setState({
                     state: "error",
-                    message: errorMessage,
+                    messages_q: errorMessages_Q,
                 });
             }
         } catch (error) {
@@ -197,7 +206,7 @@ class App extends Component<Props, State> {
             }
             this.setState({
                 state: "error",
-                message: `Error: ${error["message"]}`,
+                messages_q: [`Error: ${error["messages_q"]}`],
             });
         }
     }
@@ -234,12 +243,12 @@ class App extends Component<Props, State> {
             }
             else {
                 this.setState({
-                    message: "Hit Poke to update graph"
+                    messages_q: ["Hit Poke to update graph"]
                 })
             }
         } else {
             this.setState({
-                message: "Select Up to 2 nodes"
+                messages_q: ["Select Up to 2 nodes"]
             });
         }
         this.setState({
@@ -257,7 +266,7 @@ class App extends Component<Props, State> {
             state,
             trees,
             runCmd,
-            message,
+            messages_q,
             nodeSelection,
             currentTime,
             layout,
@@ -296,7 +305,7 @@ class App extends Component<Props, State> {
                 <div className= "app" >
                 { main }
                 <Aside
-                    message = {message}
+                    messages_q = {messages_q}
                     mode = { this.props.mode }
                     tree = { tree }
                     nodeSelection = { nodeSelection }
