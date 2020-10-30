@@ -105,7 +105,7 @@ export default class NodeDetails extends React.Component<Props, State> {
                                 break;
                             }
                         }
-                        exprList.map((literal, key) => {
+                        exprList.forEach((literal, key) => {
                             let lemmaColour = {
                                 color: "black"
                             }
