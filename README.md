@@ -52,4 +52,4 @@ We need 3 components to run this:
 Running this script will serve the frontend at [http://localhost:3000](http://localhost:3000).
 
 Note that even if the browser is popped up, the compilation process is still running, so it will take a while.
-
+ 
