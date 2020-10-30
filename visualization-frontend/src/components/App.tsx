@@ -66,7 +66,6 @@ class App extends Component<Props, State> {
 
     async poke() {
         let message_q = ["Poking Spacer..."];
-        
 
         console.log("poking...")
         this.setState({
@@ -88,51 +87,38 @@ class App extends Component<Props, State> {
         try {
             const json = await fetchedJSON.json();
             console.log("backend response:", json);
-            /* if (json.status === "success") { */
-                message_q = ["Get response from Backend."]
-                let tree = json.nodes_list;
-                for (let i = 0; i < Object.keys(tree).length; i++){
-                    let rawWithVars = replaceVarNames(tree[i].expr, json.var_names);
-                    let readable = toReadable(rawWithVars);
-                    tree[i].expr = {
-                        raw: rawWithVars,
-                        readable: readable,
-                    };
-                }
-                const state = "loaded";
-                const PobLemmasMap = buildPobLemmasMap(tree, json.var_names);
-                // NOTE: use varNames in state, not in props. The one in state is returned by the backend.
-                let ExprMap;
-                if (json.expr_map === "") {
-                    ExprMap = buildExprMap(tree, json.var_names);
-                }
-                else {
-                    ExprMap = JSON.parse(json.expr_map);
-                }
+            message_q = ["Get response from Backend."]
+            let tree = json.nodes_list;
+            for (let i = 0; i < Object.keys(tree).length; i++){
+                let rawWithVars = replaceVarNames(tree[i].expr, json.var_names);
+                let readable = toReadable(rawWithVars);
+                tree[i].expr = {
+                    raw: rawWithVars,
+                    readable: readable,
+                };
+            }
+            const state = "loaded";
+            const PobLemmasMap = buildPobLemmasMap(tree, json.var_names);
+            // NOTE: use varNames in state, not in props. The one in state is returned by the backend.
+            let ExprMap;
+            if (json.expr_map === "") {
+                ExprMap = buildExprMap(tree, json.var_names);
+            }
+            else {
+                ExprMap = JSON.parse(json.expr_map);
+            }
 
-                
 
-                this.setState({
-                    trees: [tree],
-                    runCmd: json.run_cmd,
-                    messages_q: ["Spacer is "+json.spacer_state],
-                    state: state,
-                    PobLemmasMap: PobLemmasMap,
-                    ExprMap: ExprMap,
-                    varNames: json.var_names
-                });
-                console.log("state is set")
-                /* }
-                 * else {
-
-                 *     assert(json.status === "error");
-                 *     const errorMessages = json.message;
-                 *     assert(errorMessages !== undefined && errorMessages !== null);
-                 *     this.setState({
-                 *         state: "error",
-                 *         messages_q: errorMessages,
-                 *     });
-                 * } */
+            this.setState({
+                trees: [tree],
+                runCmd: json.run_cmd,
+                messages_q: ["Spacer is "+json.spacer_state],
+                state: state,
+                PobLemmasMap: PobLemmasMap,
+                ExprMap: ExprMap,
+                varNames: json.var_names
+            });
+            console.log("state is set")
         } catch (error) {
             if (error.name === "SatVisAssertionError") {
                 throw error;
@@ -143,7 +129,7 @@ class App extends Component<Props, State> {
             });
         }
     }
-    
+
     async saveExprMap() {
         await fetch('http://localhost:5000/spacer/save_exprs', {
             method: 'POST',
@@ -157,7 +143,6 @@ class App extends Component<Props, State> {
             })
         });
     }
-    
 
     async runSpacer(problem: string, spacerUserOptions: string, mode: "proof" | "replay" | "iterative") {
         this.setState({
@@ -193,11 +178,11 @@ class App extends Component<Props, State> {
                 });
             } else {
                 assert(json.status === "error");
-                const errorMessages_Q = json.messages_q;
-                assert(errorMessages_Q !== undefined && errorMessages_Q !== null);
+                const errorMessages = json.message;
+                assert(errorMessages !== undefined && errorMessages !== null);
                 this.setState({
                     state: "error",
-                    messages_q: errorMessages_Q,
+                    messages_q: errorMessages,
                 });
             }
         } catch (error) {
