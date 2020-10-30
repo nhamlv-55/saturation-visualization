@@ -24,7 +24,7 @@ class GeneralGraphOverview extends React.Component<Props, State> {
     }
     
     createGraph() {
-        d3. select("." + this.props.className + "svg").remove();
+        d3.select("." + this.props.className + " svg").remove();
         
         if (this.props.data.length === 0) return;
         let data = this.props.data;
