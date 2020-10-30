@@ -2,9 +2,10 @@ branches:
   only:
   - master
 language: node_js
+node_js:
+  - 14
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq npm
-  - npm install
+  - cd visualization-frontend
   - npm build
 script: npm deploy
