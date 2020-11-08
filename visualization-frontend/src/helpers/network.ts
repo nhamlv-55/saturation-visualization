@@ -1,5 +1,8 @@
+import {parse} from "s-exify";
+import { DataSet, Network, Node, Edge } from 'vis'
+import { isObject } from "util";
+import { assert } from "../model/util";
 const styleTemplates = require('../resources/styleTemplates');
-
 export const lemmaColours = [
     "#e6194B",
     "#f58231",
@@ -178,3 +181,149 @@ export function toVisEdge(edgeId: number, parentNodeId: number, nodeID: number, 
 export function getSliderValue(slider): number {
     return slider.current ? parseInt(slider.current.value, 10) : 0;
 }
+
+export class ASTNode{
+    nodeID: number;
+    token: string;
+    parentID: number;
+    children: ASTNode[];
+    transformers = [];
+    constructor(nodeID: number, token: string, parentID: number, children: ASTNode[]){
+        this.nodeID = nodeID;
+        this.token = token;
+        this.parentID = parentID;
+        this.children = children;
+    }
+
+
+}
+
+function isOpt(lst){
+    const optList = ["+", "-", "*", "/",
+                     ">", "<", ">=", "<=", "=",
+                     "and", "or", "not", "=>",
+                     "assert",
+                     "declare-datatypes",
+                    "forall"]
+    if(typeof lst !== "string"){
+        return false;
+    }
+    return optList.indexOf(lst)>-1;
+}
+
+export class ASTTransformer{
+
+    flipCmp(node: ASTNode): ASTNode{
+        assert(node.children.length === 2);
+        switch(node.token){
+            case "=":
+                return new ASTNode(node.nodeID, "=", node.parentID, [node.children[1], node.children[0]]);
+            case "<":
+                return new ASTNode(node.nodeID, ">=", node.parentID, [node.children[1], node.children[0]]);
+            case ">":
+                return new ASTNode(node.nodeID, "<=", node.parentID, [node.children[1], node.children[0]]);
+            case ">=":
+                return new ASTNode(node.nodeID, "<", node.parentID, [node.children[1], node.children[0]]);
+            case "<=":
+                return new ASTNode(node.nodeID, ">", node.parentID, [node.children[1], node.children[0]]);
+            default:
+                return node;
+        }
+    }
+
+
+}
+
+
+export class AST {
+    root: ASTNode;
+    nodeList = new Array<ASTNode>();
+    visNodes = new Array<Node>();
+    visEdges = new Array<Edge>();
+
+    constructor(formula: string){
+        this.root = this.lstToAST(-1, parse(formula));
+        this.buildVis();
+    }
+
+
+
+
+    lstToAST(parentID, lst): ASTNode{
+        const nodeID = this.nodeList.length
+        if(typeof lst === 'string'){
+            const node = new ASTNode(nodeID, lst, parentID, []);
+            this.nodeList.push(node);
+            return node;
+        }
+
+        //if is an opt
+        if(isOpt(lst[0])){
+            let node = new ASTNode(nodeID, lst[0], parentID, []);
+            this.nodeList.push(node);
+
+            for(var _i=1; _i < lst.length; _i++){
+                node.children.push(this.lstToAST(nodeID, lst[_i]));
+            }
+
+            return node;
+        }else{
+            //is a list
+            let node = new ASTNode(nodeID, "list", parentID, []);
+            this.nodeList.push(node);
+
+            for(var _i=0; _i < lst.length; _i++){
+                node.children.push(this.lstToAST(nodeID, lst[_i]));
+            }
+
+            return node;
+        }
+
+        //
+    }
+
+    buildVis(){
+        console.log(this.nodeList)
+        this.visNodes = [];
+        this.visEdges = [];
+
+        for(const node of this.nodeList){
+            this.visNodes.push({
+                id: node.nodeID,
+                label: node.token,
+                shape: "box",
+                size: 20
+            })
+            for(const child of node.children){
+                this.visEdges.push({
+                    id: this.visEdges.length,
+                    from: node.nodeID,
+                    to: child.nodeID
+                })
+            }
+        }
+    }
+
+
+
+
+    toHTML(selectedID: number, node: ASTNode): string{
+        let result: string;
+        if(node.children.length == 0){
+            result = node.token
+        }else{
+            let children = ""
+            for(const child of node.children){
+                children+=this.toHTML(selectedID, child);
+            }
+            result = node.token + "(" + children + ")";
+        }
+        
+        if(selectedID == node.nodeID){
+            return '<span class="highlighted">' + result + '</span>'
+        }else{
+            return result;
+        }
+    }
+}
+
