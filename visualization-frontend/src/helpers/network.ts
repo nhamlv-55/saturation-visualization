@@ -312,11 +312,19 @@ export class AST {
         if(node.children.length == 0){
             result = node.token
         }else{
-            let children = ""
+            let children = new Array<string>();
+            if(node.token !== 'list'){ children.push(node.token);  }
+
             for(const child of node.children){
-                children+=this.toHTML(selectedID, child);
+                children.push(this.toHTML(selectedID, child));
             }
-            result = node.token + "(" + children + ")";
+            if (children.length === 1){
+                result = children.join(" ");
+            }else{
+                result = "("+children.join(" ")+")";
+            }
+
+
         }
         
         if(selectedID == node.nodeID){
