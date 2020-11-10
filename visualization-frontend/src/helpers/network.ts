@@ -2,7 +2,10 @@ import {parse} from "s-exify";
 import { DataSet, Network, Node, Edge } from 'vis'
 import { isObject } from "util";
 import { assert } from "../model/util";
+const _ = require("lodash");
+
 const styleTemplates = require('../resources/styleTemplates');
+
 export const lemmaColours = [
     "#e6194B",
     "#f58231",
@@ -186,9 +189,9 @@ export class ASTNode{
     nodeID: number;
     token: string;
     parentID: number;
-    children: ASTNode[];
+    children: number[];
     transformers = [];
-    constructor(nodeID: number, token: string, parentID: number, children: ASTNode[]){
+    constructor(nodeID: number, token: string, parentID: number, children: number[]){
         this.nodeID = nodeID;
         this.token = token;
         this.parentID = parentID;
@@ -213,48 +216,85 @@ function isOpt(lst){
 
 export class ASTTransformer{
 
-    flipCmp(node: ASTNode): ASTNode{
-        assert(node.children.length === 2);
+    flipCmp(node: ASTNode, ast: AST): AST{
+        let cloned_ast = _.cloneDeep(ast);
+
+        
+
         switch(node.token){
-            case "=":
-                return new ASTNode(node.nodeID, "=", node.parentID, [node.children[1], node.children[0]]);
+            // case "=":
+            //     let new_node = new ASTNode(node.nodeID, "=", node.parentID, [node.children[1], node.children[0]]);
+            //     cloned_ast.nodeList[node.nodeID] = new_node;
+            //     break;
             case "<":
-                return new ASTNode(node.nodeID, ">=", node.parentID, [node.children[1], node.children[0]]);
-            case ">":
-                return new ASTNode(node.nodeID, "<=", node.parentID, [node.children[1], node.children[0]]);
-            case ">=":
-                return new ASTNode(node.nodeID, "<", node.parentID, [node.children[1], node.children[0]]);
-            case "<=":
-                return new ASTNode(node.nodeID, ">", node.parentID, [node.children[1], node.children[0]]);
-            default:
-                return node;
+                let new_node = new ASTNode(node.nodeID, ">=", node.parentID, [node.children[1], node.children[0]]);
+                cloned_ast.nodeList[node.nodeID] = new_node;
+                break;
+            // case ">":
+            //     return new ASTNode(node.nodeID, "<=", node.parentID, [node.children[1], node.children[0]]);
+            // case ">=":
+            //     return new ASTNode(node.nodeID, "<", node.parentID, [node.children[1], node.children[0]]);
+            // case "<=":
+            //     return new ASTNode(node.nodeID, ">", node.parentID, [node.children[1], node.children[0]]);
+            // default:
+            //     return node;
         }
+
+        cloned_ast.buildVis();
+        console.log("cloned_ast", cloned_ast);
+        return cloned_ast;
     }
+
+    toImp(node: ASTNode, ast: AST): AST{
+        let cloned_ast = _.cloneDeep(ast);
+
+        let parent = cloned_ast.nodeList[node.parentID];
+        console.log("parent", parent);
+
+        let newHead = new ASTNode(cloned_ast.nodeList.length, "not", parent.nodeID, [node.nodeID]);
+        cloned_ast.nodeList.push(newHead);
+
+        let newTail = new ASTNode(cloned_ast.nodeList.length, "or", parent.nodeID, []);
+        cloned_ast.nodeList.push(newTail);
+
+        for(var childID of parent.children){
+            if(childID != node.nodeID){
+                cloned_ast.nodeList[childID].parentID = newTail.nodeID;
+                newTail.children.push(childID);
+            }
+        }
+
+        let newParent = new ASTNode(parent.nodeID, "=>", parent.parentID, [newHead.nodeID, newTail.nodeID]);
+        cloned_ast.nodeList[parent.nodeID] = newParent;
+
+        cloned_ast.buildVis();
+
+        return cloned_ast;
+    } 
 
 
 }
 
 
 export class AST {
-    root: ASTNode;
     nodeList = new Array<ASTNode>();
     visNodes = new Array<Node>();
     visEdges = new Array<Edge>();
 
     constructor(formula: string){
-        this.root = this.lstToAST(-1, parse(formula));
+        this.lstToAST(-1, parse(formula));
         this.buildVis();
     }
 
 
 
 
-    lstToAST(parentID, lst): ASTNode{
+    lstToAST(parentID, lst): number{
         const nodeID = this.nodeList.length
         if(typeof lst === 'string'){
             const node = new ASTNode(nodeID, lst, parentID, []);
             this.nodeList.push(node);
-            return node;
+            return nodeID;
         }
 
         //if is an opt
@@ -263,10 +303,11 @@ export class AST {
             this.nodeList.push(node);
 
             for(var _i=1; _i < lst.length; _i++){
+
                 node.children.push(this.lstToAST(nodeID, lst[_i]));
             }
 
-            return node;
+            return nodeID;
         }else{
             //is a list
             let node = new ASTNode(nodeID, "list", parentID, []);
@@ -276,7 +317,7 @@ export class AST {
                 node.children.push(this.lstToAST(nodeID, lst[_i]));
             }
 
-            return node;
+            return nodeID;
         }
 
         //
@@ -294,11 +335,11 @@ export class AST {
                 shape: "box",
                 size: 20
             })
-            for(const child of node.children){
+            for(const childID of node.children){
                 this.visEdges.push({
                     id: this.visEdges.length,
                     from: node.nodeID,
-                    to: child.nodeID
+                    to: childID
                 })
             }
         }
@@ -315,8 +356,8 @@ export class AST {
             let children = new Array<string>();
             if(node.token !== 'list'){ children.push(node.token);  }
 
-            for(const child of node.children){
-                children.push(this.toHTML(selectedID, child));
+            for(const childID of node.children){
+                children.push(this.toHTML(selectedID, this.nodeList[childID]));
             }
             if (children.length === 1){
                 result = children.join(" ");

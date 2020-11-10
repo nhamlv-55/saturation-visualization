@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {options} from "../helpers/transformers";
-import { AST, ASTNode} from "./../helpers/network";
+import { AST, ASTNode, ASTTransformer} from "./../helpers/network";
 import { assert } from '../model/util';
 import { DataSet, Network, Node, Edge } from 'vis'
 
@@ -16,8 +16,8 @@ type State = {
     optionType: string,
     allOptions: {type:string, name: string, value:string}[],
     showOptions: boolean,
-    ast: AST|null,
-    selectedNodeID: number
+    selectedNodeID: number,
+    stringRep: string
 }
 
 class TreeEditor extends React.Component<Props, State> {
@@ -28,27 +28,43 @@ class TreeEditor extends React.Component<Props, State> {
         optionName: "",
         allOptions: [],
         showOptions: true,
-        ast: new AST(this.props.input),
-        selectedNodeID: -1
+        selectedNodeID: -1,
+        stringRep: ""
     }
     network: Network | null = null;
     networkNodes = new DataSet<Node>([]);
     networkEdges = new DataSet<Edge>([]);
     graphContainer = React.createRef<HTMLDivElement>();
+    astStack = new Array<AST>();
 
     componentDidMount() {
         this.generateNetwork();
         this.network!.fit();
     }
 
-    componentDidUpdate(prevProps, prevState){
-        if(prevProps.input != this.props.input || prevState.ast != this.state.ast){
-            this.state.ast = new AST(this.props.input);
+    redrawAST(){
+        if(this.astStack[this.astStack.length-1] != null){
+            let ast = this.astStack[this.astStack.length-1];
+            console.log(ast);
+            console.log("visNodes", ast.visNodes);
+            console.log("visEdges", ast.visEdges);
             this.networkNodes.clear();
-            this.networkNodes.add(this.state.ast.visNodes);
+            this.networkNodes.add(ast.visNodes);
             this.networkEdges.clear();
-            this.networkEdges.add(this.state.ast.visEdges);
-            this.network!.fit();
+            this.networkEdges.add(ast.visEdges);
+            /* this.network!.fit(); */
+            this.network!.redraw();
+            console.log(ast.toHTML(this.state.selectedNodeID, ast.nodeList[0]));
+            this.setState({stringRep: ast.toHTML(this.state.selectedNodeID, ast.nodeList[0])});
+        }
+    }
+
+
+
+    componentDidUpdate(prevProps: Props){
+        if(prevProps.input !== this.props.input){
+            this.astStack.push(new AST(this.props.input));
+            this.redrawAST();
         }
     }
 
@@ -65,7 +81,7 @@ class TreeEditor extends React.Component<Props, State> {
                 multiselect: false
             },layout: {
                 hierarchical: {
-                    direction: 'UD',
+                    /* direction: 'UD', */
                     sortMethod: 'directed',
                 },
             }
@@ -122,6 +138,15 @@ class TreeEditor extends React.Component<Props, State> {
     }
 
     displaySpacerOptions() {
+        if (this.props.spacerUserOptions !== "") {
+            return this.props.spacerUserOptions.trim().split(" ");
+        }
+        return []
+    }
+    displayTransformers() {
+        
+
+
         if (this.props.spacerUserOptions !== "") {
             return this.props.spacerUserOptions.trim().split(" ");
         }
@@ -190,41 +215,62 @@ class TreeEditor extends React.Component<Props, State> {
             showOptions: !this.state.showOptions
         });
     }
+
+    flipCmp(){
+        const transformer = new ASTTransformer();
+        const currentAST = this.astStack[this.astStack.length - 1];
+        let node = currentAST.nodeList[this.state.selectedNodeID];
+        this.astStack.push(transformer.flipCmp(node, currentAST));
+        this.redrawAST();
+    }
+    toImp(){
+        const transformer = new ASTTransformer();
+        const currentAST = this.astStack[this.astStack.length - 1];
+        let node = currentAST.nodeList[this.state.selectedNodeID];
+        this.astStack.push(transformer.toImp(node, currentAST));
+        this.redrawAST();
+    }
+    undo(){
+        this.astStack.pop();
+        this.redrawAST();
+    }
+
     render() {
         let selectedOptions = this.displaySpacerOptions();
-        let astHTML = this.state.ast.toHTML(this.state.selectedNodeID, this.state.ast.root);
-        console.log('astHTML', astHTML);
         return (
                 <fieldset className="options-card" id="graph-container">
                     <h3>Transformer Queue</h3>
                     <ul>
-                        <li>
-                            <label htmlFor="userOptions" className="form-label">Transformer options</label>
-                            {selectedOptions.length !== 0 && this.state.showOptions && selectedOptions.map((option, key) => {
+                        <button onClick={this.flipCmp.bind(this)}>Flip Cmp</button>
+                        <button onClick={this.toImp.bind(this)}>To Imp</button>
+                        <button onClick={this.undo.bind(this)}>Undo</button>
+                        {/* <li> */}
+                            {/* <label htmlFor="userOptions" className="form-label">Transformer options</label>
+                                {selectedOptions.length !== 0 && this.state.showOptions && selectedOptions.map((option, key) => {
                                 if (option !== "") {
-                                    let kvp = option.split("=");
-                                    let name = kvp[0];
-                                    let value = kvp[1];
-                                    let displayValue = value ? name + ": " + value : name;
-                                    return (
-                                        <div className="displaySpacerOption" key={key}>
-                                            <span>{displayValue}</span>
-                                            <button className="fake-button" type="button" onClick={this.removeOption.bind(this, name, value)}>x</button>
-                                        </div>
-                                    );
+                                let kvp = option.split("=");
+                                let name = kvp[0];
+                                let value = kvp[1];
+                                let displayValue = value ? name + ": " + value : name;
+                                return (
+                                <div className="displaySpacerOption" key={key}>
+                                <span>{displayValue}</span>
+                                <button className="fake-button" type="button" onClick={this.removeOption.bind(this, name, value)}>x</button>
+                                </div>
+                                );
                                 }
                                 return "";
-                            })}
-                            <form className="tfradio" name="tfradio" onSubmit={this.storeSpacerOptions.bind(this)}>
+                                })}
+                                <form className="tfradio" name="tfradio" onSubmit={this.storeSpacerOptions.bind(this)}>
                                 <input type="text" className="optionsList" list="spacerOptions" name="spacerOptions" onChange={this.changeOptionType.bind(this)}/>
                                 <datalist id="spacerOptions">
-                                    {options.map((part, key) => (
-                                        <option value={part.name} key={key}/>
-                                    ))}
+                                {options.map((part, key) => (
+                                <option value={part.name} key={key}/>
+                                ))}
                                 </datalist>
                                 {this.state.optionTypeHTML}
-                            </form>
-                        </li>
+                                </form>
+                                </li> */}
                         {/* <label>Or using manual run parameters</label>
                             <input type="text" name="manualRun" onChange={this.changeSpacerManualUserOptions.bind(this)}/>
                             <li>
@@ -233,7 +279,7 @@ class TreeEditor extends React.Component<Props, State> {
                             <input type="text" name="variables" onChange={this.props.onChangeVariables}/>
                             </li> */}
                     </ul>
-                    <h4><div dangerouslySetInnerHTML={{ __html: astHTML }} /></h4>
+                    <h4><div dangerouslySetInnerHTML={{ __html: this.state.stringRep }} /></h4>
                     <div className= "component-graph" ref = { this.graphContainer }>
                         <canvas />
                     </div>
