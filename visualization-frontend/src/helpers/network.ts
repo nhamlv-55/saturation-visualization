@@ -188,12 +188,16 @@ export function getSliderValue(slider): number {
 export class ASTNode{
     nodeID: number;
     token: string;
+    shouldBreak: number;
+    shouldInBracket: number;
     parentID: number;
     children: number[];
     transformers = [];
     constructor(nodeID: number, token: string, parentID: number, children: number[]){
         this.nodeID = nodeID;
         this.token = token;
+        this.shouldBreak = 0;
+        this.shouldInBracket = 1;
         this.parentID = parentID;
         this.children = children;
     }
@@ -273,6 +277,18 @@ export class ASTTransformer{
     } 
 
 
+    changeBreak(node: ASTNode, ast: AST): AST{
+        let cloned_ast = _.cloneDeep(ast);
+        cloned_ast.nodeList[node.nodeID].shouldBreak ^= 1;
+        cloned_ast.buildVis();
+        return cloned_ast;
+    }
+    changeBracket(node: ASTNode, ast: AST): AST{
+        let cloned_ast = _.cloneDeep(ast);
+        cloned_ast.nodeList[node.nodeID].shouldInBracket ^= 1;
+        cloned_ast.buildVis();
+        return cloned_ast;
+    }
 }
 
 
@@ -331,9 +347,9 @@ export class AST {
         for(const node of this.nodeList){
             this.visNodes.push({
                 id: node.nodeID,
-                label: node.token,
+                label: node.token + ((node.shouldInBracket)?'+()':'') + ((node.shouldBreak)?'+nl':''),
                 shape: "box",
-                size: 20
+                size: 20,
             })
             for(const childID of node.children){
                 this.visEdges.push({
@@ -359,7 +375,7 @@ export class AST {
             for(const childID of node.children){
                 children.push(this.toHTML(selectedID, this.nodeList[childID]));
             }
-            if (children.length === 1){
+            if (children.length === 1 || !node.shouldInBracket){
                 result = children.join(" ");
             }else{
                 result = "("+children.join(" ")+")";
@@ -367,12 +383,18 @@ export class AST {
 
 
         }
-        
+
+        //add highlight
         if(selectedID == node.nodeID){
-            return '<span class="highlighted">' + result + '</span>'
-        }else{
-            return result;
+            result = '<span class="highlighted">' + result + '</span>'
         }
+
+        //add linebreak
+        if(node.shouldBreak){
+            result+='</br>'
+        }
+
+        return result
     }
 }
 

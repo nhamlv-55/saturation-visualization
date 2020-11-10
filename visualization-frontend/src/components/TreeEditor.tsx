@@ -37,6 +37,7 @@ class TreeEditor extends React.Component<Props, State> {
     graphContainer = React.createRef<HTMLDivElement>();
     astStack = new Array<AST>();
 
+    transformer = new ASTTransformer();
     componentDidMount() {
         this.generateNetwork();
         this.network!.fit();
@@ -217,17 +218,27 @@ class TreeEditor extends React.Component<Props, State> {
     }
 
     flipCmp(){
-        const transformer = new ASTTransformer();
         const currentAST = this.astStack[this.astStack.length - 1];
         let node = currentAST.nodeList[this.state.selectedNodeID];
-        this.astStack.push(transformer.flipCmp(node, currentAST));
+        this.astStack.push(this.transformer.flipCmp(node, currentAST));
         this.redrawAST();
     }
     toImp(){
-        const transformer = new ASTTransformer();
         const currentAST = this.astStack[this.astStack.length - 1];
         let node = currentAST.nodeList[this.state.selectedNodeID];
-        this.astStack.push(transformer.toImp(node, currentAST));
+        this.astStack.push(this.transformer.toImp(node, currentAST));
+        this.redrawAST();
+    }
+    changeBreak(){
+        const currentAST = this.astStack[this.astStack.length - 1];
+        let node = currentAST.nodeList[this.state.selectedNodeID];
+        this.astStack.push(this.transformer.changeBreak(node, currentAST));
+        this.redrawAST();
+    }
+    changeBracket(){
+        const currentAST = this.astStack[this.astStack.length - 1];
+        let node = currentAST.nodeList[this.state.selectedNodeID];
+        this.astStack.push(this.transformer.changeBracket(node, currentAST));
         this.redrawAST();
     }
     undo(){
@@ -243,6 +254,8 @@ class TreeEditor extends React.Component<Props, State> {
                     <ul>
                         <button onClick={this.flipCmp.bind(this)}>Flip Cmp</button>
                         <button onClick={this.toImp.bind(this)}>To Imp</button>
+                        <button onClick={this.changeBreak.bind(this)}>\n?</button>
+                        <button onClick={this.changeBracket.bind(this)}>()?</button>
                         <button onClick={this.undo.bind(this)}>Undo</button>
                         {/* <li> */}
                             {/* <label htmlFor="userOptions" className="form-label">Transformer options</label>
