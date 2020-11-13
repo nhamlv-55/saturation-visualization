@@ -202,7 +202,6 @@ export class ASTNode{
         this.children = children;
     }
 
-
 }
 
 function isOpt(lst){
@@ -218,38 +217,118 @@ function isOpt(lst){
     return optList.indexOf(lst)>-1;
 }
 
+export class Transformer{
+    action: string;
+    params: {};
+
+    constructor(action: string, params: {}){
+        this.action = action;
+        this.params = params;
+    }
+}
+
 export class ASTTransformer{
+    run(node: ASTNode, ast: AST, t: Transformer): AST{
+        switch(t.action){
+            case "move":
+                return this.move(node, ast, t.params);
+            case "flipCmp":
+                return this.flipCmp(node, ast, t.params);
+            case "toImp":
+                return this.toImp(node, ast, t.params);
+            case "rename":
+                return this.rename(node, ast, t.params);
+            case "changeBreak":
+                return this.changeBreak(node, ast, t.params);
+            case "changeBracket":
+                return this.changeBracket(node, ast, t.params);
+            default:
+                return ast;
+        }
+    }
 
-    flipCmp(node: ASTNode, ast: AST): AST{
+    runStack(node: ASTNode, ast: AST, s: Transformer[]){
+        let result = _.cloneDeep(ast);
+        for(var transformer of s){
+            result = this.run(node, ast, transformer);
+        }
+        return result;
+    }
+
+    move(node: ASTNode, ast: AST, params: {}): AST{
+        /*
+          move an AST node to the left or to the right
+          E.g: moveLeft("+ x y z", "z") -> "+ x z y"
+         */
+        const movable = ["+", "*", "=", "and", "or"];
         let cloned_ast = _.cloneDeep(ast);
+        let parent = cloned_ast.nodeList[node.parentID];
+        assert('direction' in params);
+        assert(movable.indexOf(parent.token)!=-1, "The parent node doesnt support reordering.");//only can move stuff under some opt
+        let siblings = parent.children;
 
-        
+        const nodePosition = siblings.indexOf(node.nodeID);
 
-        switch(node.token){
-            // case "=":
-            //     let new_node = new ASTNode(node.nodeID, "=", node.parentID, [node.children[1], node.children[0]]);
-            //     cloned_ast.nodeList[node.nodeID] = new_node;
-            //     break;
-            case "<":
-                let new_node = new ASTNode(node.nodeID, ">=", node.parentID, [node.children[1], node.children[0]]);
-                cloned_ast.nodeList[node.nodeID] = new_node;
+        switch(params["direction"]){
+            case "l":{
+                if(nodePosition>0){
+                    //ES6 magic
+                    [siblings[nodePosition], siblings[nodePosition-1]] = [siblings[nodePosition-1], siblings[nodePosition]];
+                }
                 break;
-            // case ">":
-            //     return new ASTNode(node.nodeID, "<=", node.parentID, [node.children[1], node.children[0]]);
-            // case ">=":
-            //     return new ASTNode(node.nodeID, "<", node.parentID, [node.children[1], node.children[0]]);
-            // case "<=":
-            //     return new ASTNode(node.nodeID, ">", node.parentID, [node.children[1], node.children[0]]);
-            // default:
-            //     return node;
+            }
+            case "r":{
+                if(nodePosition<siblings.length-1){
+                    //ES6 magic
+                    [siblings[nodePosition], siblings[nodePosition+1]] = [siblings[nodePosition+1], siblings[nodePosition]];
+                }
+                break;
+            }
+            default:
+                break;
         }
 
         cloned_ast.buildVis();
-        console.log("cloned_ast", cloned_ast);
         return cloned_ast;
     }
 
-    toImp(node: ASTNode, ast: AST): AST{
+    flipCmp(node: ASTNode, ast: AST, params: {}): AST{
+        /*
+          flip a comparison node
+          E.g: flipCmp("> x y") -> "<= y x"
+         */
+        let cloned_ast = _.cloneDeep(ast);
+        let new_node : ASTNode;
+        switch(node.token){
+            case "=":{
+                new_node = new ASTNode(node.nodeID, "=", node.parentID, [node.children[1], node.children[0]]);
+                break;
+            }
+            case "<":{
+                new_node = new ASTNode(node.nodeID, ">=", node.parentID, [node.children[1], node.children[0]]);
+                break;
+            }
+            case ">":{
+                new_node = new ASTNode(node.nodeID, "<=", node.parentID, [node.children[1], node.children[0]]);
+                break;
+            }
+            case ">=":{
+                new_node = new ASTNode(node.nodeID, "<", node.parentID, [node.children[1], node.children[0]]);
+                break;
+            }
+            case "<=":{
+                new_node = new ASTNode(node.nodeID, ">", node.parentID, [node.children[1], node.children[0]]);
+                break;
+            }
+            default:
+                new_node = node;
+        }
+        cloned_ast.nodeList[node.nodeID] = new_node;
+        cloned_ast.buildVis();
+        return cloned_ast;
+    }
+
+    toImp(node: ASTNode, ast: AST, params: {}): AST{
         let cloned_ast = _.cloneDeep(ast);
 
         let parent = cloned_ast.nodeList[node.parentID];
@@ -276,14 +355,17 @@ export class ASTTransformer{
         return cloned_ast;
     } 
 
-
-    changeBreak(node: ASTNode, ast: AST): AST{
+    rename(node: ASTNode, ast: AST, params: {}): AST{
+        let cloned_ast = _.cloneDeep(ast);
+        return cloned_ast;
+    }
+    changeBreak(node: ASTNode, ast: AST, params:{}): AST{
         let cloned_ast = _.cloneDeep(ast);
         cloned_ast.nodeList[node.nodeID].shouldBreak ^= 1;
         cloned_ast.buildVis();
         return cloned_ast;
     }
-    changeBracket(node: ASTNode, ast: AST): AST{
+    changeBracket(node: ASTNode, ast: AST, params:{}): AST{
         let cloned_ast = _.cloneDeep(ast);
         cloned_ast.nodeList[node.nodeID].shouldInBracket ^= 1;
         cloned_ast.buildVis();
@@ -302,7 +384,13 @@ export class AST {
         this.buildVis();
     }
 
+    nodeDepth(node: ASTNode): number{
+        if (node.parentID==-1){
+            return 0;
+        }
 
+        return this.nodeDepth(this.nodeList[node.parentID])+1;
+    }
 
 
     lstToAST(parentID, lst): number{
@@ -364,7 +452,7 @@ export class AST {
 
 
 
-    toHTML(selectedID: number, node: ASTNode): string{
+    toHTML(selectedID: number, node: ASTNode, add_highlight = true): string{
         let result: string;
         if(node.children.length == 0){
             result = node.token
@@ -385,13 +473,13 @@ export class AST {
         }
 
         //add highlight
-        if(selectedID == node.nodeID){
+        if(add_highlight && selectedID == node.nodeID){
             result = '<span class="highlighted">' + result + '</span>'
         }
 
         //add linebreak
         if(node.shouldBreak){
-            result+='</br>'
+            result= '\n'+ '\t'.repeat(this.nodeDepth(node)) +  result ;
         }
 
         return result

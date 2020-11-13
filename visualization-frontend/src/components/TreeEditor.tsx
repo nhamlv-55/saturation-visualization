@@ -17,7 +17,8 @@ type State = {
     allOptions: {type:string, name: string, value:string}[],
     showOptions: boolean,
     selectedNodeID: number,
-    stringRep: string
+    stringRep: string,
+    status: string
 }
 
 class TreeEditor extends React.Component<Props, State> {
@@ -29,7 +30,8 @@ class TreeEditor extends React.Component<Props, State> {
         allOptions: [],
         showOptions: true,
         selectedNodeID: -1,
-        stringRep: ""
+        stringRep: "",
+        status: ""
     }
     network: Network | null = null;
     networkNodes = new DataSet<Node>([]);
@@ -218,51 +220,36 @@ class TreeEditor extends React.Component<Props, State> {
         });
     }
 
-    flipCmp(){
+    applyLocal(action: string, params: {}){
         const currentAST = this.astStack[this.astStack.length - 1];
-        let node = currentAST.nodeList[this.state.selectedNodeID];
-        this.astStack.push(this.transformer.flipCmp(node, currentAST));
-        this.transformerStack.push(new Transformer("flipCmp", ""));
-        this.redrawAST();
-    }
-    toImp(){
-        const currentAST = this.astStack[this.astStack.length - 1];
-        let node = currentAST.nodeList[this.state.selectedNodeID];
-        this.astStack.push(this.transformer.toImp(node, currentAST));
-        this.transformerStack.push(new Transformer("toImp", ""));
-        this.redrawAST();
-    }
-    changeBreak(){
-        const currentAST = this.astStack[this.astStack.length - 1];
-        let node = currentAST.nodeList[this.state.selectedNodeID];
-        this.astStack.push(this.transformer.changeBreak(node, currentAST));
-        this.transformerStack.push(new Transformer("changeBreak", ""));
-        this.redrawAST();
-    }
-    changeBracket(){
-        const currentAST = this.astStack[this.astStack.length - 1];
-        let node = currentAST.nodeList[this.state.selectedNodeID];
-        this.astStack.push(this.transformer.changeBracket(node, currentAST));
-        this.transformerStack.push(new Transformer("changeBracket", ""));
-        this.redrawAST();
+        const node = currentAST.nodeList[this.state.selectedNodeID];
+        const t = new Transformer(action, params);
+        try{
+            this.astStack.push(this.transformer.run(node, currentAST, t));
+            this.transformerStack.push(t);
+            this.redrawAST();
+        }catch(error){
+            this.setState({"status": "Error:"+error.message});
+        }
     }
     undo(){
-        /* if (this.astStack.length) */
         this.astStack.pop();
         this.transformerStack.pop();
         this.redrawAST();
     }
-
     render() {
         let selectedOptions = this.displaySpacerOptions();
         return (
                 <fieldset className="options-card" id="graph-container">
                     <h3>Transformer Queue</h3>
+                    <h4>{this.state.status}</h4>
                     <ul>
-                        <button onClick={this.flipCmp.bind(this)}>Flip Cmp</button>
-                        <button onClick={this.toImp.bind(this)}>To Imp</button>
-                        <button onClick={this.changeBreak.bind(this)}>\n?</button>
-                        <button onClick={this.changeBracket.bind(this)}>()?</button>
+                        <button onClick={this.applyLocal.bind(this, "flipCmp", {})}>Flip Cmp</button>
+                        <button onClick={this.applyLocal.bind(this, "toImp", {})}>To Imp</button>
+                        <button onClick={this.applyLocal.bind(this, "move", {"direction": "l"})}>Move Left</button>
+                        <button onClick={this.applyLocal.bind(this, "move", {"direction": "r"})}>Move Right</button>
+                        <button onClick={this.applyLocal.bind(this, "changeBreak", {})}>\n?</button>
+                        <button onClick={this.applyLocal.bind(this, "changeBracket", {})}>()?</button>
                         <button onClick={this.undo.bind(this)}>Undo</button>
                         {/* <li> */}
                             {/* <label htmlFor="userOptions" className="form-label">Transformer options</label>
