@@ -223,7 +223,7 @@ class TreeEditor extends React.Component<Props, State> {
     applyLocal(action: string, params: {}){
         const currentAST = this.astStack[this.astStack.length - 1];
         const node = currentAST.nodeList[this.state.selectedNodeID];
-        const t = new Transformer(action, params);
+        const t = {"action": action, "params": params};
         try{
             this.astStack.push(this.transformer.run(node, currentAST, t));
             this.transformerStack.push(t);
@@ -278,13 +278,7 @@ class TreeEditor extends React.Component<Props, State> {
                                 {this.state.optionTypeHTML}
                                 </form>
                                 </li> */}
-                        {/* <label>Or using manual run parameters</label>
-                            <input type="text" name="manualRun" onChange={this.changeSpacerManualUserOptions.bind(this)}/>
-                            <li>
-                            <label htmlFor="varOptions" className="form-label">Variable Designation</label>
-                            <p>Enter a single space separated list of your chosen variables in the order they appear (var1 var2 var3 ..)</p>
-                            <input type="text" name="variables" onChange={this.props.onChangeVariables}/>
-                            </li> */}
+
                     </ul>
                     <pre><div dangerouslySetInnerHTML={{ __html: this.state.stringRep }} /></pre>
                     <div className= "component-graph" ref = { this.graphContainer }>

@@ -217,14 +217,9 @@ function isOpt(lst){
     return optList.indexOf(lst)>-1;
 }
 
-export class Transformer{
+export interface Transformer{
     action: string;
     params: {};
-
-    constructor(action: string, params: {}){
-        this.action = action;
-        this.params = params;
-    }
 }
 
 export class ASTTransformer{
