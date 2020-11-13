@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {options} from "../helpers/transformers";
-import { AST, ASTNode, ASTTransformer} from "./../helpers/network";
+import { AST, ASTNode, ASTTransformer, Transformer} from "./../helpers/network";
 import { assert } from '../model/util';
 import { DataSet, Network, Node, Edge } from 'vis'
 
@@ -36,7 +36,7 @@ class TreeEditor extends React.Component<Props, State> {
     networkEdges = new DataSet<Edge>([]);
     graphContainer = React.createRef<HTMLDivElement>();
     astStack = new Array<AST>();
-
+    transformerStack = new Array<{}>();
     transformer = new ASTTransformer();
     componentDidMount() {
         this.generateNetwork();
@@ -49,10 +49,11 @@ class TreeEditor extends React.Component<Props, State> {
             console.log(ast);
             console.log("visNodes", ast.visNodes);
             console.log("visEdges", ast.visEdges);
-            this.networkNodes.clear();
-            this.networkNodes.add(ast.visNodes);
+
             this.networkEdges.clear();
             this.networkEdges.add(ast.visEdges);
+            this.networkNodes.clear();
+            this.networkNodes.add(ast.visNodes);
             /* this.network!.fit(); */
             this.network!.redraw();
             console.log(ast.toHTML(this.state.selectedNodeID, ast.nodeList[0]));
@@ -221,28 +222,34 @@ class TreeEditor extends React.Component<Props, State> {
         const currentAST = this.astStack[this.astStack.length - 1];
         let node = currentAST.nodeList[this.state.selectedNodeID];
         this.astStack.push(this.transformer.flipCmp(node, currentAST));
+        this.transformerStack.push(new Transformer("flipCmp", ""));
         this.redrawAST();
     }
     toImp(){
         const currentAST = this.astStack[this.astStack.length - 1];
         let node = currentAST.nodeList[this.state.selectedNodeID];
         this.astStack.push(this.transformer.toImp(node, currentAST));
+        this.transformerStack.push(new Transformer("toImp", ""));
         this.redrawAST();
     }
     changeBreak(){
         const currentAST = this.astStack[this.astStack.length - 1];
         let node = currentAST.nodeList[this.state.selectedNodeID];
         this.astStack.push(this.transformer.changeBreak(node, currentAST));
+        this.transformerStack.push(new Transformer("changeBreak", ""));
         this.redrawAST();
     }
     changeBracket(){
         const currentAST = this.astStack[this.astStack.length - 1];
         let node = currentAST.nodeList[this.state.selectedNodeID];
         this.astStack.push(this.transformer.changeBracket(node, currentAST));
+        this.transformerStack.push(new Transformer("changeBracket", ""));
         this.redrawAST();
     }
     undo(){
+        /* if (this.astStack.length) */
         this.astStack.pop();
+        this.transformerStack.pop();
         this.redrawAST();
     }
 
@@ -292,7 +299,7 @@ class TreeEditor extends React.Component<Props, State> {
                             <input type="text" name="variables" onChange={this.props.onChangeVariables}/>
                             </li> */}
                     </ul>
-                    <h4><div dangerouslySetInnerHTML={{ __html: this.state.stringRep }} /></h4>
+                    <pre><div dangerouslySetInnerHTML={{ __html: this.state.stringRep }} /></pre>
                     <div className= "component-graph" ref = { this.graphContainer }>
                         <canvas />
                     </div>
