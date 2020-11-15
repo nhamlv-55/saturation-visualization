@@ -37,7 +37,7 @@ class TreeEditor extends React.Component<Props, State> {
     networkEdges = new DataSet<Edge>([]);
     graphContainer = React.createRef<HTMLDivElement>();
     astStack = new Array<AST>();
-    transformerStack = new Array<{}>();
+    transformerStack = new Array<Transformer>();
     transformer = new ASTTransformer();
     componentDidMount() {
         this.generateNetwork();
@@ -103,60 +103,40 @@ class TreeEditor extends React.Component<Props, State> {
         
     }
 
-
-
-
-    updateSpacerOptions() {
-        let allOptions: {type:string, name: string, value:string}[] = this.state.allOptions;
-        let fullOptionString = "";
-        for (let option of allOptions) {
-            if (option.type === "flag") {
-                fullOptionString += "-" + option.name + " ";
-            }
-            else {
-                fullOptionString += option.name + "=" + option.value + " ";
-            }
-        }
-    }
-
-    storeSpacerOptions(e) {
-        e.preventDefault();
-        e.target.reset();
-        if (this.state.optionName === "" || (this.state.optionType !== "custom" && this.state.optionValue === "")) return;
-        let allOptions: {type:string, name: string, value:string}[] = this.state.allOptions;
-        allOptions.push({
-            name: this.state.optionName,
-            value: this.state.optionValue,
-            type: this.state.optionValue === "" ? "flag" : this.state.optionType
-        });
-        this.setState({
-            allOptions: allOptions
-        });
-        this.setState({
-            optionName: "",
-            optionValue: "",
-            optionType: ""
-        });
-        this.updateSpacerOptions();
-    }
-
     displayTransformers() {
-        
+        const listItems = this.transformerStack.map((t, index) =>{
+            return (
+                <div key={index}>
+                <span>If (best guess):</span>
+                <input type="text" value={t.condition} width="20rem"/>
+                then
+                {t.action}
+                </div>);
+        });
 
-
-        if (this.props.spacerUserOptions !== "") {
-            return this.props.spacerUserOptions.trim().split(" ");
-        }
-        return []
+        return listItems;
     }
 
 
-    applyLocal(action: string, params: {}, condition: string){
+    applyStack(){
+        const original_ast = new AST(this.props.input);
+        try{
+            this.astStack.push(this.transformer.runStack(original_ast, this.transformerStack));
+            this.transformerStack.push({"action": "runStack", "params": "", "condition": ""});
+            this.redrawAST();
+        }catch(error){
+            this.setState({"status": "Error:"+error.message});
+        }
+    }
+
+    applyLocal(action: string, params: {}){
         const currentAST = this.astStack[this.astStack.length - 1];
         const node = currentAST.nodeList[this.state.selectedNodeID];
-        const t = {"action": action, "params": params, "condition": condition};
+        let t = {"action": action, "params": params, "condition": "true"};
         try{
             this.astStack.push(this.transformer.run(node, currentAST, t));
+            //guess the condition
+            t.condition = this.transformer.getCondition(action, node, currentAST);
             this.transformerStack.push(t);
             this.redrawAST();
         }catch(error){
@@ -171,18 +151,19 @@ class TreeEditor extends React.Component<Props, State> {
 
     
     render() {
+        let tStack = this.displayTransformers();
         return (
             <section>
                 <fieldset className="options-card" id="graph-container">
                     <h3>Transformer Queue</h3>
                     <h4>{this.state.status}</h4>
                     <ul>
-                        <button onClick={this.applyLocal.bind(this, "flipCmp", {}, "true" )}>Flip Cmp</button>
-                        <button onClick={this.applyLocal.bind(this, "toImp", {}, "true")}>To Imp</button>
-                        <button onClick={this.applyLocal.bind(this, "move", {"direction": "l"}, "true")}>Move Left</button>
-                        <button onClick={this.applyLocal.bind(this, "move", {"direction": "r"}, "true")}>Move Right</button>
-                        <button onClick={this.applyLocal.bind(this, "changeBreak", {}, "true")}>\n?</button>
-                        <button onClick={this.applyLocal.bind(this, "changeBracket", {}, "true")}>()?</button>
+                        <button onClick={this.applyLocal.bind(this, "flipCmp", {})}>Flip Cmp</button>
+                        <button onClick={this.applyLocal.bind(this, "toImp", {})}>To Imp</button>
+                        <button onClick={this.applyLocal.bind(this, "move", {"direction": "l"})}>Move Left</button>
+                        <button onClick={this.applyLocal.bind(this, "move", {"direction": "r"})}>Move Right</button>
+                        <button onClick={this.applyLocal.bind(this, "changeBreak", {})}>\n?</button>
+                        <button onClick={this.applyLocal.bind(this, "changeBracket", {})}>()?</button>
                         <button onClick={this.undo.bind(this)}>Undo</button>
                         {/* <li> */}
                             {/* <label htmlFor="userOptions" className="form-label">Transformer options</label>
@@ -220,7 +201,8 @@ class TreeEditor extends React.Component<Props, State> {
                 </fieldset>
                 <fieldset className="options-card" id="transformer-container">
                     <h3>Transformer Queue</h3>
-
+                    {tStack}
+                    <button onClick={this.applyStack.bind(this)}>Apply for the current AST</button>
                     <button onClick={this.undo.bind(this)}>Blast</button>
                 </fieldset>
             </section>

@@ -43,16 +43,44 @@ export interface Transformer{
 
 export class ASTTransformer{
     run(node: ASTNode, ast: AST, t: Transformer): AST{
-        return this[t.action](node, ast, t.params, t.condition);
+        if(t.action!=="applyStack"){
+            return this[t.action](node, ast, t.params, t.condition);
+        }
+        return ast;
     }
 
-    runStack(node: ASTNode, ast: AST, s: Transformer[]){
+    runStack(ast: AST, tStack: Transformer[]){
         let result = _.cloneDeep(ast);
-        for(var transformer of s){
-            result = this.run(node, ast, transformer);
+        //loop over all transformer
+        console.log("res:", result);
+        for(var transformer of tStack){
+            //apply the transformer to all the node if possible.
+            for(var node of result.nodeList){
+                console.log("res:", result);
+                result = this.run(node, result, transformer);
+            }
         }
         return result;
     }
+
+    getCondition(action: string, node: ASTNode, ast: AST): string{
+        let condition = "true";
+        switch(action){
+            case "move":{
+                const node_depth = ast.nodeDepth(node);
+                condition = `ast.nodeDepth(node) === ${node_depth}`;
+                break;
+            }
+            case "changeBreak":{
+                const current_break = node.shouldBreak;
+                const node_depth = ast.nodeDepth(node);
+                condition = `ast.nodeDepth(node) === ${node_depth} && node.shouldBreak === ${current_break}`;
+                break;
+            }
+        }
+        return condition;
+    }
+
 
     move(node: ASTNode, ast: AST, params: {}, condition: string ): AST{
         /*
