@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AST, ASTNode, ASTTransformer, Transformer} from "./../helpers/transformers";
+import { AST, ASTTransformer, Transformer} from "./../helpers/transformers";
 import { assert } from '../model/util';
 import { DataSet, Network, Node, Edge } from 'vis'
 
@@ -168,8 +168,11 @@ class TreeEditor extends React.Component<Props, State> {
         this.transformerStack.pop();
         this.redrawAST();
     }
+
+    
     render() {
         return (
+            <section>
                 <fieldset className="options-card" id="graph-container">
                     <h3>Transformer Queue</h3>
                     <h4>{this.state.status}</h4>
@@ -215,6 +218,12 @@ class TreeEditor extends React.Component<Props, State> {
                         <canvas />
                     </div>
                 </fieldset>
+                <fieldset className="options-card" id="transformer-container">
+                    <h3>Transformer Queue</h3>
+
+                    <button onClick={this.undo.bind(this)}>Blast</button>
+                </fieldset>
+            </section>
         );
     }
 }

@@ -1,5 +1,5 @@
 import {parse} from "s-exify";
-import { DataSet, Network, Node, Edge } from 'vis'
+import { Node, Edge } from 'vis'
 import { assert } from "../model/util";
 const _ = require("lodash");
 
@@ -43,22 +43,7 @@ export interface Transformer{
 
 export class ASTTransformer{
     run(node: ASTNode, ast: AST, t: Transformer): AST{
-        switch(t.action){
-            case "move":
-                return this.move(node, ast, t.params, t.condition);
-            case "flipCmp":
-                return this.flipCmp(node, ast, t.params, t.condition);
-            case "toImp":
-                return this.toImp(node, ast, t.params, t.condition);
-            case "rename":
-                return this.rename(node, ast, t.params, t.condition);
-            case "changeBreak":
-                return this.changeBreak(node, ast, t.params, t.condition);
-            case "changeBracket":
-                return this.changeBracket(node, ast, t.params, t.condition);
-            default:
-                return ast;
-        }
+        return this[t.action](node, ast, t.params, t.condition);
     }
 
     runStack(node: ASTNode, ast: AST, s: Transformer[]){
@@ -80,7 +65,7 @@ export class ASTTransformer{
         if(eval(condition)){
             let parent = cloned_ast.nodeList[node.parentID];
             assert('direction' in params);
-            assert(movable.indexOf(parent.token)!=-1, "The parent node doesnt support reordering.");//only can move stuff under some opt
+            assert(movable.indexOf(parent.token)!==-1, "The parent node doesnt support reordering.");//only can move stuff under some opt
             let siblings = parent.children;
 
             const nodePosition = siblings.indexOf(node.nodeID);
@@ -159,7 +144,7 @@ export class ASTTransformer{
             cloned_ast.nodeList.push(newTail);
 
             for(var childID of parent.children){
-                if(childID != node.nodeID){
+                if(childID !== node.nodeID){
                     cloned_ast.nodeList[childID].parentID = newTail.nodeID;
                     newTail.children.push(childID);
                 }
@@ -204,7 +189,7 @@ export class AST {
     }
 
     nodeDepth(node: ASTNode): number{
-        if (node.parentID==-1){
+        if (node.parentID===-1){
             return 0;
         }
 
@@ -273,7 +258,7 @@ export class AST {
 
     toHTML(selectedID: number, node: ASTNode, add_highlight = true): string{
         let result: string;
-        if(node.children.length == 0){
+        if(node.children.length === 0){
             result = node.token
         }else{
             let children = new Array<string>();
@@ -292,7 +277,7 @@ export class AST {
         }
 
         //add highlight
-        if(add_highlight && selectedID == node.nodeID){
+        if(add_highlight && selectedID === node.nodeID){
             result = '<span class="highlighted">' + result + '</span>'
         }
 
