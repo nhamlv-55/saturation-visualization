@@ -1,61 +1,308 @@
-export const options = [
-    {name: "remove_parenthesis", type:"bool"},
-    {name: "rename_variables", type:"string"}
-];
-// export const options = [
-//     {name: "fp.spacer.arith.solver", type:"unsigned int"},
-//     {name: "fp.spacer.blast_term_ite_inflation", type:"unsigned int"},
-//     {name: "fp.spacer.ctp", type:"bool"},
-//     {name: "fp.spacer.dump_benchmarks", type:"bool"},
-//     {name: "fp.spacer.dump_threshold", type:"double"},
-//     {name: "fp.spacer.elim_aux", type:"bool"},
-//     {name: "fp.spacer.eq_prop", type:"bool"},
-//     {name: "fp.spacer.gpdr", type:"bool"},
-//     {name: "fp.spacer.gpdr.bfs", type:"bool"},
-//     {name: "fp.spacer.ground_pobs", type:"bool"},
-//     {name: "fp.spacer.iuc", type:"unsigned int"},
-//     {name: "fp.spacer.iuc.arith", type:"unsigned int"},
-//     {name: "fp.spacer.iuc.debug_proof", type:"bool"},
-//     {name: "fp.spacer.iuc.old_hyp_reducer", type:"bool"},
-//     {name: "fp.spacer.iuc.print_farkas_stats", type:"bool"},
-//     {name: "fp.spacer.iuc.split_farkas_literals", type:"bool"},
-//     {name: "fp.spacer.keep_proxy", type:"bool"},
-//     {name: "fp.spacer.logic", type:"symbol"},
-//     {name: "fp.spacer.max_level", type:"unsigned int"},
-//     {name: "fp.spacer.max_num_contexts", type:"unsigned int"},
-//     {name: "fp.spacer.mbqi", type:"bool"},
-//     {name: "fp.spacer.min_level", type:"unsigned int"},
-//     {name: "fp.spacer.native_mbp", type:"bool"},
-//     {name: "fp.spacer.order_children", type:"unsigned int"},
-//     {name: "fp.spacer.p3.share_invariants", type:"bool"},
-//     {name: "fp.spacer.p3.share_lemmas", type:"bool"},
-//     {name: "fp.spacer.print_json", type:"symbol"},
-//     {name: "fp.spacer.propagate", type:"bool"},
-//     {name: "fp.spacer.push_pob", type:"bool"},
-//     {name: "fp.spacer.push_pob_max_depth", type:"unsigned int"},
-//     {name: "fp.spacer.q3", type:"bool"},
-//     {name: "fp.spacer.q3.instantiate", type:"bool"},
-//     {name: "fp.spacer.q3.qgen.normalize", type:"bool"},
-//     {name: "fp.spacer.q3.use_qgen", type:"bool"},
-//     {name: "fp.spacer.random_seed", type:"unsigned int"},
-//     {name: "fp.spacer.reach_dnf", type:"bool"},
-//     {name: "fp.spacer.reset_pob_queue", type:"bool"},
-//     {name: "fp.spacer.restart_initial_threshold", type:"unsigned int"},
-//     {name: "fp.spacer.restarts", type:"bool"},
-//     {name: "fp.spacer.simplify_lemmas_post", type:"bool"},
-//     {name: "fp.spacer.simplify_lemmas_pre", type:"bool"},
-//     {name: "fp.spacer.simplify_pob", type:"bool"},
-//     {name: "fp.spacer.trace_file", type:"symbol"},
-//     {name: "fp.spacer.use_array_eq_generalizer", type:"bool"},
-//     {name: "fp.spacer.use_bg_invs", type:"bool"},
-//     {name: "fp.spacer.use_derivations", type:"bool"},
-//     {name: "fp.spacer.use_euf_gen", type:"bool"},
-//     {name: "fp.spacer.use_inc_clause", type:"bool"},
-//     {name: "fp.spacer.use_inductive_generalizer", type:"bool"},
-//     {name: "fp.spacer.use_lemma_as_cti", type:"bool"},
-//     {name: "fp.spacer.use_lim_num_gen", type:"bool"},
-//     {name: "fp.spacer.validate_lemmas", type:"bool"},
-//     {name: "tr", type: "bool"},
-//     {name: "fp.spacer.weak_abs", type:"bool"}
-// ];
+import {parse} from "s-exify";
+import { DataSet, Network, Node, Edge } from 'vis'
+import { assert } from "../model/util";
+const _ = require("lodash");
+
+export class ASTNode{
+    nodeID: number;
+    token: string;
+    shouldBreak: number;
+    shouldInBracket: number;
+    parentID: number;
+    children: number[];
+    transformers = [];
+    constructor(nodeID: number, token: string, parentID: number, children: number[]){
+        this.nodeID = nodeID;
+        this.token = token;
+        this.shouldBreak = 0;
+        this.shouldInBracket = 1;
+        this.parentID = parentID;
+        this.children = children;
+    }
+
+}
+
+function isOpt(lst){
+    const optList = ["+", "-", "*", "/",
+                     ">", "<", ">=", "<=", "=",
+                     "and", "or", "not", "=>",
+                     "assert",
+                     "declare-datatypes",
+                    "forall"]
+    if(typeof lst !== "string"){
+        return false;
+    }
+    return optList.indexOf(lst)>-1;
+}
+
+export interface Transformer{
+    action: string;
+    condition: string;
+    params: {};
+}
+
+export class ASTTransformer{
+    run(node: ASTNode, ast: AST, t: Transformer): AST{
+        switch(t.action){
+            case "move":
+                return this.move(node, ast, t.params, t.condition);
+            case "flipCmp":
+                return this.flipCmp(node, ast, t.params, t.condition);
+            case "toImp":
+                return this.toImp(node, ast, t.params, t.condition);
+            case "rename":
+                return this.rename(node, ast, t.params, t.condition);
+            case "changeBreak":
+                return this.changeBreak(node, ast, t.params, t.condition);
+            case "changeBracket":
+                return this.changeBracket(node, ast, t.params, t.condition);
+            default:
+                return ast;
+        }
+    }
+
+    runStack(node: ASTNode, ast: AST, s: Transformer[]){
+        let result = _.cloneDeep(ast);
+        for(var transformer of s){
+            result = this.run(node, ast, transformer);
+        }
+        return result;
+    }
+
+    move(node: ASTNode, ast: AST, params: {}, condition: string ): AST{
+        /*
+          move an AST node to the left or to the right
+          E.g: moveLeft("+ x y z", "z") -> "+ x z y"
+         */
+        const movable = ["+", "*", "=", "and", "or"];
+        let cloned_ast = _.cloneDeep(ast);
+
+        if(eval(condition)){
+            let parent = cloned_ast.nodeList[node.parentID];
+            assert('direction' in params);
+            assert(movable.indexOf(parent.token)!=-1, "The parent node doesnt support reordering.");//only can move stuff under some opt
+            let siblings = parent.children;
+
+            const nodePosition = siblings.indexOf(node.nodeID);
+
+            switch(params["direction"]){
+                case "l":{
+                    if(nodePosition>0){
+                        //ES6 magic
+                        [siblings[nodePosition], siblings[nodePosition-1]] = [siblings[nodePosition-1], siblings[nodePosition]];
+                    }
+                    break;
+                }
+                case "r":{
+                    if(nodePosition<siblings.length-1){
+                        //ES6 magic
+                        [siblings[nodePosition], siblings[nodePosition+1]] = [siblings[nodePosition+1], siblings[nodePosition]];
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+            cloned_ast.buildVis();
+        }
+        return cloned_ast;
+    }
+
+    flipCmp(node: ASTNode, ast: AST, params: {}, condition: string ): AST{
+        /*
+          flip a comparison node
+          E.g: flipCmp("> x y") -> "<= y x"
+         */
+        let cloned_ast = _.cloneDeep(ast);
+        if(eval(condition)){
+            let new_node : ASTNode;
+            switch(node.token){
+                case "=":{
+                    new_node = new ASTNode(node.nodeID, "=", node.parentID, [node.children[1], node.children[0]]);
+                    break;
+                }
+                case "<":{
+                    new_node = new ASTNode(node.nodeID, ">=", node.parentID, [node.children[1], node.children[0]]);
+                    break;
+                }
+                case ">":{
+                    new_node = new ASTNode(node.nodeID, "<=", node.parentID, [node.children[1], node.children[0]]);
+                    break;
+                }
+                case ">=":{
+                    new_node = new ASTNode(node.nodeID, "<", node.parentID, [node.children[1], node.children[0]]);
+                    break;
+                }
+                case "<=":{
+                    new_node = new ASTNode(node.nodeID, ">", node.parentID, [node.children[1], node.children[0]]);
+                    break;
+                }
+                default:
+                    new_node = node;
+            }
+            cloned_ast.nodeList[node.nodeID] = new_node;
+            cloned_ast.buildVis();
+        }
+        return cloned_ast;
+    }
+
+    toImp(node: ASTNode, ast: AST, params: {}, condition: string ): AST{
+        let cloned_ast = _.cloneDeep(ast);
+        if(eval(condition)){
+            let parent = cloned_ast.nodeList[node.parentID];
+            console.log("parent", parent);
+
+            let newHead = new ASTNode(cloned_ast.nodeList.length, "not", parent.nodeID, [node.nodeID]);
+            cloned_ast.nodeList.push(newHead);
+
+            let newTail = new ASTNode(cloned_ast.nodeList.length, "or", parent.nodeID, []);
+            cloned_ast.nodeList.push(newTail);
+
+            for(var childID of parent.children){
+                if(childID != node.nodeID){
+                    cloned_ast.nodeList[childID].parentID = newTail.nodeID;
+                    newTail.children.push(childID);
+                }
+            }
+
+            let newParent = new ASTNode(parent.nodeID, "=>", parent.parentID, [newHead.nodeID, newTail.nodeID]);
+            cloned_ast.nodeList[parent.nodeID] = newParent;
+
+            cloned_ast.buildVis();
+        }
+        return cloned_ast;
+    } 
+
+    rename(node: ASTNode, ast: AST, params: {}, condition: string ): AST{
+        let cloned_ast = _.cloneDeep(ast);
+
+        return cloned_ast;
+    }
+    changeBreak(node: ASTNode, ast: AST, params:{}, condition: string ): AST{
+        let cloned_ast = _.cloneDeep(ast);
+        cloned_ast.nodeList[node.nodeID].shouldBreak ^= 1;
+        cloned_ast.buildVis();
+        return cloned_ast;
+    }
+    changeBracket(node: ASTNode, ast: AST, params:{}, condition: string ): AST{
+        let cloned_ast = _.cloneDeep(ast);
+        cloned_ast.nodeList[node.nodeID].shouldInBracket ^= 1;
+        cloned_ast.buildVis();
+        return cloned_ast;
+    }
+}
+
+
+export class AST {
+    nodeList = new Array<ASTNode>();
+    visNodes = new Array<Node>();
+    visEdges = new Array<Edge>();
+
+    constructor(formula: string){
+        this.lstToAST(-1, parse(formula));
+        this.buildVis();
+    }
+
+    nodeDepth(node: ASTNode): number{
+        if (node.parentID==-1){
+            return 0;
+        }
+
+        return this.nodeDepth(this.nodeList[node.parentID])+1;
+    }
+
+
+    lstToAST(parentID, lst): number{
+        const nodeID = this.nodeList.length
+        if(typeof lst === 'string'){
+            const node = new ASTNode(nodeID, lst, parentID, []);
+            this.nodeList.push(node);
+            return nodeID;
+        }
+
+        //if is an opt
+        if(isOpt(lst[0])){
+            let node = new ASTNode(nodeID, lst[0], parentID, []);
+            this.nodeList.push(node);
+
+            for(var _i=1; _i < lst.length; _i++){
+
+                node.children.push(this.lstToAST(nodeID, lst[_i]));
+            }
+
+            return nodeID;
+        }else{
+            //is a list
+            let node = new ASTNode(nodeID, "list", parentID, []);
+            this.nodeList.push(node);
+
+            for(var _i=0; _i < lst.length; _i++){
+                node.children.push(this.lstToAST(nodeID, lst[_i]));
+            }
+
+            return nodeID;
+        }
+
+        //
+    }
+
+    buildVis(){
+        console.log(this.nodeList)
+        this.visNodes = [];
+        this.visEdges = [];
+
+        for(const node of this.nodeList){
+            this.visNodes.push({
+                id: node.nodeID,
+                label: node.token + ((node.shouldInBracket)?'+()':'') + ((node.shouldBreak)?'+nl':''),
+                shape: "box",
+                size: 20,
+            })
+            for(const childID of node.children){
+                this.visEdges.push({
+                    id: this.visEdges.length,
+                    from: node.nodeID,
+                    to: childID
+                })
+            }
+        }
+    }
+
+
+
+
+    toHTML(selectedID: number, node: ASTNode, add_highlight = true): string{
+        let result: string;
+        if(node.children.length == 0){
+            result = node.token
+        }else{
+            let children = new Array<string>();
+            if(node.token !== 'list'){ children.push(node.token);  }
+
+            for(const childID of node.children){
+                children.push(this.toHTML(selectedID, this.nodeList[childID]));
+            }
+            if (children.length === 1 || !node.shouldInBracket){
+                result = children.join(" ");
+            }else{
+                result = "("+children.join(" ")+")";
+            }
+
+
+        }
+
+        //add highlight
+        if(add_highlight && selectedID == node.nodeID){
+            result = '<span class="highlighted">' + result + '</span>'
+        }
+
+        //add linebreak
+        if(node.shouldBreak){
+            result= '\n'+ '\t'.repeat(this.nodeDepth(node)) +  result ;
+        }
+
+        return result
+    }
+}
+
 

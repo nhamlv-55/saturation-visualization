@@ -4,8 +4,6 @@ import '../styles/Editor.css';
 import * as Monaco from 'monaco-editor'
 import TransformerTable from './TransformerTable';
 import { assert } from '../model/util';
-import EditorOptions from "./EditorOptions";
-
 import TreeEditor from "./TreeEditor";
 const icons = require('../resources/icons/all.svg') as string;
 
@@ -114,9 +112,6 @@ export class Editor extends React.Component<Props, State> {
 
                         </main>
                         <div className="tree-editor">
-                            <EditorOptions 
-                                spacerUserOptions = ""
-                            />
                             <TransformerTable/>
                             <TreeEditor
                                 input = {this.state.input}

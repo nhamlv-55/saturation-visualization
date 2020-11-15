@@ -1,6 +1,5 @@
 import * as React from 'react';
-import {options} from "../helpers/transformers";
-import { AST, ASTNode, ASTTransformer, Transformer} from "./../helpers/network";
+import { AST, ASTNode, ASTTransformer, Transformer} from "./../helpers/transformers";
 import { assert } from '../model/util';
 import { DataSet, Network, Node, Edge } from 'vis'
 
@@ -141,12 +140,6 @@ class TreeEditor extends React.Component<Props, State> {
         this.updateSpacerOptions();
     }
 
-    displaySpacerOptions() {
-        if (this.props.spacerUserOptions !== "") {
-            return this.props.spacerUserOptions.trim().split(" ");
-        }
-        return []
-    }
     displayTransformers() {
         
 
@@ -157,73 +150,11 @@ class TreeEditor extends React.Component<Props, State> {
         return []
     }
 
-    updateOptionValue(e){
-        this.setState({
-            optionValue: e.target.value
-        });
-    }
 
-    getOptions(name:string, type:string) {
-        if (type === "bool") {
-            this.setState({
-                optionTypeHTML:
-                    <React.Fragment>
-                        <input type="radio" name={name} value="true" onClick={this.updateOptionValue.bind(this)}/>True
-                        <input type="radio" name={name} value="false" onClick={this.updateOptionValue.bind(this)}/>False
-                        <button className="fake-button" type="submit" value="Submit">+</button>
-                    </React.Fragment>
-            });
-        } else {
-            this.setState({
-                optionTypeHTML:
-                    <React.Fragment>
-                        <input type="text" name={name} placeholder={type} defaultValue={this.state.optionValue} onChange={this.updateOptionValue.bind(this)}/>
-                        <button className="fake-button" type="submit" value="Submit">+</button>
-                    </React.Fragment>
-            });
-        }
-    }
-
-    changeOptionType(e: React.ChangeEvent<HTMLInputElement>){
-        let tempList = options.filter(option => option.name === e.target.value);
-        let type = "custom";
-        if (tempList.length > 0) {
-            type = tempList[0].type;
-        }
-        this.setState({
-            optionName: e.target.value,
-            optionType: type
-        });
-        this.getOptions(e.target.value, type);
-    }
-
-    removeOption(name:string, value:string){
-        let allOptions: {type:string, name: string, value:string}[] = this.state.allOptions;
-        let rIndex = -1;
-        for (let i = 0; i < allOptions.length; i++){
-            if (allOptions[i].name === name && allOptions[i].value === value){
-                rIndex = i;
-                break;
-            }
-        }
-        if (rIndex === -1) return;
-        allOptions.splice(rIndex, 1);
-        this.updateSpacerOptions();
-    }
-    changeSpacerManualUserOptions(event: React.ChangeEvent<HTMLInputElement>) {
-        const newValue = event.target.value;
-    }
-
-    showHideOptions() {
-        this.setState({
-            showOptions: !this.state.showOptions
-        });
-    }
-
-    applyLocal(action: string, params: {}){
+    applyLocal(action: string, params: {}, condition: string){
         const currentAST = this.astStack[this.astStack.length - 1];
         const node = currentAST.nodeList[this.state.selectedNodeID];
-        const t = {"action": action, "params": params};
+        const t = {"action": action, "params": params, "condition": condition};
         try{
             this.astStack.push(this.transformer.run(node, currentAST, t));
             this.transformerStack.push(t);
@@ -238,18 +169,17 @@ class TreeEditor extends React.Component<Props, State> {
         this.redrawAST();
     }
     render() {
-        let selectedOptions = this.displaySpacerOptions();
         return (
                 <fieldset className="options-card" id="graph-container">
                     <h3>Transformer Queue</h3>
                     <h4>{this.state.status}</h4>
                     <ul>
-                        <button onClick={this.applyLocal.bind(this, "flipCmp", {})}>Flip Cmp</button>
-                        <button onClick={this.applyLocal.bind(this, "toImp", {})}>To Imp</button>
-                        <button onClick={this.applyLocal.bind(this, "move", {"direction": "l"})}>Move Left</button>
-                        <button onClick={this.applyLocal.bind(this, "move", {"direction": "r"})}>Move Right</button>
-                        <button onClick={this.applyLocal.bind(this, "changeBreak", {})}>\n?</button>
-                        <button onClick={this.applyLocal.bind(this, "changeBracket", {})}>()?</button>
+                        <button onClick={this.applyLocal.bind(this, "flipCmp", {}, "true" )}>Flip Cmp</button>
+                        <button onClick={this.applyLocal.bind(this, "toImp", {}, "true")}>To Imp</button>
+                        <button onClick={this.applyLocal.bind(this, "move", {"direction": "l"}, "true")}>Move Left</button>
+                        <button onClick={this.applyLocal.bind(this, "move", {"direction": "r"}, "true")}>Move Right</button>
+                        <button onClick={this.applyLocal.bind(this, "changeBreak", {}, "true")}>\n?</button>
+                        <button onClick={this.applyLocal.bind(this, "changeBracket", {}, "true")}>()?</button>
                         <button onClick={this.undo.bind(this)}>Undo</button>
                         {/* <li> */}
                             {/* <label htmlFor="userOptions" className="form-label">Transformer options</label>
