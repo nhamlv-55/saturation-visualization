@@ -103,12 +103,16 @@ class TreeEditor extends React.Component<Props, State> {
         
     }
 
+    updateConditionInputEvent(evt: React.ChangeEvent<HTMLInputElement>, idx: number){
+        this.transformerStack[idx].condition = evt.target.value;
+    }
+
     displayTransformers() {
         const listItems = this.transformerStack.map((t, index) =>{
             return (
-                <div key={index}>
+                <div  key={index}>
                 <span>If (best guess):</span>
-                <input type="text" value={t.condition} width="20rem"/>
+                <input ref="condition-${index}" type="text" defaultValue={t.condition} width="20rem" onChange={evt => this.updateConditionInputEvent(evt, index)}/>
                 then
                 {t.action}
                 </div>);
@@ -120,6 +124,7 @@ class TreeEditor extends React.Component<Props, State> {
 
     applyStack(){
         const original_ast = new AST(this.props.input);
+
         try{
             this.astStack.push(this.transformer.runStack(original_ast, this.transformerStack));
             this.transformerStack.push({"action": "runStack", "params": "", "condition": ""});
