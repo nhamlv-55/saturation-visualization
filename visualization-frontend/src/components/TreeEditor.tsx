@@ -66,7 +66,9 @@ class TreeEditor extends React.Component<Props, State> {
 
     componentDidUpdate(prevProps: Props){
         if(prevProps.input !== this.props.input){
-            this.astStack.push(new AST(this.props.input));
+            //new formula. clear everything
+            this.astStack = [new AST(this.props.input)];
+            this.transformerStack = [];
             this.redrawAST();
         }
     }
