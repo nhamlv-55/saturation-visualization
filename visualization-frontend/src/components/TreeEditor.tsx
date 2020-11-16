@@ -5,7 +5,7 @@ import { DataSet, Network, Node, Edge } from 'vis'
 
 type Props = {
     input: string,
-    spacerUserOptions: string,
+    onBlast: ()=>void;
 }
 
 type State = {
@@ -108,7 +108,9 @@ class TreeEditor extends React.Component<Props, State> {
     updateConditionInputEvent(evt: React.ChangeEvent<HTMLInputElement>, idx: number){
         this.transformerStack[idx].condition = evt.target.value;
     }
-
+    updateParamsInputEvent(evt: React.ChangeEvent<HTMLInputElement>, idx: number){
+        this.transformerStack[idx].params = JSON.parse(evt.target.value);
+    }
     displayTransformers() {
         const listItems = this.transformerStack.map((t, index) =>{
             return (
@@ -116,7 +118,9 @@ class TreeEditor extends React.Component<Props, State> {
                 <span>If (best guess):</span>
                 <input ref="condition-${index}" type="text" defaultValue={t.condition} width="20rem" onChange={evt => this.updateConditionInputEvent(evt, index)}/>
                 then
-                {t.action}
+                <pre> {t.action} </pre>
+                with params:
+                <input ref="params-${index}" type="text" defaultValue={JSON.stringify(t.params)} width="20rem" onChange={evt => this.updateParamsInputEvent(evt, index)}/>
                 </div>);
         });
 
@@ -160,8 +164,8 @@ class TreeEditor extends React.Component<Props, State> {
     render() {
         let tStack = this.displayTransformers();
         return (
-            <section>
-                <fieldset className="options-card" id="graph-container">
+            <div className="tree-editor">
+                <div className="editor-options-card" id="graph-container">
                     <h3>Transformer Queue</h3>
                     <h4>{this.state.status}</h4>
                     <ul>
@@ -172,47 +176,27 @@ class TreeEditor extends React.Component<Props, State> {
                         <button onClick={this.applyLocal.bind(this, "changeBreak", {})}>\n?</button>
                         <button onClick={this.applyLocal.bind(this, "changeBracket", {})}>()?</button>
                         <button onClick={this.undo.bind(this)}>Undo</button>
-                        {/* <li> */}
-                            {/* <label htmlFor="userOptions" className="form-label">Transformer options</label>
-                                {selectedOptions.length !== 0 && this.state.showOptions && selectedOptions.map((option, key) => {
-                                if (option !== "") {
-                                let kvp = option.split("=");
-                                let name = kvp[0];
-                                let value = kvp[1];
-                                let displayValue = value ? name + ": " + value : name;
-                                return (
-                                <div className="displaySpacerOption" key={key}>
-                                <span>{displayValue}</span>
-                                <button className="fake-button" type="button" onClick={this.removeOption.bind(this, name, value)}>x</button>
-                                </div>
-                                );
-                                }
-                                return "";
-                                })}
-                                <form className="tfradio" name="tfradio" onSubmit={this.storeSpacerOptions.bind(this)}>
-                                <input type="text" className="optionsList" list="spacerOptions" name="spacerOptions" onChange={this.changeOptionType.bind(this)}/>
-                                <datalist id="spacerOptions">
-                                {options.map((part, key) => (
-                                <option value={part.name} key={key}/>
-                                ))}
-                                </datalist>
-                                {this.state.optionTypeHTML}
-                                </form>
-                                </li> */}
-
                     </ul>
                     <pre><div dangerouslySetInnerHTML={{ __html: this.state.stringRep }} /></pre>
                     <div className= "component-graph" ref = { this.graphContainer }>
                         <canvas />
                     </div>
-                </fieldset>
-                <fieldset className="options-card" id="transformer-container">
+                </div>
+                <div className="editor-options-card" id="transformer-container">
                     <h3>Transformer Queue</h3>
+                    <pre>Condition examples:
+                        // apply the transformation for all the node whose token pass the regex test &quot;ab+c&quot;
+                        /ab+c/.test(node.token)
+                        // apply the transformation for all the node whose token is either x, y, or z
+                        [&quot;x_&quot;, &quot;y_&quot;, &quot;z_&quot;].includes(node.token)
+                        // apply the transformation for all the node at depth 2
+                        ast.nodeDepth(node) === 2
+                    </pre>
                     {tStack}
                     <button onClick={this.applyStack.bind(this)}>Apply for the current AST</button>
-                    <button onClick={this.undo.bind(this)}>Blast</button>
-                </fieldset>
-            </section>
+                    <button onClick={this.props.onBlast.bind(this)}>Blast</button>
+                </div>
+            </div>
         );
     }
 }

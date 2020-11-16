@@ -1,23 +1,56 @@
-.component-menu .monaco {
-    flex-grow: 1;
+.component-menu .editor-spacer {
+    width: 100%;
+    padding: 1.5rem 2rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+#input, #output {
+    flex: 0 0 48%;
     margin: 1rem 0 0;
     border: solid 1px #ddd;
     color: rgba(0, 0, 0, .5);
+}
+
+.component-menu .editor-options-card {
+    margin: 0.5rem 0 1rem;
+    padding: 1rem;
+    overflow: hidden;
+    border: none;
+    border-radius: 2px;
+
+    background: #fff;
+    box-shadow: 1px 3px 10px 0 rgba(0, 0, 0, .1);
+}
+
+.component-menu #editor-wrapper{
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 35%;
+    margin-right: 2rem;
+    padding: 1.25rem 1rem;
+
+    border-radius: 2px;
+    background: #fff;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .05);
+    color: rgba(0, 0, 0, .5);
+}
+.tree-editor{
+    flex: 48%;
+    flex-direction: row;
+}
+.tree-editor #graph-container{
+    flex:0 0 70%;
+}
+.tree-editor #transformer-container{
+    flex:0 0 28%;
 }
 
 .component-menu .monaco .lines-content.monaco-editor-background {
     margin-top: 14px;
 }
 
-.tree-editor{
-    display: block;
-    width: 100%
-}
 
-#graph-container{
-    height: 100rem;
-    padding: 1rem;
-}
 
 .highlighted {
     color: red;

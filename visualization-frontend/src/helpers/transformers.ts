@@ -28,7 +28,7 @@ function isOpt(lst){
                      "and", "or", "not", "=>",
                      "assert",
                      "declare-datatypes",
-                    "forall"]
+                     "forall", "exists", "define"]
     if(typeof lst !== "string"){
         return false;
     }

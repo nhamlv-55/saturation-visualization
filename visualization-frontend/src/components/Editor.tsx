@@ -70,16 +70,20 @@ export class Editor extends React.Component<Props, State> {
             input: input
         });
     }
-    applyTransformation(){
-        console.log("click Apply")
-        let input = this.monaco?.getModel()!.getValue();
 
-        console.log(input);
-
-        this.setState({
-            output: input+"blha blah"
-        });
+    blast(){
+        console.log("pew pew !");
     }
+    /* applyTransformation(){
+     *     console.log("click Apply")
+     *     let input = this.monaco?.getModel()!.getValue();
+
+     *     console.log(input);
+
+     *     this.setState({
+     *         output: input+"blha blah"
+     *     });
+     * } */
 
 
     render() {
@@ -99,26 +103,19 @@ export class Editor extends React.Component<Props, State> {
                 <h1>Transformer Editor</h1>
 
                 <section className="editor">
-                    <div className="editor-spacer">
-                        <main>
-                            <h2>Original</h2>
-                            <div ref={this.monacoDiv} className="monaco"></div>
-                            <button onClick={this.openEditor.bind(this)}>Open Editor</button>
-                            <button onClick={this.applyTransformation.bind(this)}>Apply</button>
-                            <button>Learn</button>
-
-                            <h2>Transformed</h2>
-                            <textarea ref="output" id="output" rows={30} value={this.state.output}></textarea>
-
-                        </main>
-                        <div className="tree-editor">
-                            <TransformerTable/>
-                            <TreeEditor
-                                input = {this.state.input}
-                                spacerUserOptions =""
-                            />
-                        </div>
+                    <div id="editor-wrapper">
+                        <h2>Original</h2>
+                        <div ref={this.monacoDiv} className="monaco" id="input"></div>
+                        <button onClick={this.openEditor.bind(this)}>Open Editor</button>
+                        <h2>Transformed</h2>
+                        <textarea ref="output" id="output" rows={30} value={this.state.output}></textarea>
+                        
                     </div>
+                    {/* <TransformerTable/> */}
+                    <TreeEditor
+                        input = {this.state.input}
+                        onBlast = {this.blast.bind(this)}
+                    />
                 </section>
 
             </section>
