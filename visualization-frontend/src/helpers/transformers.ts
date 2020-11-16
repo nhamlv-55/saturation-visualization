@@ -165,6 +165,11 @@ export class ASTTransformer{
             let parent = cloned_ast.nodeList[node.parentID];
             console.log("parent", parent);
 
+            if(parent.token!=="or"){
+                return cloned_ast;
+            }
+
+
             let newHead = new ASTNode(cloned_ast.nodeList.length, "not", parent.nodeID, [node.nodeID]);
             cloned_ast.nodeList.push(newHead);
 
