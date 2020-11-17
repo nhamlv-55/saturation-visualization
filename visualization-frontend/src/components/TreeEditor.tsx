@@ -112,16 +112,6 @@ class TreeEditor extends React.Component<Props, State> {
         this.transformerStack[idx].params = JSON.parse(evt.target.value);
     }
 
-    guessReplaceParams(){
-        if(this.astStack.length>0 && this.state.selectedNodeID!==-1){
-            const currentAST = this.astStack[this.astStack.length - 1];
-            const node = currentAST.nodeList[this.state.selectedNodeID];
-
-            return {"source": node.token, "target": "", "regex": false}
-        }
-        return {"source":"", "target": "", "regex": false}
-    }
-
     displayTransformers() {
         const listItems = this.transformerStack.map((t, index) =>{
             return (
@@ -141,8 +131,6 @@ class TreeEditor extends React.Component<Props, State> {
 
         return listItems;
     }
-
-
 
     applyStack(){
         const original_ast = new AST(this.props.input);
@@ -185,7 +173,6 @@ class TreeEditor extends React.Component<Props, State> {
     
     render() {
         let tStack = this.displayTransformers();
-        let suggestedReplaceParams = this.guessReplaceParams();
         return (
             <div className="tree-editor">
                 <div className="editor-options-card" id="graph-container">
@@ -200,9 +187,6 @@ class TreeEditor extends React.Component<Props, State> {
                         <button onClick={this.applyLocal.bind(this, "changeBracket", {})}>()?</button>
                         <br/>
                         <ReplaceDialog
-                            source = {suggestedReplaceParams["source"]}
-                            target = {suggestedReplaceParams["target"]}
-                            regex = {suggestedReplaceParams["regex"]}
                             onApply = {this.applyLocal.bind(this)}
                         />
                         <br/>

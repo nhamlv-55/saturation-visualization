@@ -4,9 +4,6 @@ import { AST, ASTTransformer, Transformer} from "./../helpers/transformers";
 const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
-    source: string,
-    target: string,
-    regex: boolean,
     onApply: (action: string, params: {})=>void,
 }
 
@@ -18,23 +15,23 @@ type State = {
 
 
 class ReplaceDialog extends React.Component<Props, State> {
-    state: State = {
-        source: this.props.source,
-        target: this.props.target,
-        regex: this.props.regex
+    state = {
+        source: "",
+        target: "",
+        regex: false,
     };
 
 
 
     render() {
-        console.log(this.state)
+        console.log(this.props, this.state)
         return (
             <div>
-                {`Replace: `}<input type="text" defaultValue={this.props.source} onChange={(e)=> {this.setState({source: e.target.value})}} />
-                {` with: `}<input type="text" defaultValue={this.props.target} onChange={(e)=> {this.setState({target: e.target.value})}}/>
+                {`Replace: `}<input type="text" defaultValue=""onChange={(e)=> {this.setState({source: e.target.value})}} />
+                {` with: `}<input type="text" defaultValue=""onChange={(e)=> {this.setState({target: e.target.value})}}/>
                 {`\tRegex?`}
                 <input type="checkbox"
-                       defaultChecked={this.props.regex}
+                       defaultChecked={false}
                        onChange={(e)=> {this.setState({regex: e.target.checked})} }
                 />
                 <button onClick={this.props.onApply.bind(this, "replace",

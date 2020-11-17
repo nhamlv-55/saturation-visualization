@@ -221,18 +221,22 @@ export class ASTTransformer{
 
     replace(node: ASTNode, ast: AST, params: {}, condition: string ): [boolean, AST]{
         let cloned_ast = _.cloneDeep(ast);
-        let cloned_node = cloned_ast.nodeList[node.nodeID];
-        const original_token = node.token;
         let dirty = false;
+        let source = params["source"]
         if(eval(condition)){
             if(params["regex"]){
-                let regex = new RegExp(params["source"])
-                cloned_node.token = cloned_node.token.replace(regex, params["target"]);
-            }else{
-                cloned_node.token = cloned_node.token.replace(params["source"], params["target"]);
+                source = new RegExp(params["source"])
             }
-            console.log(original_token, cloned_node.token);
-            dirty = (original_token !== cloned_node.token);
+
+
+            for(var cloned_node of cloned_ast.nodeList){
+                let old_token = cloned_node.token
+                cloned_node.token = old_token.replace(source, params["target"]);
+                if(cloned_node.token !== old_token){
+                    dirty = true;
+                }
+            }
+
             if(dirty){
                 cloned_ast.buildVis();
             }
