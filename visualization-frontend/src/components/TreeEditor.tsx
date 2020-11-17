@@ -150,11 +150,14 @@ class TreeEditor extends React.Component<Props, State> {
         const node = currentAST.nodeList[this.state.selectedNodeID];
         let t = {"action": action, "params": params, "condition": "true"};
         try{
-            this.astStack.push(this.transformer.run(node, currentAST, t));
-            //guess the condition
-            t.condition = this.transformer.getCondition(action, node, currentAST);
-            this.transformerStack.push(t);
-            this.redrawAST();
+            let [dirty, new_ast] = this.transformer.run(node, currentAST, t);
+            if(dirty){
+                this.astStack.push(new_ast);
+                //guess the condition
+                t.condition = this.transformer.getCondition(action, node, currentAST);
+                this.transformerStack.push(t);
+                this.redrawAST();
+            }
         }catch(error){
             this.setState({"status": "Error:"+error.message});
         }
