@@ -115,13 +115,17 @@ class TreeEditor extends React.Component<Props, State> {
     displayTransformers() {
         const listItems = this.transformerStack.map((t, index) =>{
             return (
-                <div  key={index}>
-                <span>If (best guess):</span>
-                <input ref="condition-${index}" type="text" defaultValue={t.condition} width="20rem" onChange={evt => this.updateConditionInputEvent(evt, index)}/>
-                then
-                <pre> {t.action} </pre>
-                with params:
-                <input ref="params-${index}" type="text" defaultValue={JSON.stringify(t.params)} width="20rem" onChange={evt => this.updateParamsInputEvent(evt, index)}/>
+                <div  key={index} className="transformer-wrapper">
+                    {`If `}
+                    <input style={{display: "inline-block", width: "20rem"}}
+                           ref="condition-${index}"
+                           type="text"
+                           defaultValue={t.condition}
+                           onChange={evt => this.updateConditionInputEvent(evt, index)}/>
+                    <br/>
+                    {`then run __${t.action}__ with params:`}
+                    <br/>
+                    <input ref="params-${index}" type="text" defaultValue={JSON.stringify(t.params)} width="20rem" onChange={evt => this.updateParamsInputEvent(evt, index)}/>
                 </div>);
         });
 

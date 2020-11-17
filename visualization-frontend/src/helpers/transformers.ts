@@ -51,10 +51,13 @@ export class ASTTransformer{
 
     runStack(ast: AST, tStack: Transformer[]): AST{
         let result = _.cloneDeep(ast);
+        console.log("tStack", tStack);
         //loop over all transformer
         for(var transformer of tStack){
             //apply the transformer to all the node if possible.
+
             for(var node of result.nodeList){
+                console.log(node);
                 result = this.run(node, result, transformer);
             }
         }
