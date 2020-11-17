@@ -55,11 +55,11 @@ export class ASTTransformer{
         //loop over all transformer
         let t_index = 0;
         while(t_index < tStack.length){
+            console.log(tStack[t_index]);
             //apply the transformer to all the node if possible.
             let dirty = true;
 
             for(var node of new_ast.nodeList){
-                console.log(node);
                 [dirty, new_ast] = this.run(node, new_ast, tStack[t_index]);
                 if(dirty){
                     break;
@@ -85,6 +85,12 @@ export class ASTTransformer{
                 const current_break = node.shouldBreak;
                 const node_depth = ast.nodeDepth(node);
                 condition = `ast.nodeDepth(node) === ${node_depth} && node.shouldBreak === ${current_break}`;
+                break;
+            }
+            case "changeBracket":{
+                const current_in_bracket = node.shouldInBracket ;
+                const node_depth = ast.nodeDepth(node);
+                condition = `ast.nodeDepth(node) === ${node_depth} && node.shouldInBracket === ${current_in_bracket}`;
                 break;
             }
         }
@@ -191,6 +197,7 @@ export class ASTTransformer{
 
 
             let newHead = new ASTNode(cloned_ast.nodeList.length, "not", parent.nodeID, [node.nodeID]);
+            cloned_ast.nodeList[node.nodeID].parentID = newHead.nodeID;
             cloned_ast.nodeList.push(newHead);
 
             let newTail = new ASTNode(cloned_ast.nodeList.length, "or", parent.nodeID, []);
@@ -221,15 +228,21 @@ export class ASTTransformer{
     }
     changeBreak(node: ASTNode, ast: AST, params:{}, condition: string ): [boolean,AST]{
         let cloned_ast = _.cloneDeep(ast);
-        cloned_ast.nodeList[node.nodeID].shouldBreak ^= 1;
-        cloned_ast.buildVis();
-        return [true, cloned_ast];
+        if(eval(condition)){
+            cloned_ast.nodeList[node.nodeID].shouldBreak ^= 1;
+            cloned_ast.buildVis();
+            return [true, cloned_ast];
+        }
+        return [false, cloned_ast];
     }
     changeBracket(node: ASTNode, ast: AST, params:{}, condition: string ): [boolean, AST]{
         let cloned_ast = _.cloneDeep(ast);
-        cloned_ast.nodeList[node.nodeID].shouldInBracket ^= 1;
-        cloned_ast.buildVis();
-        return [true, cloned_ast];
+        if(eval(condition)){
+            cloned_ast.nodeList[node.nodeID].shouldInBracket ^= 1;
+            cloned_ast.buildVis();
+            return [true, cloned_ast];
+        }
+        return [false, cloned_ast];
     }
 }
 
