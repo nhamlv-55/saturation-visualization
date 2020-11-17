@@ -163,9 +163,11 @@ class TreeEditor extends React.Component<Props, State> {
         }
     }
     undo(){
-        this.astStack.pop();
-        this.transformerStack.pop();
-        this.redrawAST();
+        if(this.astStack.length>1){
+            this.astStack.pop();
+            this.transformerStack.pop();
+            this.redrawAST();
+        }
     }
 
     
