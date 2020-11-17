@@ -43,20 +43,18 @@ export interface Transformer{
 
 export class ASTTransformer{
     run(node: ASTNode, ast: AST, t: Transformer): AST{
-        if(t.action!=="applyStack"){
+        if(t.action!=="runStack"){
             return this[t.action](node, ast, t.params, t.condition);
         }
         return ast;
     }
 
-    runStack(ast: AST, tStack: Transformer[]){
+    runStack(ast: AST, tStack: Transformer[]): AST{
         let result = _.cloneDeep(ast);
         //loop over all transformer
-        console.log("res:", result);
         for(var transformer of tStack){
             //apply the transformer to all the node if possible.
             for(var node of result.nodeList){
-                console.log("res:", result);
                 result = this.run(node, result, transformer);
             }
         }
@@ -165,7 +163,7 @@ export class ASTTransformer{
             let parent = cloned_ast.nodeList[node.parentID];
             console.log("parent", parent);
 
-            if(parent.token!=="or"){
+            if(!parent || parent.token!=="or"){
                 return cloned_ast;
             }
 
@@ -288,7 +286,9 @@ export class AST {
 
 
 
-
+    toString(selectedID: number, node: ASTNode): string{
+        return this.toHTML(selectedID, node);
+    }
     toHTML(selectedID: number, node: ASTNode, add_highlight = true): string{
         let result: string;
         if(node.children.length === 0){

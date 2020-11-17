@@ -5,6 +5,7 @@ import * as Monaco from 'monaco-editor'
 import TransformerTable from './TransformerTable';
 import { assert } from '../model/util';
 import TreeEditor from "./TreeEditor";
+import { AST, ASTTransformer, Transformer} from "./../helpers/transformers";
 const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
@@ -48,12 +49,13 @@ export class Editor extends React.Component<Props, State> {
             hideCursorInOverviewRuler: true,
             links: false,
             overviewRulerBorder: false,
-            automaticLayout: true,
+            automaticLayout: false,
             lineDecorationsWidth: 0,
             lineNumbersMinChars: 0,
             wordWrap: 'wordWrapColumn'
             // fontFamily: "Monaco" TODO: decide which font to use. By default, multiple fonts are loaded, which is quite slow
         });
+
         /* this.monaco.setValue(this.props.problem);
          * this.monaco.getModel()!.onDidChangeContent(() => {
          *     console.log(this.monaco!.getModel()!.getValue());
@@ -62,29 +64,38 @@ export class Editor extends React.Component<Props, State> {
     }
     openEditor(){
         console.log("click Apply")
-        let input = this.monaco?.getModel()!.getValue()!;
+        /* let current_bracket = this.monaco?.getModel()!.matchBracket(1); */
 
-        console.log(input);
+        /* console.log(current_bracket); */
+        let input = this.monaco?.getModel()!.getValue()!;
 
         this.setState({
             input: input
         });
     }
 
-    blast(){
-        console.log("pew pew !");
+    getFormulas(input: string): string[]{
+        return input.split(/\n\s*\n/);
     }
-    /* applyTransformation(){
-     *     console.log("click Apply")
-     *     let input = this.monaco?.getModel()!.getValue();
 
-     *     console.log(input);
+    blast(tStack: Transformer[]){
+        let all_formulas = this.getFormulas(this.monaco?.getModel()!.getValue()!);
+        let transformer = new ASTTransformer();
 
-     *     this.setState({
-     *         output: input+"blha blah"
-     *     });
-     * } */
 
+        console.log(all_formulas);
+        console.log(tStack);
+        console.log("pew pew !");
+
+        let output=""
+        for(var f of all_formulas){
+            let ast = new AST(f);
+            let new_ast = transformer.runStack(ast, tStack);
+            let new_f = new_ast.toString(-1, new_ast.nodeList[0]);
+            output+=new_f+"\n\n";
+        }
+        this.setState({output: output});
+    }
 
     render() {
         if (!this.isChromeOrFirefox) {
@@ -108,7 +119,7 @@ export class Editor extends React.Component<Props, State> {
                         <div ref={this.monacoDiv} className="monaco" id="input"></div>
                         <button onClick={this.openEditor.bind(this)}>Open Editor</button>
                         <h2>Transformed</h2>
-                        <textarea ref="output" id="output" rows={30} value={this.state.output}></textarea>
+                        <textarea ref="output" id="output" rows={30} value={this.state.output} readOnly></textarea>
                         
                     </div>
                     {/* <TransformerTable/> */}

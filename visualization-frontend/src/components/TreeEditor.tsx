@@ -2,10 +2,11 @@ import * as React from 'react';
 import { AST, ASTTransformer, Transformer} from "./../helpers/transformers";
 import { assert } from '../model/util';
 import { DataSet, Network, Node, Edge } from 'vis'
+import { Transform } from 'stream';
 
 type Props = {
     input: string,
-    onBlast: ()=>void;
+    onBlast: (tStack: Transformer[])=>void;
 }
 
 type State = {
@@ -178,23 +179,24 @@ class TreeEditor extends React.Component<Props, State> {
                         <button onClick={this.undo.bind(this)}>Undo</button>
                     </ul>
                     <pre><div dangerouslySetInnerHTML={{ __html: this.state.stringRep }} /></pre>
-                    <div className= "component-graph" ref = { this.graphContainer }>
-                        <canvas />
+                    <div className= "editor-component-graph" ref = { this.graphContainer }>
+                        <canvas/>
                     </div>
                 </div>
                 <div className="editor-options-card" id="transformer-container">
                     <h3>Transformer Queue</h3>
-                    <pre>Condition examples:
-                        // apply the transformation for all the node whose token pass the regex test &quot;ab+c&quot;
-                        /ab+c/.test(node.token)
-                        // apply the transformation for all the node whose token is either x, y, or z
-                        [&quot;x_&quot;, &quot;y_&quot;, &quot;z_&quot;].includes(node.token)
-                        // apply the transformation for all the node at depth 2
-                        ast.nodeDepth(node) === 2
-                    </pre>
+                    <pre>{`
+Condition examples:
+    - apply the transformation for all the node whose token pass the regex test "ab+c"
+    /ab+c/.test(node.token)
+    - // apply the transformation for all the node whose token is either x, y, or z
+    ["x_", "y_", "z_"].includes(node.token)
+    - // apply the transformation for all the node at depth 2
+    ast.nodeDepth(node) === 2
+                        `}</pre>
                     {tStack}
                     <button onClick={this.applyStack.bind(this)}>Apply for the current AST</button>
-                    <button onClick={this.props.onBlast.bind(this)}>Blast</button>
+                    <button onClick={this.props.onBlast.bind(this, this.transformerStack)}>Blast</button>
                 </div>
             </div>
         );
