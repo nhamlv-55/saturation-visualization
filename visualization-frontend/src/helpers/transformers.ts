@@ -186,25 +186,25 @@ export class ASTTransformer{
 
     toImp(node: ASTNode, ast: AST, params: {}, condition: string ): [boolean, AST]{
         let cloned_ast = _.cloneDeep(ast);
+        let cloned_node = cloned_ast.nodeList[node.nodeID];
         let dirty = false;
         if(eval(condition)){
-            let parent = cloned_ast.nodeList[node.parentID];
-            console.log("parent", parent);
+            let parent = cloned_ast.nodeList[cloned_node.parentID];
 
             if(!parent || parent.token!=="or"){
                 return [false, cloned_ast];
             }
 
 
-            let newHead = new ASTNode(cloned_ast.nodeList.length, "not", parent.nodeID, [node.nodeID]);
-            cloned_ast.nodeList[node.nodeID].parentID = newHead.nodeID;
+            let newHead = new ASTNode(cloned_ast.nodeList.length, "not", parent.nodeID, [cloned_node.nodeID]);
+            cloned_node.parentID = newHead.nodeID;
             cloned_ast.nodeList.push(newHead);
 
             let newTail = new ASTNode(cloned_ast.nodeList.length, "or", parent.nodeID, []);
             cloned_ast.nodeList.push(newTail);
 
             for(var childID of parent.children){
-                if(childID !== node.nodeID){
+                if(childID !== cloned_node.nodeID){
                     cloned_ast.nodeList[childID].parentID = newTail.nodeID;
                     newTail.children.push(childID);
                 }
@@ -219,10 +219,24 @@ export class ASTTransformer{
         return [dirty, cloned_ast];
     } 
 
-    rename(node: ASTNode, ast: AST, params: {}, condition: string ): [boolean, AST]{
+    replace(node: ASTNode, ast: AST, params: {}, condition: string ): [boolean, AST]{
         let cloned_ast = _.cloneDeep(ast);
-
+        let cloned_node = cloned_ast.nodeList[node.nodeID];
+        const original_token = node.token;
         let dirty = false;
+        if(eval(condition)){
+            if(params["regex"]){
+                let regex = new RegExp(params["source"])
+                cloned_node.token = cloned_node.token.replace(regex, params["target"]);
+            }else{
+                cloned_node.token = cloned_node.token.replace(params["source"], params["target"]);
+            }
+            console.log(original_token, cloned_node.token);
+            dirty = (original_token !== cloned_node.token);
+            if(dirty){
+                cloned_ast.buildVis();
+            }
+        }
 
         return [dirty, cloned_ast];
     }
@@ -306,9 +320,14 @@ export class AST {
         this.visEdges = [];
 
         for(const node of this.nodeList){
+            let label = node.token;
+
+            if(node.shouldInBracket){
+                label = '(' + label + ')';
+            }
             this.visNodes.push({
                 id: node.nodeID,
-                label: node.token + ((node.shouldInBracket)?'+()':'') + ((node.shouldBreak)?'+nl':''),
+                label: label + ((node.shouldBreak)?'\u21B5':''),
                 shape: "box",
                 size: 20,
             })
