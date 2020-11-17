@@ -67,7 +67,8 @@ export class Editor extends React.Component<Props, State> {
         /* let current_bracket = this.monaco?.getModel()!.matchBracket(1); */
 
         /* console.log(current_bracket); */
-        let input = this.monaco?.getModel()!.getValue()!;
+        let input = this.monaco!.getModel()!.getValueInRange(this.monaco!.getSelection()!);
+        /* getValue()!; */
 
         this.setState({
             input: input
