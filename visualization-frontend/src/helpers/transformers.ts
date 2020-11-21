@@ -94,12 +94,26 @@ export class ASTTransformer{
                 condition = `ast.nodeDepth(node) === ${node_depth} && node.shouldInBracket === ${current_in_bracket}`;
                 break;
             }
+            case "squashNegation":{
+                condition = "true";
+                break;
+            }
+            case "replace":{
+                condition = "true";
+                break;
+            }
+            default:{
+                const current_token = node.token;
+                const node_depth = ast.nodeDepth(node);
+                condition = `node.token === "${current_token}" && ast.nodeDepth(node) === ${node_depth}`;
+                break;
+            }
         }
         return condition;
     }
 
 
-    squash_negation(node: ASTNode, ast: AST, params: {}, condition: string ): [boolean, AST]{
+    squashNegation(node: ASTNode, ast: AST, params: {}, condition: string ): [boolean, AST]{
         /*
           collapse a `not` and its children N into the negation
         */
@@ -127,9 +141,10 @@ export class ASTTransformer{
                     current_parent.children[current_child_index] = grandchild.nodeID;
 
                     //remove the 2 `not` nodes
-                    cloned_ast.nodeList[cloned_node.nodeID] = cloned_ast.null_node;
-                    cloned_ast.nodeList[cloned_child.nodeID] = cloned_ast.null_node;
+                    cloned_ast.deleteNode(cloned_node);
+                    cloned_ast.deleteNode(cloned_child);
 
+                    //rebuild vis
                     cloned_ast.buildVis();
 
                     dirty = true;
@@ -317,13 +332,11 @@ export class AST {
     visNodes = new Array<Node>();
     visEdges = new Array<Edge>();
 
-    null_node = new ASTNode(-100, "", -100, []);
+    null_node = new ASTNode(-100, "null-node", -100, []);
     constructor(formula: string){
         this.lstToAST(-1, parse(formula));
         this.buildVis();
     }
-
-    
 
     nodeDepth(node: ASTNode): number{
         if (node.parentID===-1){
@@ -333,6 +346,9 @@ export class AST {
         return this.nodeDepth(this.nodeList[node.parentID])+1;
     }
 
+    deleteNode(node: ASTNode): void{
+        this.nodeList[node.nodeID] = this.null_node;
+    }
 
     lstToAST(parentID, lst): number{
         const nodeID = this.nodeList.length

@@ -188,7 +188,7 @@ class TreeEditor extends React.Component<Props, State> {
                         <button onClick={this.applyLocal.bind(this, "move", {"direction": "r"})}>Move Right</button>
                         <button onClick={this.applyLocal.bind(this, "changeBreak", {})}>\n?</button>
                         <button onClick={this.applyLocal.bind(this, "changeBracket", {})}>()?</button>
-                        <button onClick={this.applyLocal.bind(this, "squash_negation", {})}>Collapse Negation</button>
+                        <button onClick={this.applyLocal.bind(this, "squashNegation", {})}>Collapse Negation</button>
                         <br/>
                         <ReplaceDialog
                             onApply = {this.applyLocal.bind(this)}
