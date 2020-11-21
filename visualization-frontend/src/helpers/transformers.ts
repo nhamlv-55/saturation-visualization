@@ -78,8 +78,8 @@ export class ASTTransformer{
         let condition = "true";
         switch(action){
             case "move":{
-                const node_depth = ast.nodeDepth(node);
-                condition = `ast.nodeDepth(node) === ${node_depth}`;
+                const current_token = node.token;
+                condition = `node.token === ${current_token}`;
                 break;
             }
             case "changeBreak":{
@@ -127,7 +127,6 @@ export class ASTTransformer{
 
         if(eval(condition)){
             let cloned_child = cloned_ast.nodeList[cloned_node.children[0]];
-            let new_node : ASTNode;
 
             switch(cloned_child.token){
                 case "not":{
@@ -150,6 +149,42 @@ export class ASTTransformer{
                     dirty = true;
                     break;
                 }
+
+                case "<":{
+                    //flip
+                    cloned_child.token = ">=";
+                    //point to parent
+                    cloned_child.parentID = cloned_node.parentID;
+                    //point parent to grandchild
+                    let current_parent = cloned_ast.nodeList[cloned_node.parentID];
+                    let current_child_index = current_parent.children.indexOf(cloned_node.nodeID);
+                    current_parent.children[current_child_index] = cloned_child.nodeID;
+
+                    //remove the `not` node
+                    cloned_ast.deleteNode(cloned_node);
+                    //rebuild vis
+                    cloned_ast.buildVis();
+                    dirty = true;
+                    break;
+                }
+                case ">":{
+                    //flip
+                    cloned_child.token = "<=";
+                    //point to parent
+                    cloned_child.parentID = cloned_node.parentID;
+                    //point parent to grandchild
+                    let current_parent = cloned_ast.nodeList[cloned_node.parentID];
+                    let current_child_index = current_parent.children.indexOf(cloned_node.nodeID);
+                    current_parent.children[current_child_index] = cloned_child.nodeID;
+
+                    //remove the `not` node
+                    cloned_ast.deleteNode(cloned_node);
+                    //rebuild vis
+                    cloned_ast.buildVis();
+                    dirty = true;
+                    break;
+                }
+
                 default:
 
             }
