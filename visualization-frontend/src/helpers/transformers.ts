@@ -28,7 +28,8 @@ function isOpt(lst){
                      "and", "or", "not", "=>",
                      "assert",
                      "declare-datatypes",
-                     "forall", "exists", "define"]
+                     "forall", "exists", "define",
+                     "select", "store"]
     if(typeof lst !== "string"){
         return false;
     }
@@ -97,6 +98,52 @@ export class ASTTransformer{
         return condition;
     }
 
+
+    squash_negation(node: ASTNode, ast: AST, params: {}, condition: string ): [boolean, AST]{
+        /*
+          collapse a `not` and its children N into the negation
+        */
+        let cloned_ast = _.cloneDeep(ast);
+        let cloned_node = cloned_ast.nodeList[node.nodeID];
+        let dirty = false;
+
+        if(node.token!=="not"){
+            return [false, cloned_ast]
+        }
+
+        if(eval(condition)){
+            let cloned_child = cloned_ast.nodeList[cloned_node.children[0]];
+            let new_node : ASTNode;
+
+            switch(cloned_child.token){
+                case "not":{
+                    //point new node's parent to current parent
+                    let grandchild = cloned_ast.nodeList[cloned_child.children[0]];
+                    grandchild.parentID = cloned_node.parentID;
+
+                    //point parent's child to new_node
+                    let current_parent = cloned_ast.nodeList[cloned_node.parentID];
+                    let current_child_index = current_parent.children.indexOf(cloned_node.nodeID);
+                    current_parent.children[current_child_index] = grandchild.nodeID;
+
+                    //remove the 2 `not` nodes
+                    cloned_ast.nodeList[cloned_node.nodeID] = cloned_ast.null_node;
+                    cloned_ast.nodeList[cloned_child.nodeID] = cloned_ast.null_node;
+
+                    cloned_ast.buildVis();
+
+                    dirty = true;
+                    break;
+                }
+                default:
+
+            }
+
+        }
+
+        return [dirty, cloned_ast]
+
+    }
 
     move(node: ASTNode, ast: AST, params: {}, condition: string ): [boolean, AST]{
         /*
@@ -270,10 +317,13 @@ export class AST {
     visNodes = new Array<Node>();
     visEdges = new Array<Edge>();
 
+    null_node = new ASTNode(-100, "", -100, []);
     constructor(formula: string){
         this.lstToAST(-1, parse(formula));
         this.buildVis();
     }
+
+    
 
     nodeDepth(node: ASTNode): number{
         if (node.parentID===-1){
@@ -324,23 +374,25 @@ export class AST {
         this.visEdges = [];
 
         for(const node of this.nodeList){
-            let label = node.token;
+            if(node.nodeID!==-100){
+                let label = node.token;
 
-            if(node.shouldInBracket){
-                label = '(' + label + ')';
-            }
-            this.visNodes.push({
-                id: node.nodeID,
-                label: label + ((node.shouldBreak)?'\u21B5':''),
-                shape: "box",
-                size: 20,
-            })
-            for(const childID of node.children){
-                this.visEdges.push({
-                    id: this.visEdges.length,
-                    from: node.nodeID,
-                    to: childID
+                if(node.shouldInBracket){
+                    label = '(' + label + ')';
+                }
+                this.visNodes.push({
+                    id: node.nodeID,
+                    label: label + ((node.shouldBreak)?'\u21B5':''),
+                    shape: "box",
+                    size: 20,
                 })
+                for(const childID of node.children){
+                    this.visEdges.push({
+                        id: this.visEdges.length,
+                        from: node.nodeID,
+                        to: childID
+                    })
+                }
             }
         }
     }

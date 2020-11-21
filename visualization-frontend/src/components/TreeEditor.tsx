@@ -2,6 +2,7 @@ import * as React from 'react';
 import { AST, ASTTransformer, Transformer} from "./../helpers/transformers";
 import { assert } from '../model/util';
 import { DataSet, Network, Node, Edge } from 'vis'
+import CollapseNegationDialog from './CollapseNegationDialog'
 import ReplaceDialog from './ReplaceDialog'
 type Props = {
     input: string,
@@ -125,7 +126,9 @@ class TreeEditor extends React.Component<Props, State> {
                     <br/>
                     {`then run __${t.action}__ with params:`}
                     <br/>
-                    <input ref="params-${index}" type="text" defaultValue={JSON.stringify(t.params)} width="20rem" onChange={evt => this.updateParamsInputEvent(evt, index)}/>
+                    <input ref="params-${index}" type="text" defaultValue={JSON.stringify(t.params)}
+                           style={{width: "100%"}}
+                           onChange={evt => this.updateParamsInputEvent(evt, index)}/>
                 </div>);
         });
 
@@ -185,6 +188,7 @@ class TreeEditor extends React.Component<Props, State> {
                         <button onClick={this.applyLocal.bind(this, "move", {"direction": "r"})}>Move Right</button>
                         <button onClick={this.applyLocal.bind(this, "changeBreak", {})}>\n?</button>
                         <button onClick={this.applyLocal.bind(this, "changeBracket", {})}>()?</button>
+                        <button onClick={this.applyLocal.bind(this, "squash_negation", {})}>Collapse Negation</button>
                         <br/>
                         <ReplaceDialog
                             onApply = {this.applyLocal.bind(this)}
