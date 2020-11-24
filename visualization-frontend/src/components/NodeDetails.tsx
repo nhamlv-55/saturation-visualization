@@ -160,7 +160,10 @@ export default class NodeDetails extends React.Component<Props, State> {
     async learnTransformation() {
         this.setState({
             learningFlag: false,
-            learningErrorFlag: false
+            learningErrorFlag: false,
+            transformationFlag: false,
+            transformationErrorFlag: false,
+            possibleTransformations: []
         });
 
         const response = await fetch("http://localhost:5000/spacer/learn_transformation", {
@@ -191,6 +194,10 @@ export default class NodeDetails extends React.Component<Props, State> {
     }
 
     async transformExprs() {
+        this.setState({
+            transformationFlag: false,
+            transformationErrorFlag: false
+        });
         const response = await fetch("http://localhost:5000/spacer/apply_transformation", {
             method: 'POST',
             mode :'cors',
