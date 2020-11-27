@@ -2,7 +2,6 @@ import * as React from 'react';
 import { AST, ASTTransformer, Transformer} from "./../helpers/transformers";
 import { assert } from '../model/util';
 import { DataSet, Network, Node, Edge } from 'vis'
-import CollapseNegationDialog from './CollapseNegationDialog'
 import ReplaceDialog from './ReplaceDialog'
 type Props = {
     input: string,
