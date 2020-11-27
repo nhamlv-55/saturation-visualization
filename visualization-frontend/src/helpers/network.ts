@@ -1,7 +1,3 @@
-import { DataSet, Network, Node, Edge } from 'vis'
-import { isObject } from "util";
-import { assert } from "../model/util";
-
 const styleTemplates = require('../resources/styleTemplates');
 
 export const lemmaColours = [
@@ -83,7 +79,6 @@ export function buildExprMap(tree: any, varList: string[]): any{
     return ExprMap
 
 }
-
 
 export function PobVisLayout(tree): any{
     let treeCloned = JSON.parse(JSON.stringify(tree));
