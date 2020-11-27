@@ -1,4 +1,5 @@
-branches: 
+warnings_are_errors: false
+branches:
   only:
   - master
 language: node_js
