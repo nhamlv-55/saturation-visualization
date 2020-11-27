@@ -3,11 +3,8 @@ import * as React from 'react';
 import '../styles/NodeDetails.css';
 import {toDiff} from "../helpers/diff";
 import {lemmaColours} from "../helpers/network";
-import {
-    cleanExprOperators,
-    getCleanExprList, getIndexOfLiteral,
-    getOp, reorder
-} from "../helpers/readable";
+import {cleanExprOperators, getCleanExprList, getIndexOfLiteral, getOp, reorder} from "../helpers/readable";
+
 type Props = {
     nodes: any,
     name: string
@@ -20,9 +17,12 @@ type Props = {
 };
 
 type State = {
+    learningFlag: boolean,
+    learningErrorFlag: boolean,
     transformationFlag: boolean
     transformationErrorFlag: boolean
-    appliedTransformation: string
+    possibleTransformations: {humanReadableAst: string, xmlAst: string}[]
+    transformationSelected: string
 }
 
 export default class NodeDetails extends React.Component<Props, State> {
@@ -31,9 +31,12 @@ export default class NodeDetails extends React.Component<Props, State> {
     constructor(props) {
         super(props);
         this.state = {
+            learningFlag: false,
+            learningErrorFlag: false,
             transformationFlag: false,
             transformationErrorFlag: false,
-            appliedTransformation: ""
+            possibleTransformations: [],
+            transformationSelected: ""
         }
     }
 
@@ -153,13 +156,17 @@ export default class NodeDetails extends React.Component<Props, State> {
         this.forceUpdate();
         
     }
-
-    async transformExprs() {
+    
+    async learnTransformation() {
         this.setState({
+            learningFlag: false,
+            learningErrorFlag: false,
             transformationFlag: false,
-            transformationErrorFlag: false
+            transformationErrorFlag: false,
+            possibleTransformations: []
         });
-        const response = await fetch("http://localhost:5000/spacer/transform_exprs", {
+
+        const response = await fetch("http://localhost:5000/spacer/learn_transformation", {
             method: 'POST',
             mode :'cors',
             headers: {
@@ -169,12 +176,43 @@ export default class NodeDetails extends React.Component<Props, State> {
                 exp_path: this.props.name
             })
         });
+        if (response.status === 200){
+            let responseJson = await response.json();
+            let possiblePrograms = responseJson["response"];
+            this.setState({
+                learningFlag: true,
+                possibleTransformations: possiblePrograms
+            });
+            this.forceUpdate();
+        }
+        else {
+            this.setState({
+                learningErrorFlag: true
+            });
+        }
+        
+    }
+
+    async transformExprs() {
+        this.setState({
+            transformationFlag: false,
+            transformationErrorFlag: false
+        });
+        const response = await fetch("http://localhost:5000/spacer/apply_transformation", {
+            method: 'POST',
+            mode :'cors',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }, body : JSON.stringify({
+                exp_path: this.props.name,
+                selectedProgram: this.state.transformationSelected
+            })
+        });
 
         if (response.status === 200){
             let responseData = await response.json();
-
-            let tExprMap = responseData["response"]["Lemmas"]
-            let finalProgram = responseData["response"]["FinalProgram"]
+            let tExprMap = responseData["response"];
             Object.keys(tExprMap).forEach((key) => {
                 this.props.ExprMap[key].edited = tExprMap[key]['Edited'];
                 this.props.ExprMap[key].lhs = tExprMap[key]['Lhs'];
@@ -182,7 +220,6 @@ export default class NodeDetails extends React.Component<Props, State> {
             this.props.saveExprs();
             this.setState({
                 transformationFlag: true,
-                appliedTransformation: finalProgram
             });
             this.forceUpdate();
         }
@@ -191,9 +228,14 @@ export default class NodeDetails extends React.Component<Props, State> {
                 transformationErrorFlag: true
             });
         }
-        
-
     }
+    
+    updateTransformationSelected(e) {
+        this.setState({
+            transformationSelected: e.target.value
+        })
+    }
+    
 
     render() {
         let node1, node2;
@@ -243,9 +285,16 @@ export default class NodeDetails extends React.Component<Props, State> {
                             {lemma_list.length > 0 && <section className={classNameBottom}>
                                 <article>
                                     {lemma_list}
+                                    <button onClick={this.learnTransformation.bind(this)}>Learn Transform</button>
+                                    {this.state.learningFlag && <p>Possible Transformations: </p>}
+                                    {this.state.possibleTransformations.length !== 0 && this.state.possibleTransformations.map((transformation,key) => (
+                                        <div key={key}>
+                                            <input type="radio" name={"transformation"} value={transformation.xmlAst} onClick={this.updateTransformationSelected.bind(this)}/>{transformation.humanReadableAst}
+                                        </div>
+                                    ))}
+                                    {this.state.learningErrorFlag && <p style={{color: "red"}}>Internal Server Error: Please Try Again</p>}
                                     <button onClick={this.transformExprs.bind(this)}>Apply Transform</button>
                                     {this.state.transformationFlag && <p>Transformation Complete</p>}
-                                    {this.state.transformationFlag && <p>Applied Transformation: {this.state.appliedTransformation}</p>}
                                     {this.state.transformationErrorFlag && <p style={{color: "red"}}>Internal Server Error: Please Try Again</p>}
                                 </article>
                             </section>}

@@ -112,6 +112,10 @@ class MenuOptions extends React.Component<Props, State> {
     removeOption(name:string, value:string){
         let allOptions: {type:string, name: string, value:string}[] = this.state.allOptions;
         let rIndex = -1;
+        if (value === undefined){
+            name = name.replace("-", "");
+            value = "";
+        }
         for (let i = 0; i < allOptions.length; i++){
             if (allOptions[i].name === name && allOptions[i].value === value){
                 rIndex = i;

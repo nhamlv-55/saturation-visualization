@@ -84,8 +84,8 @@ class Aside extends React.Component<Props, State> {
         return(
             <aside>
                 <article>
-                    {this.props.messages_q.map((mess) => (
-                        <section className="component-node-menu">{mess}</section>
+                    {this.props.messages_q.map((mess, key) => (
+                        <section  key={key} className="component-node-menu">{mess}</section>
                     ))}
                     <section className="component-node-menu" >
                         { this.createButton("Poke", this.props.onPoke, "graph-undo") }
