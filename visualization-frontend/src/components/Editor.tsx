@@ -1,9 +1,6 @@
 import * as React from 'react';
-import {Link} from 'react-router-dom';
 import '../styles/Editor.css';
 import * as Monaco from 'monaco-editor'
-import TransformerTable from './TransformerTable';
-import { assert } from '../model/util';
 import TreeEditor from "./TreeEditor";
 import { AST, ASTTransformer, Transformer} from "./../helpers/transformers";
 const icons = require('../resources/icons/all.svg') as string;
@@ -31,11 +28,11 @@ export class Editor extends React.Component<Props, State> {
     };
 
 
-
     componentDidMount() {
         if (!this.isChromeOrFirefox) {
             return;
         }
+
         // generate instance of Monaco Editor
         this.monaco = Monaco.editor.create(this.monacoDiv.current!, {
             lineNumbers: 'off',
@@ -62,12 +59,12 @@ export class Editor extends React.Component<Props, State> {
          *     this.props.onChangeProblem(this.monaco!.getModel()!.getValue());
          * }); */
     }
+
     openEditor(){
         console.log("click Apply")
-        /* let current_bracket = this.monaco?.getModel()!.matchBracket(1); */
 
-        /* console.log(current_bracket); */
         let input = this.monaco!.getModel()!.getValueInRange(this.monaco!.getSelection()!);
+        console.log(input)
         /* getValue()!; */
 
         this.setState({

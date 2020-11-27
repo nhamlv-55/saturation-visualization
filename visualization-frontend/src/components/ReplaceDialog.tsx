@@ -1,7 +1,4 @@
 import * as React from 'react';
-import { assert } from '../model/util';
-import { AST, ASTTransformer, Transformer} from "./../helpers/transformers";
-const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
     onApply: (action: string, params: {})=>void,
