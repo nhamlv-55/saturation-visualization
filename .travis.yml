@@ -8,7 +8,7 @@ node_js:
 before_install:
   - sudo apt-get update -qq
   - cd visualization-frontend
-script: yarn build
+script: CI=false yarn build
 deploy:
   provider: pages
   skip_cleanup: true
