@@ -1,6 +1,6 @@
-import {parse} from "s-exify";
-import { Node, Edge } from 'vis'
-import { assert } from "../model/util";
+import { Node, Edge } from 'vis';
+import { assert } from "./util";
+import {parse, isSExpNode, SExp, SExpNode} from './s-exify';
 const _ = require("lodash");
 
 export class ASTNode{
@@ -11,29 +11,46 @@ export class ASTNode{
     parentID: number;
     children: number[];
     transformers = [];
-    constructor(nodeID: number, token: string, parentID: number, children: number[]){
+    startLine: number;
+    endLine: number;
+    startOffset: number;
+    endOffset: number;
+
+    constructor(nodeID: number, token: string, parentID: number, children: number[]){ 
         this.nodeID = nodeID;
         this.token = token;
         this.shouldBreak = 0;
         this.shouldInBracket = 1;
         this.parentID = parentID;
         this.children = children;
+        this.startLine = -1;
+        this.endLine = -1;
+        this.startOffset = -1;
+        this.endOffset = -1;
+    }
+
+    updateRange(node: SExpNode){
+        this.startLine = node.startLine;
+        this.startOffset = node.startOffset;
+        this.endLine = node.endLine;
+        this.endOffset = node.endOffset;
     }
 
 }
 
-function isOpt(lst){
+function isOpt(lst: SExp|SExpNode){
     const optList = ["+", "-", "*", "/",
                      ">", "<", ">=", "<=", "=",
                      "and", "or", "not", "=>",
                      "assert",
                      "declare-datatypes",
                      "forall", "exists", "define",
-                     "select", "store"]
-    if(typeof lst !== "string"){
+                     "select", "store"];
+
+    if(Array.isArray(lst)){
         return false;
     }
-    return optList.indexOf(lst)>-1;
+    return optList.indexOf(lst.token)>-1;
 }
 
 export interface Transformer{
@@ -42,7 +59,7 @@ export interface Transformer{
     params: {};
 }
 
-export class ASTTransformer{
+export class ASTTransformer extends Object{
     run(node: ASTNode, ast: AST, t: Transformer): [boolean, AST]{
         if(t.action!=="runStack"){
             return this[t.action](node, ast, t.params, t.condition);
@@ -52,11 +69,9 @@ export class ASTTransformer{
 
     runStack(ast: AST, tStack: Transformer[]): AST{
         let new_ast = _.cloneDeep(ast);
-        console.log("tStack", tStack);
         //loop over all transformer
         let t_index = 0;
         while(t_index < tStack.length){
-            console.log(tStack[t_index]);
             //apply the transformer to all the node if possible.
             let dirty = true;
 
@@ -385,17 +400,30 @@ export class AST {
         this.nodeList[node.nodeID] = this.null_node;
     }
 
-    lstToAST(parentID, lst): number{
-        const nodeID = this.nodeList.length
-        if(typeof lst === 'string'){
-            const node = new ASTNode(nodeID, lst, parentID, []);
+    findNode(line: number, character: number): ASTNode| null{
+        for(var node of this.nodeList){
+            if(node.startLine<=line &&
+                node.endLine>=line &&
+                node.startOffset<=character &&
+                node.endOffset>=character)
+                return node;
+        }
+        return null;
+    }
+
+
+    lstToAST(parentID: number, lst: SExp|SExpNode): number{
+        const nodeID = this.nodeList.length;
+        if(isSExpNode(lst)){
+            const node = new ASTNode(nodeID, lst.token, parentID, []);
+            node.updateRange(lst); 
             this.nodeList.push(node);
             return nodeID;
         }
-
         //if is an opt
         if(isOpt(lst[0])){
-            let node = new ASTNode(nodeID, lst[0], parentID, []);
+            let node = new ASTNode(nodeID, (lst[0] as SExpNode).token, parentID, []);
+            node.updateRange(lst[0] as SExpNode);
             this.nodeList.push(node);
 
             for(var _i=1; _i < lst.length; _i++){
@@ -406,7 +434,9 @@ export class AST {
             return nodeID;
         }else{
             //is a list
-            let node = new ASTNode(nodeID, "list", parentID, []);
+            let node = new ASTNode(nodeID, (lst[0] as SExpNode).token, parentID, []); 
+            node.updateRange(lst[0] as SExpNode);
+            // let node = new ASTNode(nodeID, "list", parentID, []);
             this.nodeList.push(node);
 
             for(var _i=0; _i < lst.length; _i++){
@@ -420,7 +450,6 @@ export class AST {
     }
 
     buildVis(){
-        console.log(this.nodeList)
         this.visNodes = [];
         this.visEdges = [];
 
@@ -480,7 +509,7 @@ export class AST {
 
         //add linebreak
         if(node.shouldBreak){
-            result= '\n'+ '\t'.repeat(this.nodeDepth(node)) +  result ;
+            result= '\n'+ '    '.repeat(this.nodeDepth(node)) +  result ;
         }
 
         return result

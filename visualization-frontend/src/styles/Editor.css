@@ -41,7 +41,7 @@
     flex-direction: row;
 }
 .tree-editor #graph-container{
-    flex: 70%;
+    flex: 0 0 70%;
 }
 
 .tree-editor .editor-component-graph{
@@ -49,7 +49,7 @@
     display: block;
 }
 .tree-editor #transformer-container{
-    flex: 28%;
+    flex: 0 0 28%;
 }
 
 .component-menu .monaco .lines-content.monaco-editor-background {
