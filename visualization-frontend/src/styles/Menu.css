@@ -33,16 +33,7 @@
   background: #f8f9fb;
 }
 
-.component-menu .editor-spacer {
-  width: 100%;
-  max-width: 1500px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 1.5rem 2rem;
-  display: flex;
-  flex-grow: 1;
-  justify-content: space-evenly;
-}
+
 
 
 /* INPUT */

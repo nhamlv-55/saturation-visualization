@@ -80,7 +80,6 @@ export function buildExprMap(tree: any, varList: string[]): any{
 
 }
 
-
 export function PobVisLayout(tree): any{
     let treeCloned = JSON.parse(JSON.stringify(tree));
 
@@ -178,3 +177,4 @@ export function toVisEdge(edgeId: number, parentNodeId: number, nodeID: number, 
 export function getSliderValue(slider): number {
     return slider.current ? parseInt(slider.current.value, 10) : 0;
 }
+
