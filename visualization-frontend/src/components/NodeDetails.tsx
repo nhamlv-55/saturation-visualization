@@ -285,6 +285,7 @@ export default class NodeDetails extends React.Component<Props, State> {
                             {lemma_list.length > 0 && <section className={classNameBottom}>
                                 <article>
                                     {lemma_list}
+                                    <button onClick={this.learnTransformation.bind(this)}>Open Editor</button>
                                     <button onClick={this.learnTransformation.bind(this)}>Learn Transform</button>
                                     {this.state.learningFlag && <p>Possible Transformations: </p>}
                                     {this.state.possibleTransformations.length !== 0 && this.state.possibleTransformations.map((transformation,key) => (
