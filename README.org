@@ -1,0 +1,44 @@
+* How to Run
+** Front end
+   [[https://nhamlv-55.github.io/spacer-visualization]]
+
+** Backend
+   - copy the =docker-compose.yml= to a local directory of your choosing
+   - run the following command to spin up both containers for the backend
+     =docker-compose up=
+   
+
+* How to develop
+** Requirements
+   - nodejs
+   - npm
+     
+** High Level Description
+   
+We need 3 components to run this:
+
+*** Z3
+    [[https://github.com/agurfinkel/z3]]
+    - Note: there is a version of z3 being pulled to the relevant containers
+
+*** The Vis Backend
+    [[https://github.com/aishr/SpacerVisBackend]]
+    
+    Docker Container: [[https://hub.docker.com/repository/docker/aishr/spacer-vis-backend]] 
+
+*** [OPTIONAL] The Prose Backend
+    - Note: Some secondary features will not work without this backend
+    - Note: you need to request access to the repo
+
+    [[https://github.com/aishr/SpacerProseBackend]]
+
+    Docker Container: https://hub.docker.com/repository/docker/aishr/spacer-prose-backend
+
+*** The Frontend (this repo)
+    - Setup and run the frontend (dev mode)
+    =./start_frontend.sh=
+
+    Running this script will serve the frontend at [http://localhost:3000](http://localhost:3000).
+
+    Note that even if the browser is popped up, the compilation process is still running, so it will take a while.
+ 

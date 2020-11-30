@@ -1,10 +1,10 @@
 version: "3.8"
 services:
   SpacerVisBackend:
-    image: aishr/spacer-vis-backend:develop
+    image: aishr/spacer-vis-backend:latest
     ports: 
       - 5000:5000
   SpacerProseBackend:
-    image: aishr/spacer-prose-backend:develop
+    image: aishr/spacer-prose-backend:latest
     ports: 
       - 2000:2000
