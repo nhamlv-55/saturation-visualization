@@ -153,15 +153,15 @@ class TreeEditor extends React.Component<Props, State> {
 
     applyLocal(action: string, params: {}){
         const currentAST = this.astStack[this.astStack.length - 1];
-        const node = currentAST.nodeList[this.state.selectedNodeID];
+        const nodes = [this.state.selectedNodeID];
         console.log(params)
         let t = {"action": action, "params": params, "condition": "true"};
         try{
-            let [dirty, new_ast] = this.transformer.run(node, currentAST, t);
+            let [dirty, new_ast] = this.transformer.run(nodes, currentAST, t);
             if(dirty){
                 this.astStack.push(new_ast);
                 //guess the condition
-                t.condition = this.transformer.getCondition(action, node, currentAST);
+                t.condition = this.transformer.getCondition(action, nodes, currentAST);
                 this.transformerStack.push(t);
                 this.redrawAST();
             }
@@ -176,7 +176,41 @@ class TreeEditor extends React.Component<Props, State> {
             this.redrawAST();
         }
     }
-
+    async learnTransformation() {
+        /* this.setState({
+         *     learningFlag: false,
+         *     learningErrorFlag: false,
+         *     transformationFlag: false,
+         *     transformationErrorFlag: false,
+         *     possibleTransformations: []
+         * });
+         */
+        const response = await fetch("http://localhost:5000/spacer/learn_transformation", {
+            method: 'POST',
+            mode :'cors',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }, body : JSON.stringify({
+                expPairs:{}
+            })
+        });
+        if (response.status === 200){
+            let responseJson = await response.json();
+            let possiblePrograms = responseJson["response"];
+            /* this.setState({
+             *     learningFlag: true,
+             *     possibleTransformations: possiblePrograms
+             * });
+             * this.forceUpdate(); */
+        }
+        else {
+            /* this.setState({
+             *     learningErrorFlag: true
+             * }); */
+        }
+        
+    }
     
     render() {
         console.log("I'm TreeEditor. I got", this.props.input);
@@ -220,7 +254,7 @@ Condition examples:
                     {tStack}
                     <button onClick={this.applyStack.bind(this)}>Apply for the current AST</button>
                     <button onClick={this.props.onBlast.bind(this, this.transformerStack)}>Blast</button>
-                    <button onClick={this.props.onBlast.bind(this, this.transformerStack)}>Learn</button>
+                    <button onClick={this.learnTransformation.bind(this)}>Learn</button>
                 </div>
             </div>
         );

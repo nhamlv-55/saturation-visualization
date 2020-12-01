@@ -60,9 +60,9 @@ export interface Transformer{
 }
 
 export class ASTTransformer extends Object{
-    run(node: ASTNode, ast: AST, t: Transformer): [boolean, AST]{
+    run(nodes: number[], ast: AST, t: Transformer): [boolean, AST]{
         if(t.action!=="runStack"){
-            return this[t.action](node, ast, t.params, t.condition);
+            return this[t.action](nodes, ast, t.params, t.condition);
         }
         return [false, ast];
     }
@@ -76,7 +76,7 @@ export class ASTTransformer extends Object{
             let dirty = true;
 
             for(var node of new_ast.nodeList){
-                [dirty, new_ast] = this.run(node, new_ast, tStack[t_index]);
+                [dirty, new_ast] = this.run([node.nodeID], new_ast, tStack[t_index]);
                 if(dirty){
                     break;
                 }
@@ -89,7 +89,8 @@ export class ASTTransformer extends Object{
         return new_ast;
     }
 
-    getCondition(action: string, node: ASTNode, ast: AST): string{
+    getCondition(action: string, nodes: number[], ast: AST): string{
+        let node = ast.nodeList[nodes[nodes.length - 1]];
         let condition = "true";
         switch(action){
             case "move":{
@@ -128,11 +129,12 @@ export class ASTTransformer extends Object{
     }
 
 
-    squashNegation(node: ASTNode, ast: AST, params: {}, condition: string ): [boolean, AST]{
+    squashNegation(nodes: number[], ast: AST, params: {}, condition: string ): [boolean, AST]{
         /*
           collapse a `not` and its children N into the negation
         */
         let cloned_ast = _.cloneDeep(ast);
+        let node = ast.nodeList[nodes[nodes.length - 1]];
         let cloned_node = cloned_ast.nodeList[node.nodeID];
         let dirty = false;
 
@@ -210,11 +212,12 @@ export class ASTTransformer extends Object{
 
     }
 
-    move(node: ASTNode, ast: AST, params: {}, condition: string ): [boolean, AST]{
+    move(nodes: number[], ast: AST, params: {}, condition: string ): [boolean, AST]{
         /*
           move an AST node to the left or to the right
           E.g: moveLeft("+ x y z", "z") -> "+ x z y"
          */
+        let node = ast.nodeList[nodes[nodes.length - 1]];
         const movable = ["+", "*", "=", "and", "or"];
         let cloned_ast = _.cloneDeep(ast);
 
@@ -252,11 +255,12 @@ export class ASTTransformer extends Object{
         return [dirty, cloned_ast];
     }
 
-    flipCmp(node: ASTNode, ast: AST, params: {}, condition: string ): [boolean, AST]{
+    flipCmp(nodes: number[], ast: AST, params: {}, condition: string ): [boolean, AST]{
         /*
           flip a comparison node
           E.g: flipCmp("> x y") -> "<= y x"
          */
+        let node = ast.nodeList[nodes[nodes.length - 1]];
         let cloned_ast = _.cloneDeep(ast);
         let dirty = false;
         if(eval(condition)){
@@ -296,7 +300,8 @@ export class ASTTransformer extends Object{
         return [dirty, cloned_ast];
     }
 
-    toImp(node: ASTNode, ast: AST, params: {}, condition: string ): [boolean, AST]{
+    toImp(nodes: number[], ast: AST, params: {}, condition: string ): [boolean, AST]{
+        let node = ast.nodeList[nodes[nodes.length - 1]];
         let cloned_ast = _.cloneDeep(ast);
         let cloned_node = cloned_ast.nodeList[node.nodeID];
         let dirty = false;
@@ -331,7 +336,8 @@ export class ASTTransformer extends Object{
         return [dirty, cloned_ast];
     } 
 
-    replace(node: ASTNode, ast: AST, params: {}, condition: string ): [boolean, AST]{
+    replace(nodes: number[], ast: AST, params: {}, condition: string ): [boolean, AST]{
+        let node = ast.nodeList[nodes[nodes.length - 1]];
         let cloned_ast = _.cloneDeep(ast);
         let dirty = false;
         let source = params["source"]
@@ -356,7 +362,8 @@ export class ASTTransformer extends Object{
 
         return [dirty, cloned_ast];
     }
-    changeBreak(node: ASTNode, ast: AST, params:{}, condition: string ): [boolean,AST]{
+    changeBreak(nodes: number[], ast: AST, params:{}, condition: string ): [boolean,AST]{
+        let node = ast.nodeList[nodes[nodes.length - 1]];
         let cloned_ast = _.cloneDeep(ast);
         if(eval(condition)){
             cloned_ast.nodeList[node.nodeID].shouldBreak ^= 1;
@@ -365,7 +372,8 @@ export class ASTTransformer extends Object{
         }
         return [false, cloned_ast];
     }
-    changeBracket(node: ASTNode, ast: AST, params:{}, condition: string ): [boolean, AST]{
+    changeBracket(nodes: number[], ast: AST, params:{}, condition: string ): [boolean, AST]{
+        let node = ast.nodeList[nodes[nodes.length - 1]];
         let cloned_ast = _.cloneDeep(ast);
         if(eval(condition)){
             cloned_ast.nodeList[node.nodeID].shouldInBracket ^= 1;
