@@ -67,6 +67,7 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
                 }/>
                 <Route exact path="/editor/" render={() =>
                     <Editor
+                    name=""
                     input=""
                     />
                 }/>
