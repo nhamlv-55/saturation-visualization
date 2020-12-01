@@ -4,6 +4,7 @@ import { assert } from '../model/util';
 import { DataSet, Network, Node, Edge } from 'vis'
 import ReplaceDialog from './ReplaceDialog'
 type Props = {
+    name: string,
     input: string,
     onBlast: (tStack: Transformer[])=>void;
 }
@@ -68,8 +69,6 @@ class TreeEditor extends React.Component<Props, State> {
 
 
     componentDidUpdate(prevProps: Props){
-        console.log("prevProps input", prevProps.input);
-        console.log("currentProps input", this.props.input);
         if(prevProps.input !== this.props.input){
             //new formula. clear everything
             this.astStack = [new AST(this.props.input)];
@@ -185,19 +184,30 @@ class TreeEditor extends React.Component<Props, State> {
          *     possibleTransformations: []
          * });
          */
-        const response = await fetch("http://localhost:5000/spacer/learn_transformation", {
+        let inputAST = this.astStack[0];
+        let outputAST = this.astStack[this.astStack.length - 1];
+
+        let payload = {
+            trainingInputOutput:{"input": inputAST.toString(-1, inputAST.nodeList[0]),
+                                 "output": outputAST.toString(-1, outputAST.nodeList[0]),
+                                 "aux": [""]},
+            exp_path: this.props.name 
+        };
+
+        console.log("payload", payload);
+        const response = await fetch("http://localhost:5000/spacer/learn_transformation_modified", {
             method: 'POST',
             mode :'cors',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
-            }, body : JSON.stringify({
-                expPairs:{}
-            })
+            }, body : JSON.stringify(payload)
         });
+        console.log(response);
         if (response.status === 200){
             let responseJson = await response.json();
             let possiblePrograms = responseJson["response"];
+            console.log(possiblePrograms);
             /* this.setState({
              *     learningFlag: true,
              *     possibleTransformations: possiblePrograms
