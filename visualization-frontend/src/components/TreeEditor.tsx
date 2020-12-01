@@ -188,10 +188,10 @@ class TreeEditor extends React.Component<Props, State> {
         let outputAST = this.astStack[this.astStack.length - 1];
 
         let payload = {
-            trainingInputOutput:{"input": inputAST.toString(-1, inputAST.nodeList[0]),
+            "inputOutputExamples":[{"input": inputAST.toString(-1, inputAST.nodeList[0]),
                                  "output": outputAST.toString(-1, outputAST.nodeList[0]),
-                                 "aux": [""]},
-            exp_path: this.props.name 
+                                 "aux": [""]}],
+            "exp_path": this.props.name 
         };
 
         console.log("payload", payload);
@@ -206,6 +206,7 @@ class TreeEditor extends React.Component<Props, State> {
         console.log(response);
         if (response.status === 200){
             let responseJson = await response.json();
+            console.log(responseJson);
             let possiblePrograms = responseJson["response"];
             console.log(possiblePrograms);
             /* this.setState({
