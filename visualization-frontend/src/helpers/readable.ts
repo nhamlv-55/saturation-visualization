@@ -1,6 +1,6 @@
 import {parse} from "s-exify";
 
-const negateMap = {
+export const negateMap = {
     "<=": ">",
     ">=": "<",
     "!=": "=",
