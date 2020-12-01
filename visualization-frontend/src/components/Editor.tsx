@@ -53,6 +53,8 @@ export class Editor extends React.Component<Props, State> {
             // fontFamily: "Monaco" TODO: decide which font to use. By default, multiple fonts are loaded, which is quite slow
         });
 
+        this.monaco.setValue(this.props.input);
+
         /* this.monaco.setValue(this.props.problem);
          * this.monaco.getModel()!.onDidChangeContent(() => {
          *     console.log(this.monaco!.getModel()!.getValue());
@@ -109,8 +111,6 @@ export class Editor extends React.Component<Props, State> {
 
         return (
             <section className="component-menu">
-                <h1>Transformer Editor</h1>
-
                 <section className="editor">
                     <div id="editor-wrapper">
                         <h2>Original</h2>

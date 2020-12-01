@@ -1,10 +1,13 @@
 import * as React from 'react';
 
 import '../styles/NodeDetails.css';
+import '../styles/Editor.css';
 import {toDiff} from "../helpers/diff";
 import {lemmaColours} from "../helpers/network";
 import {cleanExprOperators, getCleanExprList, getIndexOfLiteral, getOp, reorder} from "../helpers/readable";
-
+import Modal from 'react-modal';
+import TreeEditor from './TreeEditor';
+import {Editor} from './Editor';
 type Props = {
     nodes: any,
     name: string
@@ -22,7 +25,8 @@ type State = {
     transformationFlag: boolean
     transformationErrorFlag: boolean
     possibleTransformations: {humanReadableAst: string, xmlAst: string}[]
-    transformationSelected: string
+    transformationSelected: string,
+    editorIsOpen: boolean
 }
 
 export default class NodeDetails extends React.Component<Props, State> {
@@ -36,7 +40,8 @@ export default class NodeDetails extends React.Component<Props, State> {
             transformationFlag: false,
             transformationErrorFlag: false,
             possibleTransformations: [],
-            transformationSelected: ""
+            transformationSelected: "",
+            editorIsOpen: false
         }
     }
 
@@ -236,6 +241,18 @@ export default class NodeDetails extends React.Component<Props, State> {
         })
     }
     
+    openModal() {
+        this.setState({editorIsOpen: true});
+    }
+
+    afterOpenModal() {
+        // references are now sync'd and can be accessed.
+    }
+
+    closeModal(){
+        this.setState({editorIsOpen: false});
+    }
+
 
     render() {
         let node1, node2;
@@ -246,6 +263,22 @@ export default class NodeDetails extends React.Component<Props, State> {
         }
         return (
             <div>
+                {/* Editor modal */}
+                <Modal
+                    isOpen={this.state.editorIsOpen}
+                    onRequestClose={this.closeModal.bind(this)}
+                    overlayClassName="editor-modal"
+                    contentLabel="Example Modal"
+                >
+                    <h2>Editor</h2>
+                    <button onClick={this.closeModal.bind(this)}>close</button>
+                    <Editor input={this.props.nodes[0].expr.raw}/>
+                    {/* <TreeEditor
+                        input = {this.props.nodes[0].expr.raw}
+                        onBlast = {this.learnTransformation.bind(this)}
+                        /> */}
+                </Modal>
+
                 {this.props.nodes.length > 1 && <section className='component-node-details details-diff'>
                     <article>
                         <h2>Diff (Node: <strong>{node1.nodeID}</strong> vs. Node: <strong>{node2.nodeID}</strong>)</h2>
@@ -285,7 +318,7 @@ export default class NodeDetails extends React.Component<Props, State> {
                             {lemma_list.length > 0 && <section className={classNameBottom}>
                                 <article>
                                     {lemma_list}
-                                    <button onClick={this.learnTransformation.bind(this)}>Open Editor</button>
+                                    <button onClick={this.openModal.bind(this)}>Open Editor</button>
                                     <button onClick={this.learnTransformation.bind(this)}>Learn Transform</button>
                                     {this.state.learningFlag && <p>Possible Transformations: </p>}
                                     {this.state.possibleTransformations.length !== 0 && this.state.possibleTransformations.map((transformation,key) => (
