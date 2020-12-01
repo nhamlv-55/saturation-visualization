@@ -1,6 +1,7 @@
 import { Node, Edge } from 'vis';
 import { assert } from "./util";
 import {parse, isSExpNode, SExp, SExpNode} from './uber-s-exify';
+import {negateMap} from "./readable";
 const _ = require("lodash");
 
 export class ASTNode{
@@ -34,6 +35,10 @@ export class ASTNode{
         this.startOffset = node.startOffset;
         this.endLine = node.endLine;
         this.endOffset = node.endOffset;
+    }
+
+    negate(): ASTNode{
+        return new ASTNode(this.nodeID, negateMap[this.token], this.parentID, this.children);
     }
 
 }
@@ -301,34 +306,54 @@ export class ASTTransformer extends Object{
     }
 
     toImp(nodes: number[], ast: AST, params: {}, condition: string ): [boolean, AST]{
+        /*
+          Convert (or X Y Z T) to (and(~X ~Y) => (or Z T))
+
+         */
         let node = ast.nodeList[nodes[nodes.length - 1]];
         let cloned_ast = _.cloneDeep(ast);
         let cloned_node = cloned_ast.nodeList[node.nodeID];
         let dirty = false;
         if(eval(condition)){
+            //get the `or` node
             let parent = cloned_ast.nodeList[cloned_node.parentID];
 
             if(!parent || parent.token!=="or"){
                 return [false, cloned_ast];
             }
-
-
-            let newHead = new ASTNode(cloned_ast.nodeList.length, "not", parent.nodeID, [cloned_node.nodeID]);
-            cloned_node.parentID = newHead.nodeID;
-            cloned_ast.nodeList.push(newHead);
-
-            let newTail = new ASTNode(cloned_ast.nodeList.length, "or", parent.nodeID, []);
-            cloned_ast.nodeList.push(newTail);
-
-            for(var childID of parent.children){
-                if(childID !== cloned_node.nodeID){
-                    cloned_ast.nodeList[childID].parentID = newTail.nodeID;
-                    newTail.children.push(childID);
+            // For an implication X => Y, X is the head, Y is the tail
+            let headChildren = new Array<number>();
+            let tailChildren = new Array<number>();
+            for(var cID of parent.children){
+                if(nodes.includes(cID)){
+                    // console.log("c negate", cloned_ast.nodeList[cID].negate());
+                    cloned_ast.nodeList[cID] = cloned_ast.nodeList[cID].negate();
+                    headChildren.push(cID);
+                }else{
+                    tailChildren.push(cID);
                 }
             }
 
-            let newParent = new ASTNode(parent.nodeID, "=>", parent.parentID, [newHead.nodeID, newTail.nodeID]);
-            cloned_ast.nodeList[parent.nodeID] = newParent;
+
+            console.log("111111111");
+            //build the head (X in X => Y)
+            let newHead = new ASTNode(cloned_ast.nodeList.length, "and", parent.nodeID, headChildren);
+            cloned_ast.nodeList.push(newHead);
+            for(var childID of headChildren){
+                cloned_ast.nodeList[childID].parentID = newHead.nodeID;
+            }
+
+            console.log("222222222");
+            //build the tail (Y in X => Y)
+            let newTail = new ASTNode(cloned_ast.nodeList.length, "or", parent.nodeID, tailChildren);
+            cloned_ast.nodeList.push(newTail);
+            for(var childID of tailChildren){
+                cloned_ast.nodeList[childID].parentID = newTail.nodeID;
+            }
+
+            //change the `or` node into the `=>` node
+            parent.token = "=>";
+            parent.children = [newHead.nodeID, newTail.nodeID];
 
             cloned_ast.buildVis();
             dirty = true;
