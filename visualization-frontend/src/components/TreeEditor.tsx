@@ -184,7 +184,6 @@ class TreeEditor extends React.Component<Props, State> {
         return (
             <div className="tree-editor">
                 <div className="editor-options-card" id="graph-container">
-                    <h3>Transformer Queue</h3>
                     <h4>{this.state.status}</h4>
                     <ul>
                         <button onClick={this.applyLocal.bind(this, "flipCmp", {})}>Flip Cmp</button>

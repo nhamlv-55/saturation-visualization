@@ -271,12 +271,8 @@ export default class NodeDetails extends React.Component<Props, State> {
                     contentLabel="Example Modal"
                 >
                     <h2>Editor</h2>
-                    <button onClick={this.closeModal.bind(this)}>close</button>
+                    <button onClick={this.closeModal.bind(this)}>Close</button>
                     <Editor input={this.props.nodes[0].expr.raw}/>
-                    {/* <TreeEditor
-                        input = {this.props.nodes[0].expr.raw}
-                        onBlast = {this.learnTransformation.bind(this)}
-                        /> */}
                 </Modal>
 
                 {this.props.nodes.length > 1 && <section className='component-node-details details-diff'>
