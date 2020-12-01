@@ -41,7 +41,10 @@ class TreeEditor extends React.Component<Props, State> {
     transformer = new ASTTransformer();
     componentDidMount() {
         this.generateNetwork();
-        this.network!.fit();
+        if(this.props.input !== "()"){
+            this.astStack = [new AST(this.props.input)];
+            this.redrawAST();
+        }
     }
 
     redrawAST(){
@@ -65,6 +68,8 @@ class TreeEditor extends React.Component<Props, State> {
 
 
     componentDidUpdate(prevProps: Props){
+        console.log("prevProps input", prevProps.input);
+        console.log("currentProps input", this.props.input);
         if(prevProps.input !== this.props.input){
             //new formula. clear everything
             this.astStack = [new AST(this.props.input)];
@@ -174,6 +179,7 @@ class TreeEditor extends React.Component<Props, State> {
 
     
     render() {
+        console.log("I'm TreeEditor. I got", this.props.input);
         let tStack = this.displayTransformers();
         return (
             <div className="tree-editor">
@@ -215,6 +221,7 @@ Condition examples:
                     {tStack}
                     <button onClick={this.applyStack.bind(this)}>Apply for the current AST</button>
                     <button onClick={this.props.onBlast.bind(this, this.transformerStack)}>Blast</button>
+                    <button onClick={this.props.onBlast.bind(this, this.transformerStack)}>Learn</button>
                 </div>
             </div>
         );
