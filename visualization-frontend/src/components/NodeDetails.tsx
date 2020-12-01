@@ -26,7 +26,8 @@ type State = {
     transformationErrorFlag: boolean
     possibleTransformations: {humanReadableAst: string, xmlAst: string}[]
     transformationSelected: string,
-    editorIsOpen: boolean
+    editorIsOpen: boolean,
+    editorTextInput: string,
 }
 
 export default class NodeDetails extends React.Component<Props, State> {
@@ -41,7 +42,8 @@ export default class NodeDetails extends React.Component<Props, State> {
             transformationErrorFlag: false,
             possibleTransformations: [],
             transformationSelected: "",
-            editorIsOpen: false
+            editorIsOpen: false,
+            editorTextInput: "",
         }
     }
 
@@ -81,6 +83,21 @@ export default class NodeDetails extends React.Component<Props, State> {
         }
         return result
     }
+
+    getLemmaExprs(node){
+        let lemmaExprs = new Array<string>();
+        if (node.event_type === "EType.EXP_POB") {
+            if (node.exprID in this.props.PobLemmasMap){
+                let lemmas = this.props.PobLemmasMap[node.exprID];
+                for (const lemma of lemmas){
+                    let expr = this.props.ExprMap[lemma[0]];
+                    lemmaExprs.push(expr["raw"]);
+                }
+            }
+        }
+        return lemmaExprs;
+    }
+
     getLemmaList(node) {
         let lemma_list: JSX.Element[] = [];
         if (node.event_type === "EType.EXP_POB") {
@@ -242,7 +259,8 @@ export default class NodeDetails extends React.Component<Props, State> {
     }
     
     openModal() {
-        this.setState({editorIsOpen: true});
+        let editorTextInput = this.getLemmaExprs(this.props.nodes[0]).join("\n\n");
+        this.setState({editorIsOpen: true, editorTextInput: editorTextInput});
     }
 
     afterOpenModal() {
@@ -272,7 +290,7 @@ export default class NodeDetails extends React.Component<Props, State> {
                 >
                     <h2>Editor</h2>
                     <button onClick={this.closeModal.bind(this)}>Close</button>
-                    <Editor input={this.props.nodes[0].expr.raw}/>
+                    <Editor name={this.props.name} input={this.state.editorTextInput}/>
                 </Modal>
 
                 {this.props.nodes.length > 1 && <section className='component-node-details details-diff'>

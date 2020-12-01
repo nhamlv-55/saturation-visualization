@@ -6,7 +6,8 @@ import { AST, ASTTransformer, Transformer} from "./../helpers/transformers";
 const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
-    input: string
+    input: string,
+    name: string
 }
 
 type State = {
@@ -121,6 +122,7 @@ export class Editor extends React.Component<Props, State> {
                     </div>
                     {/* <TransformerTable/> */}
                     <TreeEditor
+                        name ={this.props.name}
                         input = {this.state.input}
                         onBlast = {this.blast.bind(this)}
                     />
