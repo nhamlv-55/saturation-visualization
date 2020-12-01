@@ -1,6 +1,6 @@
 import { Node, Edge } from 'vis';
 import { assert } from "./util";
-import {parse, isSExpNode, SExp, SExpNode} from './s-exify';
+import {parse, isSExpNode, SExp, SExpNode} from './uber-s-exify';
 const _ = require("lodash");
 
 export class ASTNode{
