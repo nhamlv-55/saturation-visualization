@@ -118,7 +118,6 @@ export class Editor extends React.Component<Props, State> {
                         <button onClick={this.openEditor.bind(this)}>Open Editor</button>
                         <h2>Transformed</h2>
                         <textarea ref="output" id="output" rows={30} value={this.state.output} readOnly></textarea>
-                        
                     </div>
                     {/* <TransformerTable/> */}
                     <TreeEditor
@@ -130,12 +129,5 @@ export class Editor extends React.Component<Props, State> {
             </section>
         );
     }
-
-    chooseFile() {
-        if (this.fileUpload.current) {
-            this.fileUpload.current.click();
-        }
-    }
-
 }
 
