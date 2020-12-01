@@ -324,6 +324,8 @@ export class ASTTransformer extends Object{
             // For an implication X => Y, X is the head, Y is the tail
             let headChildren = new Array<number>();
             let tailChildren = new Array<number>();
+            let newHead: ASTNode;
+            let newTail: ASTNode;
             for(var cID of parent.children){
                 if(nodes.includes(cID)){
                     // console.log("c negate", cloned_ast.nodeList[cID].negate());
@@ -337,20 +339,28 @@ export class ASTTransformer extends Object{
 
             console.log("111111111");
             //build the head (X in X => Y)
-            let newHead = new ASTNode(cloned_ast.nodeList.length, "and", parent.nodeID, headChildren);
-            cloned_ast.nodeList.push(newHead);
-            for(var childID of headChildren){
-                cloned_ast.nodeList[childID].parentID = newHead.nodeID;
+            if(headChildren.length>1){
+                newHead = new ASTNode(cloned_ast.nodeList.length, "and", parent.nodeID, headChildren);
+                cloned_ast.nodeList.push(newHead);
+                for(var childID of headChildren){
+                    cloned_ast.nodeList[childID].parentID = newHead.nodeID;
+                }               
+            }else{
+                newHead = cloned_ast.nodeList[headChildren[0]];
             }
+
 
             console.log("222222222");
             //build the tail (Y in X => Y)
-            let newTail = new ASTNode(cloned_ast.nodeList.length, "or", parent.nodeID, tailChildren);
-            cloned_ast.nodeList.push(newTail);
-            for(var childID of tailChildren){
-                cloned_ast.nodeList[childID].parentID = newTail.nodeID;
+            if(tailChildren.length > 1){
+                newTail = new ASTNode(cloned_ast.nodeList.length, "or", parent.nodeID, tailChildren);
+                cloned_ast.nodeList.push(newTail);
+                for(var childID of tailChildren){
+                    cloned_ast.nodeList[childID].parentID = newTail.nodeID;
+                }
+            }else{
+                newTail = cloned_ast.nodeList[tailChildren[0]];
             }
-
             //change the `or` node into the `=>` node
             parent.token = "=>";
             parent.children = [newHead.nodeID, newTail.nodeID];
