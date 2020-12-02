@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AST, ASTTransformer, Transformer} from "./../helpers/transformers";
+import { AST, ASTTransformer, Transformer, ProseTransformation} from "./../helpers/transformers";
 import { assert } from '../model/util';
 import { DataSet, Network, Node, Edge } from 'vis'
 import ReplaceDialog from './ReplaceDialog'
@@ -18,7 +18,9 @@ type State = {
     showOptions: boolean,
     selectedNodeID: number,
     stringRep: string,
-    status: string
+    status: string,
+    possibleTransformations: ProseTransformation[],
+    transformationSelected: string,
 }
 
 class TreeEditor extends React.Component<Props, State> {
@@ -31,7 +33,9 @@ class TreeEditor extends React.Component<Props, State> {
         showOptions: true,
         selectedNodeID: -1,
         stringRep: "",
-        status: ""
+        status: "",
+        possibleTransformations: [],
+        transformationSelected: "",
     }
     network: Network | null = null;
     networkNodes = new DataSet<Node>([]);
@@ -203,29 +207,37 @@ class TreeEditor extends React.Component<Props, State> {
                 'Content-Type': 'application/json'
             }, body : JSON.stringify(payload)
         });
-        console.log(response);
         if (response.status === 200){
-            let responseJson = await response.json();
-            console.log(responseJson);
+            const responseJson = await response.json();
             let possiblePrograms = responseJson["response"];
             console.log(possiblePrograms);
-            /* this.setState({
-             *     learningFlag: true,
-             *     possibleTransformations: possiblePrograms
-             * });
-             * this.forceUpdate(); */
+            this.setState({
+                possibleTransformations: possiblePrograms
+            });
+            /* this.forceUpdate(); */
         }
         else {
-            /* this.setState({
-             *     learningErrorFlag: true
-             * }); */
+            this.setState({
+                possibleTransformations: []
+            });
         }
         
     }
-    
+    updateTransformationSelected(e) {
+        this.setState({
+            transformationSelected: e.target.value
+        })
+    }
     render() {
         console.log("I'm TreeEditor. I got", this.props.input);
+        console.log("I'm TreeEditor. My possibleTs:", this.state.possibleTransformations);
         let tStack = this.displayTransformers();
+        let possibleTs = this.state.possibleTransformations.map((transformation: ProseTransformation,key) => (
+            <div key={key}>
+                <input type="radio" name={"transformation"} value={transformation.xmlAst} onClick={this.updateTransformationSelected.bind(this)}/>{transformation.humanReadableAst}
+            </div>
+        ))
+
         return (
             <div className="tree-editor">
                 <div className="editor-options-card" id="graph-container">
@@ -266,6 +278,8 @@ Condition examples:
                     <button onClick={this.applyStack.bind(this)}>Apply for the current AST</button>
                     <button onClick={this.props.onBlast.bind(this, this.transformerStack)}>Blast</button>
                     <button onClick={this.learnTransformation.bind(this)}>Learn</button>
+                    <h3>Possible Transformations</h3>
+                    {possibleTs}
                 </div>
             </div>
         );
