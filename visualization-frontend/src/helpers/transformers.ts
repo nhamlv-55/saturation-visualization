@@ -4,6 +4,12 @@ import {parse, isSExpNode, SExp, SExpNode} from './uber-s-exify';
 import {negateMap} from "./readable";
 const _ = require("lodash");
 
+export interface ProseTransformation{
+    humanReadableAst: string,
+    xmlAst: string
+}
+
+
 export class ASTNode{
     nodeID: number;
     token: string;
