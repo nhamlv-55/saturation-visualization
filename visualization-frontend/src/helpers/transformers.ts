@@ -43,9 +43,7 @@ export class ASTNode{
         this.endOffset = node.endOffset;
     }
 
-    negate(): ASTNode{
-        return new ASTNode(this.nodeID, negateMap[this.token], this.parentID, this.children);
-    }
+
 
 }
 
@@ -137,90 +135,6 @@ export class ASTTransformer extends Object{
             }
         }
         return condition;
-    }
-
-
-    squashNegation(nodes: number[], ast: AST, params: {}, condition: string ): [boolean, AST]{
-        /*
-          collapse a `not` and its children N into the negation
-        */
-        let cloned_ast = _.cloneDeep(ast);
-        let node = ast.nodeList[nodes[nodes.length - 1]];
-        let cloned_node = cloned_ast.nodeList[node.nodeID];
-        let dirty = false;
-
-        if(node.token!=="not"){
-            return [false, cloned_ast]
-        }
-
-        if(eval(condition)){
-            let cloned_child = cloned_ast.nodeList[cloned_node.children[0]];
-
-            switch(cloned_child.token){
-                case "not":{
-                    //point new node's parent to current parent
-                    let grandchild = cloned_ast.nodeList[cloned_child.children[0]];
-                    grandchild.parentID = cloned_node.parentID;
-
-                    //point parent's child to new_node
-                    let current_parent = cloned_ast.nodeList[cloned_node.parentID];
-                    let current_child_index = current_parent.children.indexOf(cloned_node.nodeID);
-                    current_parent.children[current_child_index] = grandchild.nodeID;
-
-                    //remove the 2 `not` nodes
-                    cloned_ast.deleteNode(cloned_node);
-                    cloned_ast.deleteNode(cloned_child);
-
-                    //rebuild vis
-                    cloned_ast.buildVis();
-
-                    dirty = true;
-                    break;
-                }
-
-                case "<":{
-                    //flip
-                    cloned_child.token = ">=";
-                    //point to parent
-                    cloned_child.parentID = cloned_node.parentID;
-                    //point parent to grandchild
-                    let current_parent = cloned_ast.nodeList[cloned_node.parentID];
-                    let current_child_index = current_parent.children.indexOf(cloned_node.nodeID);
-                    current_parent.children[current_child_index] = cloned_child.nodeID;
-
-                    //remove the `not` node
-                    cloned_ast.deleteNode(cloned_node);
-                    //rebuild vis
-                    cloned_ast.buildVis();
-                    dirty = true;
-                    break;
-                }
-                case ">":{
-                    //flip
-                    cloned_child.token = "<=";
-                    //point to parent
-                    cloned_child.parentID = cloned_node.parentID;
-                    //point parent to grandchild
-                    let current_parent = cloned_ast.nodeList[cloned_node.parentID];
-                    let current_child_index = current_parent.children.indexOf(cloned_node.nodeID);
-                    current_parent.children[current_child_index] = cloned_child.nodeID;
-
-                    //remove the `not` node
-                    cloned_ast.deleteNode(cloned_node);
-                    //rebuild vis
-                    cloned_ast.buildVis();
-                    dirty = true;
-                    break;
-                }
-
-                default:
-
-            }
-
-        }
-
-        return [dirty, cloned_ast]
-
     }
 
     move(nodes: number[], ast: AST, params: {}, condition: string ): [boolean, AST]{
@@ -335,7 +249,7 @@ export class ASTTransformer extends Object{
             for(var cID of parent.children){
                 if(nodes.includes(cID)){
                     // console.log("c negate", cloned_ast.nodeList[cID].negate());
-                    cloned_ast.nodeList[cID] = cloned_ast.nodeList[cID].negate();
+                    cloned_ast.negateNode(cID);
                     headChildren.push(cID);
                 }else{
                     tailChildren.push(cID);
@@ -444,9 +358,28 @@ export class AST {
 
         return this.nodeDepth(this.nodeList[node.parentID])+1;
     }
+    negateNode(nodeID: number){
+        let node = this.getNode(nodeID);
+        if(node.token==="not"){
+            let child = this.getNode(node.children[0]);
+            this.nodeList[nodeID] = new ASTNode(node.nodeID, child.token, node.parentID, child.children);
+            //point all child to the new parent
+            for(var cID of child.children){
+                this.getNode(cID).parentID = node.nodeID;
+            }
 
-    deleteNode(node: ASTNode): void{
-        this.nodeList[node.nodeID] = this.null_node;
+            this.deleteNode(child.nodeID);
+        }else{
+            this.nodeList[nodeID] = new ASTNode(node.nodeID, negateMap[node.token], node.parentID, node.children);
+        }
+    }
+
+    getNode(nodeID: number): ASTNode{
+        return this.nodeList[nodeID];
+    }
+
+    deleteNode(nodeID: number): void{
+        this.nodeList[nodeID] = this.null_node;
     }
 
     findNode(line: number, character: number): ASTNode| null{
