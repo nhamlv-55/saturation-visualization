@@ -214,6 +214,7 @@ export default class NodeDetails extends React.Component<Props, State> {
         }
     }
     async transformExprsFromText(t: string) {
+        //wrapper around transformExprs to take in a string instead of reading transformationSelected from state
         this.setState({
             transformationSelected: t
         }, ()=>this.transformExprs());
