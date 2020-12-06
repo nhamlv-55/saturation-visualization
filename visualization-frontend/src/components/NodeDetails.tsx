@@ -290,7 +290,12 @@ export default class NodeDetails extends React.Component<Props, State> {
                 >
                     <h2>Editor</h2>
                     <button onClick={this.closeModal.bind(this)}>Close</button>
-                    <Editor name={this.props.name} input={this.state.editorTextInput}/>
+                    <Editor
+                        name={this.props.name}
+                        input={this.state.editorTextInput}
+                        isModal={true}
+                        onTransformExprs={this.transformExprs.bind(this)}
+                    />
                 </Modal>
 
                 {this.props.nodes.length > 1 && <section className='component-node-details details-diff'>
