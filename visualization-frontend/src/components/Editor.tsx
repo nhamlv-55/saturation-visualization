@@ -7,7 +7,9 @@ const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
     input: string,
-    name: string
+    name: string,
+    isModal: boolean,
+    onTransformExprs?: ()=> Promise<void>
 }
 
 type State = {
@@ -125,6 +127,8 @@ export class Editor extends React.Component<Props, State> {
                         name ={this.props.name}
                         input = {this.state.input}
                         onBlast = {this.blast.bind(this)}
+                        isModal = {this.props.isModal}
+                        onTransformExprs = {this.props.onTransformExprs}
                     />
                 </section>
 

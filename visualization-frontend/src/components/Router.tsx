@@ -67,8 +67,9 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
                 }/>
                 <Route exact path="/editor/" render={() =>
                     <Editor
-                    name=""
-                    input=""
+                        name=""
+                        input=""
+                        isModal ={false}
                     />
                 }/>
             </HashRouter>

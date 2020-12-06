@@ -6,7 +6,9 @@ import ReplaceDialog from './ReplaceDialog'
 type Props = {
     name: string,
     input: string,
-    onBlast: (tStack: Transformer[])=>void;
+    onBlast: (tStack: Transformer[])=>void,
+    onTransformExprs?: ()=>Promise<void>,
+    isModal: boolean
 }
 
 type State = {
@@ -223,6 +225,9 @@ class TreeEditor extends React.Component<Props, State> {
         }
         
     }
+
+    
+
     updateTransformationSelected(e) {
         this.setState({
             transformationSelected: e.target.value
@@ -249,7 +254,6 @@ class TreeEditor extends React.Component<Props, State> {
                         <button onClick={this.applyLocal.bind(this, "move", {"direction": "r"})}>Move Right</button>
                         <button onClick={this.applyLocal.bind(this, "changeBreak", {})}>\n?</button>
                         <button onClick={this.applyLocal.bind(this, "changeBracket", {})}>()?</button>
-                        <button onClick={this.applyLocal.bind(this, "squashNegation", {})}>Collapse Negation</button>
                         <br/>
                         <ReplaceDialog
                             onApply = {this.applyLocal.bind(this)}
@@ -280,6 +284,7 @@ Condition examples:
                     <button onClick={this.learnTransformation.bind(this)}>Learn</button>
                     <h3>Possible Transformations</h3>
                     {possibleTs}
+                    {this.props.isModal?<button onClick={this.props.onTransformExprs!.bind(this, this.state.transformationSelected)}>Apply Everywhere</button>:''}
                 </div>
             </div>
         );
