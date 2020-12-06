@@ -212,7 +212,11 @@ export default class NodeDetails extends React.Component<Props, State> {
                 learningErrorFlag: true
             });
         }
-        
+    }
+    async transformExprsFromText(t: string) {
+        this.setState({
+            transformationSelected: t
+        }, ()=>this.transformExprs());
     }
 
     async transformExprs() {
@@ -220,19 +224,24 @@ export default class NodeDetails extends React.Component<Props, State> {
             transformationFlag: false,
             transformationErrorFlag: false
         });
+
+        const payload = {
+            exp_path: this.props.name,
+            selectedProgram: this.state.transformationSelected
+        }
+
+        console.log("transformExprs payload", payload);
         const response = await fetch("http://localhost:5000/spacer/apply_transformation", {
             method: 'POST',
             mode :'cors',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
-            }, body : JSON.stringify({
-                exp_path: this.props.name,
-                selectedProgram: this.state.transformationSelected
-            })
+            }, body : JSON.stringify(payload)
         });
 
         if (response.status === 200){
+            this.closeModal();
             let responseData = await response.json();
             let tExprMap = responseData["response"];
             Object.keys(tExprMap).forEach((key) => {
@@ -253,11 +262,12 @@ export default class NodeDetails extends React.Component<Props, State> {
     }
     
     updateTransformationSelected(e) {
+        console.log(e)
         this.setState({
             transformationSelected: e.target.value
         })
     }
-    
+
     openModal() {
         let editorTextInput = this.getLemmaExprs(this.props.nodes[0]).join("\n\n");
         this.setState({editorIsOpen: true, editorTextInput: editorTextInput});
@@ -270,7 +280,6 @@ export default class NodeDetails extends React.Component<Props, State> {
     closeModal(){
         this.setState({editorIsOpen: false});
     }
-
 
     render() {
         let node1, node2;
@@ -294,7 +303,7 @@ export default class NodeDetails extends React.Component<Props, State> {
                         name={this.props.name}
                         input={this.state.editorTextInput}
                         isModal={true}
-                        onTransformExprs={this.transformExprs.bind(this)}
+                        onTransformExprs = {this.transformExprsFromText.bind(this)}
                     />
                 </Modal>
 
