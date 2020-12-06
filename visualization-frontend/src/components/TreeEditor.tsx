@@ -7,10 +7,9 @@ type Props = {
     name: string,
     input: string,
     onBlast: (tStack: Transformer[])=>void,
-    onTransformExprs?: ()=>Promise<void>,
-    isModal: boolean
+    isModal: boolean,
+    onTransformExprs?: (t: string)=> Promise<void>,
 }
-
 type State = {
     optionTypeHTML: JSX.Element,
     optionValue: string,
@@ -181,15 +180,7 @@ class TreeEditor extends React.Component<Props, State> {
             this.redrawAST();
         }
     }
-    async learnTransformation() {
-        /* this.setState({
-         *     learningFlag: false,
-         *     learningErrorFlag: false,
-         *     transformationFlag: false,
-         *     transformationErrorFlag: false,
-         *     possibleTransformations: []
-         * });
-         */
+    async learnTransformationFromInputOutput() {
         let inputAST = this.astStack[0];
         let outputAST = this.astStack[this.astStack.length - 1];
 
@@ -197,7 +188,7 @@ class TreeEditor extends React.Component<Props, State> {
             "inputOutputExamples":[{"input": inputAST.toString(-1, inputAST.nodeList[0]),
                                  "output": outputAST.toString(-1, outputAST.nodeList[0]),
                                  "aux": [""]}],
-            "exp_path": this.props.name 
+            "exp_path": this.props.name
         };
 
         console.log("payload", payload);
@@ -216,17 +207,13 @@ class TreeEditor extends React.Component<Props, State> {
             this.setState({
                 possibleTransformations: possiblePrograms
             });
-            /* this.forceUpdate(); */
         }
         else {
             this.setState({
                 possibleTransformations: []
             });
         }
-        
     }
-
-    
 
     updateTransformationSelected(e) {
         this.setState({
@@ -239,7 +226,8 @@ class TreeEditor extends React.Component<Props, State> {
         let tStack = this.displayTransformers();
         let possibleTs = this.state.possibleTransformations.map((transformation: ProseTransformation,key) => (
             <div key={key}>
-                <input type="radio" name={"transformation"} value={transformation.xmlAst} onClick={this.updateTransformationSelected.bind(this)}/>{transformation.humanReadableAst}
+                <input type="radio" name={"transformation"} value={transformation.xmlAst}
+                       onClick={this.updateTransformationSelected!.bind(this)}/>{transformation.humanReadableAst}
             </div>
         ))
 
@@ -281,7 +269,7 @@ Condition examples:
                     {tStack}
                     <button onClick={this.applyStack.bind(this)}>Apply for the current AST</button>
                     <button onClick={this.props.onBlast.bind(this, this.transformerStack)}>Blast</button>
-                    <button onClick={this.learnTransformation.bind(this)}>Learn</button>
+                    <button onClick={this.learnTransformationFromInputOutput.bind(this)}>Learn</button>
                     <h3>Possible Transformations</h3>
                     {possibleTs}
                     {this.props.isModal?<button onClick={this.props.onTransformExprs!.bind(this, this.state.transformationSelected)}>Apply Everywhere</button>:''}

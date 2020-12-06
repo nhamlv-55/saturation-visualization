@@ -9,7 +9,8 @@ type Props = {
     input: string,
     name: string,
     isModal: boolean,
-    onTransformExprs?: ()=> Promise<void>
+    onTransformExprs?: (t: string)=> Promise<void>,
+    /* onUpdateTransformationSelected?: (e: any)=>void, */
 }
 
 type State = {
@@ -19,9 +20,7 @@ type State = {
 
 
 export class Editor extends React.Component<Props, State> {
-    // private isChromeOrFirefox = navigator.userAgent.indexOf('Chrome') > -1 || navigator.userAgent.indexOf('Firefox') > -1;
     private isChromeOrFirefox = true;
-    private fileUpload = React.createRef<HTMLInputElement>();
     monacoDiv = React.createRef<HTMLDivElement>();
     monaco: Monaco.editor.IStandaloneCodeEditor | null = null
 
@@ -123,13 +122,21 @@ export class Editor extends React.Component<Props, State> {
                         <textarea ref="output" id="output" rows={30} value={this.state.output} readOnly></textarea>
                     </div>
                     {/* <TransformerTable/> */}
+                    {this.props.isModal?
                     <TreeEditor
                         name ={this.props.name}
                         input = {this.state.input}
                         onBlast = {this.blast.bind(this)}
                         isModal = {this.props.isModal}
-                        onTransformExprs = {this.props.onTransformExprs}
-                    />
+                        onTransformExprs = {this.props.onTransformExprs!.bind(this)}
+                    />:
+                     <TreeEditor
+                         name ={this.props.name}
+                         input = {this.state.input}
+                         onBlast = {this.blast.bind(this)}
+                         isModal = {this.props.isModal}
+                     />
+                    }
                 </section>
 
             </section>
