@@ -226,19 +226,16 @@ export default class NodeDetails extends React.Component<Props, State> {
             transformationErrorFlag: false
         });
 
-        const payload = {
-            exp_path: this.props.name,
-            selectedProgram: this.state.transformationSelected
-        }
-
-        console.log("transformExprs payload", payload);
         const response = await fetch("http://localhost:5000/spacer/apply_transformation", {
             method: 'POST',
             mode :'cors',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
-            }, body : JSON.stringify(payload)
+            }, body : JSON.stringify({
+                exp_path: this.props.name,
+                selectedProgram: this.state.transformationSelected
+            })
         });
 
         if (response.status === 200){
@@ -263,7 +260,6 @@ export default class NodeDetails extends React.Component<Props, State> {
     }
     
     updateTransformationSelected(e) {
-        console.log(e)
         this.setState({
             transformationSelected: e.target.value
         })
