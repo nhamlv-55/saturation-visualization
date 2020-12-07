@@ -235,7 +235,7 @@ class TreeEditor extends React.Component<Props, State> {
             <div className="tree-editor">
                 <div className="editor-options-card" id="graph-container">
                     <h4>{this.state.status}</h4>
-                    <ul>
+                    <div className="editor-menu">
                         <button onClick={this.applyLocal.bind(this, "flipCmp", {})}>Flip Cmp</button>
                         <button onClick={this.applyLocal.bind(this, "toImp", {})}>To Imp</button>
                         <button onClick={this.applyLocal.bind(this, "move", {"direction": "l"})}>Move Left</button>
@@ -249,8 +249,8 @@ class TreeEditor extends React.Component<Props, State> {
                         <br/>
 
                         <button onClick={this.undo.bind(this)}>Undo</button>
-                    </ul>
-                    <pre><div dangerouslySetInnerHTML={{ __html: this.state.stringRep }} /></pre>
+                        <pre className="editor-string-rep" dangerouslySetInnerHTML={{ __html: this.state.stringRep }} />
+                    </div>
                     <div className= "editor-component-graph" ref = { this.graphContainer }>
                         <canvas/>
                     </div>
@@ -259,12 +259,15 @@ class TreeEditor extends React.Component<Props, State> {
                     <h3>Transformer Queue</h3>
                     <pre>{`
 Condition examples:
-    - apply the transformation for all the node whose token pass the regex test "ab+c"
-    /ab+c/.test(node.token)
-    - // apply the transformation for all the node whose token is either x, y, or z
-    ["x_", "y_", "z_"].includes(node.token)
-    - // apply the transformation for all the node at depth 2
-    ast.nodeDepth(node) === 2
+- apply the transformation for all the node
+whose token pass the regex test "ab+c"
+  /ab+c/.test(node.token)
+- apply the transformation for all the node
+whose token is either x, y, or z
+  ["x_", "y_", "z_"].includes(node.token)
+- apply the transformation for all the node
+at depth 2
+  ast.nodeDepth(node) === 2
                         `}</pre>
                     {tStack}
                     <button onClick={this.applyStack.bind(this)}>Apply for the current AST</button>

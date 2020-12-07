@@ -15,22 +15,15 @@
     color: rgba(0, 0, 0, .5);
 }
 
-.component-menu .editor-options-card {
-    margin: 0.5rem 0 1rem;
-    padding: 1rem;
-    overflow: hidden;
+.editor-options-card {
+    overflow: auto;
     border: none;
-    border-radius: 2px;
-
     background: #fff;
 }
 
 .component-menu #editor-wrapper{
-    flex: 0 0 35%;
-    margin-right: 2rem;
-    padding: 1.25rem 1rem;
-
-    border-radius: 2px;
+    display: inline-block;
+    flex: 0 0 30%;
     background: #fff;
     color: rgba(0, 0, 0, .5);
 }
@@ -39,23 +32,36 @@
     flex-direction: row;
 }
 .tree-editor #graph-container{
+    display: flex;
+    flex-direction: column;
     flex: 0 0 70%;
+    padding: 1rem;
+}
+
+.editor-string-rep{
+    max-width: 60rem;
+    overflow: auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .tree-editor .editor-component-graph{
-    /* height: 80%; */
-    /* display: block; */
-    /* margin: 0; */
-    /* padding: 0; */
+    display:flex;
     height: 90rem;
-    width: 100%;
-
     background: #fff;
 
     border-radius: 2px;
 }
+
+
 .tree-editor #transformer-container{
+    display: inline-block;
     flex: 0 0 28%;
+    padding: 1rem;
+}
+
+.editor-menu{
+    display: inline-block;
 }
 
 .component-menu .monaco .lines-content.monaco-editor-background {
@@ -72,13 +78,4 @@
 
 .highlighted {
     color: red;
-}
-
-.editor-modal {
-    top                   : '50%';
-    left                  : '50%';
-    right                 : 'auto';
-    bottom                : 'auto';
-    marginRight           : '-50%';
-    transform             : 'translate(-50%, -50%)';
 }
