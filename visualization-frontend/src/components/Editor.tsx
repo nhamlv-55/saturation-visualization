@@ -10,7 +10,7 @@ type Props = {
     name: string,
     isModal: boolean,
     onTransformExprs?: (t: string)=> Promise<void>,
-    /* onUpdateTransformationSelected?: (e: any)=>void, */
+    saveExprs?: ()=> void,
 }
 
 type State = {
@@ -129,6 +129,7 @@ export class Editor extends React.Component<Props, State> {
                         onBlast = {this.blast.bind(this)}
                         isModal = {this.props.isModal}
                         onTransformExprs = {this.props.onTransformExprs!.bind(this)}
+                        saveExprs = {this.props.saveExprs!.bind(this)}
                     />:
                      <TreeEditor
                          name ={this.props.name}

@@ -303,6 +303,7 @@ export default class NodeDetails extends React.Component<Props, State> {
                         input={this.state.editorTextInput}
                         isModal={true}
                         onTransformExprs = {this.transformExprsFromText.bind(this)}
+                    saveExprs={this.props.saveExprs.bind(this)}
                     />
                 </Modal>
 
