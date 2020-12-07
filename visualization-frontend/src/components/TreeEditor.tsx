@@ -3,6 +3,7 @@ import { AST, ASTTransformer, Transformer, ProseTransformation} from "./../helpe
 import { assert } from '../model/util';
 import { DataSet, Network, Node, Edge } from 'vis'
 import ReplaceDialog from './ReplaceDialog'
+const _ = require("lodash");
 type Props = {
     name: string,
     input: string,
@@ -11,13 +12,7 @@ type Props = {
     onTransformExprs?: (t: string)=> Promise<void>,
 }
 type State = {
-    optionTypeHTML: JSX.Element,
-    optionValue: string,
-    optionName: string,
-    optionType: string,
-    allOptions: {type:string, name: string, value:string}[],
-    showOptions: boolean,
-    selectedNodeID: number,
+    selectedNodeIDs: number[],
     stringRep: string,
     status: string,
     possibleTransformations: ProseTransformation[],
@@ -26,13 +21,7 @@ type State = {
 
 class TreeEditor extends React.Component<Props, State> {
     state = {
-        optionTypeHTML: <div />,
-        optionType: "",
-        optionValue: "",
-        optionName: "",
-        allOptions: [],
-        showOptions: true,
-        selectedNodeID: -1,
+        selectedNodeIDs: [-1],
         stringRep: "",
         status: "",
         possibleTransformations: [],
@@ -45,6 +34,7 @@ class TreeEditor extends React.Component<Props, State> {
     astStack = new Array<AST>();
     transformerStack = new Array<Transformer>();
     transformer = new ASTTransformer();
+    localSelectedNodeIDs = [-1];
     componentDidMount() {
         this.generateNetwork();
         if(this.props.input !== "()"){
@@ -66,8 +56,8 @@ class TreeEditor extends React.Component<Props, State> {
             this.networkNodes.add(ast.visNodes);
             /* this.network!.fit(); */
             this.network!.redraw();
-            console.log(ast.toHTML(this.state.selectedNodeID, ast.nodeList[0]));
-            this.setState({stringRep: ast.toHTML(this.state.selectedNodeID, ast.nodeList[0])});
+            console.log(ast.toHTML(_.last(this.state.selectedNodeIDs), ast.nodeList[0]));
+            this.setState({stringRep: ast.toHTML(_.last(this.state.selectedNodeIDs), ast.nodeList[0])});
         }
     }
 
@@ -92,7 +82,7 @@ class TreeEditor extends React.Component<Props, State> {
         }, {
             physics: false,
             interaction: {
-                multiselect: false
+                multiselect: true
             },layout: {
                 hierarchical: {
                     /* direction: 'UD', */
@@ -104,11 +94,10 @@ class TreeEditor extends React.Component<Props, State> {
 
         this.network.on('click', async (clickEvent) => {
             if (clickEvent.nodes.length > 0) {
-                assert(clickEvent.nodes.length === 1);
-                const clickedNodeId = clickEvent.nodes[0];
                 console.log("clickEvent.nodes", clickEvent.nodes);
-                this.setState({selectedNodeID: clickedNodeId})
+                    this.localSelectedNodeIDs = clickEvent.nodes;
             } else {
+                this.setState({selectedNodeIDs: []});
             }
         });
         
@@ -157,7 +146,7 @@ class TreeEditor extends React.Component<Props, State> {
 
     applyLocal(action: string, params: {}){
         const currentAST = this.astStack[this.astStack.length - 1];
-        const nodes = [this.state.selectedNodeID];
+        const nodes = this.localSelectedNodeIDs;
         console.log(params)
         let t = {"action": action, "params": params, "condition": "true"};
         try{
@@ -236,6 +225,8 @@ class TreeEditor extends React.Component<Props, State> {
                 <div className="editor-options-card" id="graph-container">
                     <h4>{this.state.status}</h4>
                     <div className="editor-menu">
+                        {`Hint: Long click to select multiple nodes`}
+                        <br/>
                         <button onClick={this.applyLocal.bind(this, "flipCmp", {})}>Flip Cmp</button>
                         <button onClick={this.applyLocal.bind(this, "toImp", {})}>To Imp</button>
                         <button onClick={this.applyLocal.bind(this, "move", {"direction": "l"})}>Move Left</button>
