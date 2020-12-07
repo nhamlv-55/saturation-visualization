@@ -45,8 +45,6 @@ export class ASTNode{
         this.endOffset = node.endOffset;
     }
 
-
-
 }
 
 function isOpt(lst: SExp|SExpNode){
@@ -267,20 +265,18 @@ export class ASTTransformer extends Object{
             }
 
 
-            console.log("111111111");
             //build the head (X in X => Y)
             if(headChildren.length>1){
                 newHead = new ASTNode(cloned_ast.nodeList.length, "and", parent.nodeID, headChildren);
                 cloned_ast.nodeList.push(newHead);
                 for(var childID of headChildren){
                     cloned_ast.nodeList[childID].parentID = newHead.nodeID;
-                }               
+                }
             }else{
                 newHead = cloned_ast.nodeList[headChildren[0]];
             }
 
 
-            console.log("222222222");
             //build the tail (Y in X => Y)
             if(tailChildren.length > 1){
                 newTail = new ASTNode(cloned_ast.nodeList.length, "or", parent.nodeID, tailChildren);
@@ -302,7 +298,7 @@ export class ASTTransformer extends Object{
     } 
 
     replace(nodes: number[], ast: AST, params: {}, condition: string ): [boolean, AST]{
-        let node = ast.nodeList[nodes[nodes.length - 1]];
+        let node = ast.nodeList[_.last(nodes)];
         let cloned_ast = _.cloneDeep(ast);
         let dirty = false;
         let source = params["source"]
@@ -328,7 +324,7 @@ export class ASTTransformer extends Object{
         return [dirty, cloned_ast];
     }
     changeBreak(nodes: number[], ast: AST, params:{}, condition: string ): [boolean,AST]{
-        let node = ast.nodeList[nodes[nodes.length - 1]];
+        let node = ast.nodeList[_.last(nodes)];
         let cloned_ast = _.cloneDeep(ast);
         if(eval(condition)){
             cloned_ast.nodeList[node.nodeID].shouldBreak ^= 1;
@@ -338,7 +334,7 @@ export class ASTTransformer extends Object{
         return [false, cloned_ast];
     }
     changeBracket(nodes: number[], ast: AST, params:{}, condition: string ): [boolean, AST]{
-        let node = ast.nodeList[nodes[nodes.length - 1]];
+        let node = ast.nodeList[_.last(nodes)];
         let cloned_ast = _.cloneDeep(ast);
         if(eval(condition)){
             cloned_ast.nodeList[node.nodeID].shouldInBracket ^= 1;
