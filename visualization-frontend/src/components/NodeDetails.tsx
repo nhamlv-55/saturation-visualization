@@ -85,6 +85,9 @@ export default class NodeDetails extends React.Component<Props, State> {
     }
 
     getLemmaExprs(node){
+        /*
+        Convert all lemmas under a pob to input to Editor
+        */
         let lemmaExprs = new Array<string>();
         if (node.event_type === "EType.EXP_POB") {
             if (node.exprID in this.props.PobLemmasMap){
@@ -225,7 +228,6 @@ export default class NodeDetails extends React.Component<Props, State> {
             transformationFlag: false,
             transformationErrorFlag: false
         });
-
         const response = await fetch("http://localhost:5000/spacer/apply_transformation", {
             method: 'POST',
             mode :'cors',
