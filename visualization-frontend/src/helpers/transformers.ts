@@ -4,6 +4,8 @@ import {parse, isSExpNode, SExp, SExpNode} from './uber-s-exify';
 import {negateMap} from "./readable";
 const _ = require("lodash");
 
+const NULL_IDX = -100;
+
 export interface ProseTransformation{
     humanReadableAst: string,
     xmlAst: string
@@ -85,6 +87,10 @@ export class ASTTransformer extends Object{
             let dirty = true;
 
             for(var node of new_ast.nodeList){
+                if(node.nodeID === NULL_IDX){
+                    //null node
+                    continue;
+                }
                 [dirty, new_ast] = this.run([node.nodeID], new_ast, tStack[t_index]);
                 if(dirty){
                     break;
@@ -229,7 +235,11 @@ export class ASTTransformer extends Object{
         /*
           Convert (or X Y Z T) to (and(~X ~Y) => (or Z T))
 
-         */
+        */
+        if(nodes.length === 0){
+            return [false, _.cloneDeep(ast)];
+        }
+        
         let node = ast.nodeList[nodes[nodes.length - 1]];
         let cloned_ast = _.cloneDeep(ast);
         let cloned_node = cloned_ast.nodeList[node.nodeID];
@@ -345,7 +355,7 @@ export class AST {
     visNodes = new Array<Node>();
     visEdges = new Array<Edge>();
 
-    null_node = new ASTNode(-100, "null-node", -100, []);
+    null_node = new ASTNode(NULL_IDX, "null-node", NULL_IDX, []);
     constructor(formula: string){
         this.lstToAST(-1, parse(formula));
         this.buildVis();
@@ -436,7 +446,7 @@ export class AST {
         this.visEdges = [];
 
         for(const node of this.nodeList){
-            if(node.nodeID!==-100){
+            if(node.nodeID!==NULL_IDX){
                 let label = node.token;
 
                 if(node.shouldInBracket){
