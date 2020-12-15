@@ -176,13 +176,18 @@ class TreeEditor extends React.Component<Props, State> {
     async learnTransformationFromInputOutput() {
         let inputAST = this.astStack[0];
         let outputAST = this.astStack[this.astStack.length - 1];
+        console.log("tranformer stack", this.transformerStack);
 
         let payload = {
             "inputOutputExamples":[{"input": inputAST.toString(-1, inputAST.nodeList[0]),
                                  "output": outputAST.toString(-1, outputAST.nodeList[0]),
                                  "aux": [""]}],
-            "exp_path": this.props.name
+            "exp_path": this.props.name,
+            "type": this.transformerStack[0].action
         };
+        if (payload["type"] === "replace") {
+            payload["params"] = this.transformerStack[0].params;
+        }
 
         console.log("payload", payload);
         const response = await fetch("http://localhost:5000/spacer/learn_transformation_modified", {
