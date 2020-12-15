@@ -3,11 +3,13 @@ import { Component } from 'react';
 
 import Main from './Main';
 import Aside from './Aside';
+import {StarModal} from './StarModal';
 import '../styles/App.css';
 import { assert } from '../model/util';
 import {buildExprMap, buildPobLemmasMap} from "../helpers/network";
 import {replaceVarNames, toReadable} from "../helpers/readable";
 
+import Modal from 'react-modal';
 type Props = {
     name: string,
     exp_path: string,
@@ -34,6 +36,7 @@ type State = {
     ExprMap: {},
     multiselect: boolean,
     varNames: string
+    starModalIsOpen: boolean
 }
 
 class App extends Component<Props, State> {
@@ -51,7 +54,8 @@ class App extends Component<Props, State> {
         PobLemmasMap: {},
         ExprMap: {},
         multiselect: false,
-        varNames: ""
+        varNames: "",
+        starModalIsOpen: false
     };
 
     async componentDidMount() {
@@ -130,6 +134,7 @@ class App extends Component<Props, State> {
     }
 
     async saveExprMap() {
+        console.log("saveExprMap - this.state.ExprMap", this.state.ExprMap);
         await fetch('http://localhost:5000/spacer/save_exprs', {
             method: 'POST',
             mode: 'cors',
@@ -245,6 +250,15 @@ class App extends Component<Props, State> {
     setJSONLayout(){
         this.setState({ expr_layout: "JSON" })
     }
+
+    openStarModal(){
+        this.setState({starModalIsOpen: true});
+    }
+
+    closeStarModal(){
+        this.setState({starModalIsOpen: false});
+    }
+
     render() {
         const {
             state,
@@ -286,7 +300,20 @@ class App extends Component<Props, State> {
             );
         }
         return (
-                <div className= "app" >
+            <div className= "app" >
+                <Modal
+                    isOpen={this.state.starModalIsOpen}
+                    onRequestClose={this.closeStarModal.bind(this)}
+                    overlayClassName="editor-modal"
+                    contentLabel="Example Modal"
+                >
+                    <h2>Final invariant</h2>
+                    <button onClick={this.closeStarModal.bind(this)}>Close</button>
+                    <StarModal
+                        PobLemmasMap = {this.state.PobLemmasMap}
+                        ExprMap = {this.state.ExprMap}
+                    />
+                </Modal>
                 { main }
                 <Aside
                     messages_q = {messages_q}
@@ -295,6 +322,7 @@ class App extends Component<Props, State> {
                     nodeSelection = { nodeSelection }
                     onUpdateNodeSelection = { this.updateNodeSelection.bind(this) }
                     onPoke = {this.poke.bind(this)}
+                    onOpenStarModal = {this.openStarModal.bind(this)}
                     SatVisLayout = { this.setSatVisLayout.bind(this) }
                     PobVisLayout = { this.setPobVisLayout.bind(this) }
                     MultiSelectMode= { this.setMultiSelect.bind(this) }

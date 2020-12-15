@@ -1,0 +1,11 @@
+.star-modal-content{
+    display:flex;
+    flex-direction:row;
+}
+
+.star-modal-content .raw-inv {
+    flex: 0 0 50%;
+}
+.star-modal-content .edited-inv {
+    flex: 0 0 50%;
+}
