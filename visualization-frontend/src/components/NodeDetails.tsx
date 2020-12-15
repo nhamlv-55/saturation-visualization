@@ -6,7 +6,6 @@ import {toDiff} from "../helpers/diff";
 import {lemmaColours} from "../helpers/network";
 import {cleanExprOperators, getCleanExprList, getIndexOfLiteral, getOp, reorder} from "../helpers/readable";
 import Modal from 'react-modal';
-import TreeEditor from './TreeEditor';
 import {Editor} from './Editor';
 type Props = {
     nodes: any,
