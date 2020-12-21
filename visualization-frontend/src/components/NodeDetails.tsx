@@ -59,7 +59,7 @@ export default class NodeDetails extends React.Component<Props, State> {
     };
 
     node_to_string(n: Object, is_root: Boolean):string{
-        let result = "";
+        let result: string;
         let args = "";
         const nl = is_root?"\n":"";
         //build args 
@@ -112,7 +112,7 @@ export default class NodeDetails extends React.Component<Props, State> {
                         color: lemmaColours[colorIndex]
                     };
                     lemma_list.push(<h3 style={lemmaStyle} key={"lemma-header-"+ lemma[0]}>ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h3>);
-                    let expr = this.props.ExprMap[lemma[0]].edited;
+                    let expr = this.props.ExprMap[lemma[0]].readable;
                     if (typeof expr === "string"){
                         if (Object.keys(this.props.relatedExprMap).length > 0){
                             let keys = Object.keys(this.props.relatedExprMap);
@@ -136,18 +136,12 @@ export default class NodeDetails extends React.Component<Props, State> {
                             let lemmaColour = {
                                 color: "black"
                             }
-                            if (implies !== -1){
-                                if (key > implies){
+                            if (implies !== -1) {
+                                if (key > implies) {
                                     lemmaColour.color = "darkblue";
                                 }
                             }
-                            if (key !== exprList.length - 1) {
-                                lemma_list.push(<pre style={lemmaColour} onClick={this.addLemma.bind(this, lemma[0])} key={"lemma-expr-"+lemma[0] + key}>{literal}</pre>);
-                            }
-                            else {
-                                lemma_list.push(<pre style={lemmaColour} onClick={this.addLemma.bind(this, lemma[0])}
-                                                     key={"lemma-expr-" + lemma[0] + key}>{literal}</pre>);
-                            }
+                            lemma_list.push(<pre style={lemmaColour} key={"lemma-expr-" + lemma[0] + key}>{literal}</pre>);
                         });
                     }
                     else {
@@ -159,62 +153,6 @@ export default class NodeDetails extends React.Component<Props, State> {
         return lemma_list;
     }
     
-    addLemma(lemmaId, e) {
-        let expr = this.props.ExprMap[lemmaId].readable;
-        let exprList = getCleanExprList(expr, getOp(expr));
-        let literal = (cleanExprOperators(e.target.innerText));
-        literal = literal.trim();
-        let index = getIndexOfLiteral(exprList, literal);
-        let lhs = this.props.ExprMap[lemmaId].lhs;
-        if (lhs.includes(index)){
-            lhs.splice(lhs.indexOf(index), 1);
-        }
-        else {
-            lhs.push(index)
-        }
-        
-        this.props.ExprMap[lemmaId].lhs = lhs;
-        this.props.ExprMap[lemmaId].edited = reorder(expr, lhs, getOp(expr));
-        this.props.ExprMap[lemmaId].changed = lhs.length !== 0;
-        this.props.saveExprs();
-        this.forceUpdate();
-        
-    }
-    
-    async learnTransformation() {
-        this.setState({
-            learningFlag: false,
-            learningErrorFlag: false,
-            transformationFlag: false,
-            transformationErrorFlag: false,
-            possibleTransformations: []
-        });
-
-        const response = await fetch("http://localhost:5000/spacer/learn_transformation", {
-            method: 'POST',
-            mode :'cors',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }, body : JSON.stringify({
-                exp_path: this.props.name
-            })
-        });
-        if (response.status === 200){
-            let responseJson = await response.json();
-            let possiblePrograms = responseJson["response"];
-            this.setState({
-                learningFlag: true,
-                possibleTransformations: possiblePrograms
-            });
-            this.forceUpdate();
-        }
-        else {
-            this.setState({
-                learningErrorFlag: true
-            });
-        }
-    }
     async transformExprsFromText(t: string) {
         //wrapper around transformExprs to take in a string instead of reading transformationSelected from state
         this.setState({
@@ -244,8 +182,8 @@ export default class NodeDetails extends React.Component<Props, State> {
             let responseData = await response.json();
             let tExprMap = responseData["response"];
             Object.keys(tExprMap).forEach((key) => {
-                this.props.ExprMap[key].edited = tExprMap[key]['Edited'];
-                this.props.ExprMap[key].lhs = tExprMap[key]['Lhs'];
+                this.props.ExprMap[key].raw = tExprMap[key]['Raw'];
+                this.props.ExprMap[key].readable = tExprMap[key]['Readable'];
             });
             this.props.saveExprs();
             this.setState({
@@ -260,12 +198,6 @@ export default class NodeDetails extends React.Component<Props, State> {
         }
     }
     
-    updateTransformationSelected(e) {
-        this.setState({
-            transformationSelected: e.target.value
-        })
-    }
-
     openModal() {
         let editorTextInput = this.getLemmaExprs(this.props.nodes[0]).join("\n\n");
         this.setState({editorIsOpen: true, editorTextInput: editorTextInput});
@@ -302,7 +234,7 @@ export default class NodeDetails extends React.Component<Props, State> {
                         input={this.state.editorTextInput}
                         isModal={true}
                         onTransformExprs = {this.transformExprsFromText.bind(this)}
-                    saveExprs={this.props.saveExprs.bind(this)}
+                        saveExprs={this.props.saveExprs.bind(this)}
                     />
                 </Modal>
 
@@ -346,24 +278,13 @@ export default class NodeDetails extends React.Component<Props, State> {
                                 <article>
                                     {lemma_list}
                                     <button onClick={this.openModal.bind(this)}>Open Editor</button>
-                                    <button onClick={this.learnTransformation.bind(this)}>Learn Transform</button>
-                                    {this.state.learningFlag && <p>Possible Transformations: </p>}
-                                    {this.state.possibleTransformations.length !== 0 && this.state.possibleTransformations.map((transformation,key) => (
-                                        <div key={key}>
-                                            <input type="radio" name={"transformation"} value={transformation.xmlAst} onClick={this.updateTransformationSelected.bind(this)}/>{transformation.humanReadableAst}
-                                        </div>
-                                    ))}
-                                    {this.state.learningErrorFlag && <p style={{color: "red"}}>Internal Server Error: Please Try Again</p>}
-                                    <button onClick={this.transformExprs.bind(this)}>Apply Transform</button>
-                                    {this.state.transformationFlag && <p>Transformation Complete</p>}
-                                    {this.state.transformationErrorFlag && <p style={{color: "red"}}>Internal Server Error: Please Try Again</p>}
                                 </article>
                             </section>}
                         </div>
                     );
                 })}
             </div>
-);
+    );
 
 
 
