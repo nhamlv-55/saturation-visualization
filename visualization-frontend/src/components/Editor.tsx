@@ -2,7 +2,7 @@ import * as React from 'react';
 import '../styles/Editor.css';
 import * as Monaco from 'monaco-editor'
 import TreeEditor from "./TreeEditor";
-import { AST, ASTTransformer, Transformer} from "./../helpers/transformers";
+import { AST, ASTTransformer, Transformer} from "../helpers/transformers";
 const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {

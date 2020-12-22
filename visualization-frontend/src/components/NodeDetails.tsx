@@ -4,7 +4,7 @@ import '../styles/NodeDetails.css';
 import '../styles/Editor.css';
 import {toDiff} from "../helpers/diff";
 import {lemmaColours} from "../helpers/network";
-import {cleanExprOperators, getCleanExprList, getIndexOfLiteral, getOp, reorder} from "../helpers/readable";
+import {getCleanExprList} from "../helpers/readable";
 import Modal from 'react-modal';
 import {Editor} from './Editor';
 type Props = {
@@ -207,7 +207,7 @@ export default class NodeDetails extends React.Component<Props, State> {
         // references are now sync'd and can be accessed.
     }
 
-    closeModal(){
+    closeModal() {
         this.setState({editorIsOpen: false});
     }
 
