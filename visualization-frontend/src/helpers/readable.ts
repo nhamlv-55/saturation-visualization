@@ -57,8 +57,9 @@ function parseResult(lst, sep) {
     if (lst[0] === "not") {
         if (lst[1][0] in negateMap){
             lst[1][0] = negateMap[lst[1][0]];
+            return parseResult(lst[1], "");
         }
-        return parseResult(lst[1], "")
+        return parseResult("!" + lst[1], "");
     }
 
     //prevents trailing logical symbol
