@@ -69,7 +69,10 @@ export function buildExprMap(tree: any, varList: string[]): any{
         const node = tree[nodeID];
         const exprMapItem = {
             raw: node.expr.raw,
-            readable: node.expr.readable
+            readable: node.expr.readable,
+            editedRaw: node.expr.raw,
+            editedReadable: node.expr.readable
+            
         };
         ExprMap[node.exprID] = exprMapItem;
     }
