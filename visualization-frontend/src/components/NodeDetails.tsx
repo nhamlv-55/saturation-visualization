@@ -112,13 +112,13 @@ export default class NodeDetails extends React.Component<Props, State> {
                         color: lemmaColours[colorIndex]
                     };
                     lemma_list.push(<h3 style={lemmaStyle} key={"lemma-header-"+ lemma[0]}>ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h3>);
-                    let expr = this.props.ExprMap[lemma[0]].readable;
+                    let expr = this.props.ExprMap[lemma[0]].editedReadable;
                     if (typeof expr === "string"){
                         if (Object.keys(this.props.relatedExprMap).length > 0){
                             let keys = Object.keys(this.props.relatedExprMap);
                             for (let i = 0; i < keys.length; i++){
                                 let exprData = this.props.relatedExprMap[keys[i]];
-                               if (expr === exprData.readable) {
+                               if (expr === exprData.editedReadable) {
                                    expr = exprData.edited;
                                    break;
                                }
@@ -182,8 +182,8 @@ export default class NodeDetails extends React.Component<Props, State> {
             let responseData = await response.json();
             let tExprMap = responseData["response"];
             Object.keys(tExprMap).forEach((key) => {
-                this.props.ExprMap[key].raw = tExprMap[key]['Raw'];
-                this.props.ExprMap[key].readable = tExprMap[key]['Readable'];
+                this.props.ExprMap[key].editedRaw = tExprMap[key]['Raw'];
+                this.props.ExprMap[key].editedReadable = tExprMap[key]['Readable'];
             });
             this.props.saveExprs();
             this.setState({
