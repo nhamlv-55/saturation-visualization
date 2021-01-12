@@ -12,6 +12,7 @@ type Props = {
     nodeSelection: number[],
     onUpdateNodeSelection: (selection: number[]) => void,
     onPoke: () => void,
+    onOpenStarModal: () => void,
     SatVisLayout: () => void,
     PobVisLayout: () => void,
     MultiSelectMode: () => void,
@@ -89,6 +90,7 @@ class Aside extends React.Component<Props, State> {
                     ))}
                     <section className="component-node-menu" >
                         { this.createButton("Poke", this.props.onPoke, "graph-undo") }
+                        { this.createButton("Star", this.props.onOpenStarModal, "star") }
                         { this.createButton("SatVis", this.props.SatVisLayout, "node-parents") }
                         { this.createButton("PobVis", this.props.PobVisLayout, "node-children") }
                         { this.createButton("MultiSelect", this.props.MultiSelectMode, "history-forward") }
