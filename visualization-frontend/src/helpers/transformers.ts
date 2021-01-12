@@ -201,22 +201,22 @@ export class ASTTransformer extends Object{
                     break;
                 }
                 case "<":{
-                    new_node = new ASTNode(node.nodeID, ">=", node.parentID, [node.children[1], node.children[0]]);
+                    new_node = new ASTNode(node.nodeID, ">", node.parentID, [node.children[1], node.children[0]]);
                     dirty = true;
                     break;
                 }
                 case ">":{
-                    new_node = new ASTNode(node.nodeID, "<=", node.parentID, [node.children[1], node.children[0]]);
-                    dirty = true;
-                    break;
-                }
-                case ">=":{
                     new_node = new ASTNode(node.nodeID, "<", node.parentID, [node.children[1], node.children[0]]);
                     dirty = true;
                     break;
                 }
+                case ">=":{
+                    new_node = new ASTNode(node.nodeID, "<=", node.parentID, [node.children[1], node.children[0]]);
+                    dirty = true;
+                    break;
+                }
                 case "<=":{
-                    new_node = new ASTNode(node.nodeID, ">", node.parentID, [node.children[1], node.children[0]]);
+                    new_node = new ASTNode(node.nodeID, ">=", node.parentID, [node.children[1], node.children[0]]);
                     dirty = true;
                     break;
                 }

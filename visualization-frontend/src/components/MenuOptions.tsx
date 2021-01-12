@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {options} from "../helpers/spacerOptions";
 import eye from "./../resources/icons/singles/eye.svg"
 
 type Props = {
@@ -14,7 +13,8 @@ type State = {
     optionName: string,
     optionType: string,
     allOptions: {type:string, name: string, value:string}[],
-    showOptions: boolean
+    showOptions: boolean,
+    options: any[]
 }
 
 class MenuOptions extends React.Component<Props, State> {
@@ -24,14 +24,42 @@ class MenuOptions extends React.Component<Props, State> {
         optionValue: "",
         optionName: "",
         allOptions: [],
-        showOptions: true
+        showOptions: true,
+        options: []
     };
+    
+    async componentDidMount() {
+        await this.fetchOptions()
+    }
+    
+    
+    async fetchOptions() {
+
+        const fetchedJSON = await fetch('http://localhost:5000/spacer/fetch_options', {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }, body : ""
+        });
+
+        try {
+            const json = await fetchedJSON.json();
+            console.log(json)
+            this.setState({
+                options: json
+            })
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     updateSpacerOptions() {
-        let allOptions: {type:string, name: string, value:string}[] = this.state.allOptions;
+        let allOptions: any[] = this.state.allOptions;
         let fullOptionString = "";
         for (let option of allOptions) {
-            if (option.type === "flag") {
+            if (option.type === "flag" || option.dash) {
                 fullOptionString += "-" + option.name + " ";
             }
             else {
@@ -45,7 +73,7 @@ class MenuOptions extends React.Component<Props, State> {
         e.preventDefault();
         e.target.reset();
         if (this.state.optionName === "" || (this.state.optionType !== "custom" && this.state.optionValue === "")) return;
-        let allOptions: {type:string, name: string, value:string}[] = this.state.allOptions;
+        let allOptions: any[] = this.state.allOptions;
         allOptions.push({
             name: this.state.optionName,
             value: this.state.optionValue,
@@ -97,10 +125,10 @@ class MenuOptions extends React.Component<Props, State> {
     }
 
     changeOptionType(e: React.ChangeEvent<HTMLInputElement>){
-        let tempList = options.filter(option => option.name === e.target.value);
+        let tempList = this.state.options.filter(option => option["name"] === e.target.value);
         let type = "custom";
         if (tempList.length > 0) {
-            type = tempList[0].type;
+            type = tempList[0]["type"];
         }
         this.setState({
             optionName: e.target.value,
@@ -137,6 +165,7 @@ class MenuOptions extends React.Component<Props, State> {
         });
     }
     render() {
+        console.log(this.state);
         let selectedOptions = this.displaySpacerOptions();
         return (
             <aside>
@@ -164,8 +193,8 @@ class MenuOptions extends React.Component<Props, State> {
                             <form className="tfradio" name="tfradio" onSubmit={this.storeSpacerOptions.bind(this)}>
                                 <input type="text" className="optionsList" list="spacerOptions" name="spacerOptions" onChange={this.changeOptionType.bind(this)}/>
                                 <datalist id="spacerOptions">
-                                    {options.map((part, key) => (
-                                        <option value={part.name} key={key}/>
+                                    {this.state.options && this.state.options.length !== 0 && this.state.options.map((option, key) => (
+                                        <option value={option["name"]} key={key}/>
                                     ))}
                                 </datalist>
                                 {this.state.optionTypeHTML}

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AST, ASTTransformer, Transformer, ProseTransformation} from "./../helpers/transformers";
+import { AST, ASTTransformer, Transformer, ProseTransformation} from "../helpers/transformers";
 import { assert } from '../model/util';
 import { DataSet, Network, Node, Edge } from 'vis'
 import ReplaceDialog from './ReplaceDialog'
@@ -176,13 +176,18 @@ class TreeEditor extends React.Component<Props, State> {
     async learnTransformationFromInputOutput() {
         let inputAST = this.astStack[0];
         let outputAST = this.astStack[this.astStack.length - 1];
+        console.log("transformer stack", this.transformerStack);
 
         let payload = {
             "inputOutputExamples":[{"input": inputAST.toString(-1, inputAST.nodeList[0]),
                                  "output": outputAST.toString(-1, outputAST.nodeList[0]),
                                  "aux": [""]}],
-            "exp_path": this.props.name
+            "exp_path": this.props.name,
+            "type": this.transformerStack[0].action
         };
+        if (payload["type"] === "replace") {
+            payload["params"] = this.transformerStack.map((item) => {return item.params});
+        }
 
         console.log("payload", payload);
         const response = await fetch("http://localhost:5000/spacer/learn_transformation_modified", {
@@ -253,17 +258,17 @@ class TreeEditor extends React.Component<Props, State> {
                 <div className="editor-options-card" id="transformer-container">
                     <h3>Transformer Queue</h3>
                     <pre>{`
-Condition examples:
-- apply the transformation for all the node
-whose token pass the regex test "ab+c"
-  /ab+c/.test(node.token)
-- apply the transformation for all the node
-whose token is either x, y, or z
-  ["x_", "y_", "z_"].includes(node.token)
-- apply the transformation for all the node
-at depth 2
-  ast.nodeDepth(node) === 2
-                        `}</pre>
+                        Condition examples:
+                        - apply the transformation for all the node
+                        whose token pass the regex test "ab+c"
+                          /ab+c/.test(node.token)
+                        - apply the transformation for all the node
+                        whose token is either x, y, or z
+                          ["x_", "y_", "z_"].includes(node.token)
+                        - apply the transformation for all the node
+                        at depth 2
+                          ast.nodeDepth(node) === 2
+                    `}</pre>
                     {tStack}
                     <button onClick={this.applyStack.bind(this)}>Apply for the current AST</button>
                     <button onClick={this.props.onBlast.bind(this, this.transformerStack)}>Blast</button>

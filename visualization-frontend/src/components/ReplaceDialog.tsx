@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {ChangeEvent} from "react";
 
 type Props = {
     onApply: (action: string, params: {})=>void,
@@ -17,19 +18,34 @@ class ReplaceDialog extends React.Component<Props, State> {
         target: "",
         regex: false,
     };
+    
+    handleSourceChange(e: ChangeEvent<HTMLInputElement>) {
+        this.setState({
+            source: e.target.value
+        })
+    }
+    handleTargetChange(e: ChangeEvent<HTMLInputElement>) {
+        this.setState({
+            target: e.target.value
+        })
+    }
 
+    handleRegexChange(e: ChangeEvent<HTMLInputElement>) {
+        this.setState({
+            regex: e.target.checked
+        })
+    }
 
 
     render() {
-        console.log(this.props, this.state)
         return (
             <div>
-                {`Replace: `}<input type="text" defaultValue=""onChange={(e)=> {this.setState({source: e.target.value})}} />
-                {` with: `}<input type="text" defaultValue=""onChange={(e)=> {this.setState({target: e.target.value})}}/>
+                {`Replace: `}<input type="text" defaultValue="" onChange={this.handleSourceChange.bind(this)} />
+                {` with: `}<input type="text" defaultValue="" onChange={this.handleTargetChange.bind(this)}/>
                 {`\tRegex?`}
                 <input type="checkbox"
                        defaultChecked={false}
-                       onChange={(e)=> {this.setState({regex: e.target.checked})} }
+                       onChange={this.handleRegexChange.bind(this)} 
                 />
                 <button onClick={this.props.onApply.bind(this, "replace",
                                                          {"source": this.state.source,
