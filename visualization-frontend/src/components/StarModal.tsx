@@ -26,7 +26,7 @@ export class StarModal extends React.Component<Props, State> {
 
 
         for(const pob in this.props.PobLemmasMap){
-            console.log(pob);
+            /* console.log(pob); */
             let lemmas = this.props.PobLemmasMap[pob];
             for(const lemma of lemmas){
                 lemma_set.add(lemma);
@@ -42,13 +42,19 @@ export class StarModal extends React.Component<Props, State> {
             if(lemma instanceof Array){
                 const lemma_id = lemma[0];
                 if(lemma[2]!=="oo"){continue;}
-                console.log(this.props.ExprMap[lemma_id]);
-                let expr = this.props.ExprMap[lemma_id].edited;
+                /* console.log(this.props.ExprMap[lemma_id]); */
+                let expr_raw = '';
+                let expr_edited = '';
+                if(this.props.ExprMap[lemma_id]){
+                    expr_edited = this.props.ExprMap[lemma_id].edited;
+                    expr_raw = this.props.ExprMap[lemma_id].raw;
+                }
+
                 lemma_list_edited.push(<h4 key={"lemma-header-edited-"+ lemma_id}>ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h4>);
-                lemma_list_edited.push(<pre>{this.props.ExprMap[lemma_id].edited}</pre>);
+                lemma_list_edited.push(<pre>{expr_raw}</pre>);
 
                 lemma_list_raw.push(<h4 key={"lemma-header-"+ lemma_id}>ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h4>);
-                lemma_list_raw.push(<pre>{this.props.ExprMap[lemma_id].raw}</pre>);
+                lemma_list_raw.push(<pre>{expr_edited}</pre>);
             }
         }
         return {"raw": lemma_list_raw, "edited": lemma_list_edited};

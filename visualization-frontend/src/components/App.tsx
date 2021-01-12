@@ -134,7 +134,6 @@ class App extends Component<Props, State> {
     }
 
     async saveExprMap() {
-        console.log("saveExprMap - this.state.ExprMap", this.state.ExprMap);
         await fetch('http://localhost:5000/spacer/save_exprs', {
             method: 'POST',
             mode: 'cors',
