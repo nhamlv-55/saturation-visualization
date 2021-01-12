@@ -27,7 +27,7 @@ type Props = {
 };
 
 type State = {
-    relatedExprMap: any,
+    relatedExprMap: any
 }
 
 class Aside extends React.Component<Props, State> {
