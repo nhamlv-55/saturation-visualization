@@ -201,22 +201,22 @@ export class ASTTransformer extends Object{
                     break;
                 }
                 case "<":{
-                    new_node = new ASTNode(node.nodeID, ">=", node.parentID, [node.children[1], node.children[0]]);
+                    new_node = new ASTNode(node.nodeID, ">", node.parentID, [node.children[1], node.children[0]]);
                     dirty = true;
                     break;
                 }
                 case ">":{
-                    new_node = new ASTNode(node.nodeID, "<=", node.parentID, [node.children[1], node.children[0]]);
-                    dirty = true;
-                    break;
-                }
-                case ">=":{
                     new_node = new ASTNode(node.nodeID, "<", node.parentID, [node.children[1], node.children[0]]);
                     dirty = true;
                     break;
                 }
+                case ">=":{
+                    new_node = new ASTNode(node.nodeID, "<=", node.parentID, [node.children[1], node.children[0]]);
+                    dirty = true;
+                    break;
+                }
                 case "<=":{
-                    new_node = new ASTNode(node.nodeID, ">", node.parentID, [node.children[1], node.children[0]]);
+                    new_node = new ASTNode(node.nodeID, ">=", node.parentID, [node.children[1], node.children[0]]);
                     dirty = true;
                     break;
                 }
@@ -257,8 +257,8 @@ export class ASTTransformer extends Object{
             for(var cID of parent.children){
                 if(nodes.includes(cID)){
                     // console.log("c negate", cloned_ast.nodeList[cID].negate());
-                    cloned_ast.negateNode(cID);
-                    headChildren.push(cID);
+                    let new_cID = cloned_ast.negateNode(cID);
+                    headChildren.push(new_cID);
                 }else{
                     tailChildren.push(cID);
                 }
@@ -364,9 +364,14 @@ export class AST {
 
         return this.nodeDepth(this.nodeList[node.parentID])+1;
     }
-    negateNode(nodeID: number){
+    negateNode(nodeID: number): number{
         let node = this.getNode(nodeID);
+        //if node is `not`, squash it
         if(node.token==="not"){
+            /*
+              if a node is not->formula
+              replace it with ``formula``
+             */
             let child = this.getNode(node.children[0]);
             this.nodeList[nodeID] = new ASTNode(node.nodeID, child.token, node.parentID, child.children);
             //point all child to the new parent
@@ -375,9 +380,19 @@ export class AST {
             }
 
             this.deleteNode(child.nodeID);
-        }else{
-            this.nodeList[nodeID] = new ASTNode(node.nodeID, negateMap[node.token], node.parentID, node.children);
+            return node.nodeID;
         }
+        //negate using negateMap if operator is in negate map
+        if(node.token in negateMap){
+            this.nodeList[nodeID] = new ASTNode(node.nodeID, negateMap[node.token], node.parentID, node.children);
+            return node.nodeID;
+        }
+        //negate a normal node
+        let new_node = new ASTNode(this.nodeList.length, `not`, node.parentID, [nodeID]);
+        console.log("new node", new_node);
+        node.parentID = new_node.nodeID;
+        this.nodeList.push(new_node);
+        return new_node.nodeID;
     }
 
     getNode(nodeID: number): ASTNode{
