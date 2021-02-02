@@ -1,4 +1,15 @@
-.component-menu .editor-spacer {
+.editor-modal {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.editor-modal .editor {
+    display: flex;
+    flex-grow: 1;
+}
+
+.editor-modal .editor-spacer {
     width: 100%;
     padding: 1.5rem 2rem;
     display: flex;
@@ -21,11 +32,10 @@
     background: #fff;
 }
 
-.component-menu #editor-wrapper{
+.editor-modal #editor-wrapper{
+    margin: 1rem;
     display: inline-block;
     flex: 0 0 30%;
-    background: #fff;
-    color: rgba(0, 0, 0, .5);
 }
 
 
@@ -55,16 +65,16 @@
 }
 
 .editor-menu{
+    margin: 1rem;
     display: inline-block;
 }
 
-.component-menu .monaco .lines-content.monaco-editor-background {
+.editor-modal .monaco .lines-content.monaco-editor-background {
     margin-top: 14px;
 }
 
 
 .transformer-wrapper{
-    background-color: lightgray;
     margin: 0.5rem;
     padding: 0.5rem;
     border-radius: 0.5rem;
