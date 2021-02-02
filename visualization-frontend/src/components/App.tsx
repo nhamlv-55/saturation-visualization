@@ -105,11 +105,11 @@ class App extends Component<Props, State> {
             const PobLemmasMap = buildPobLemmasMap(tree, json.var_names);
             // NOTE: use varNames in state, not in props. The one in state is returned by the backend.
             let ExprMap;
-            if (json.expr_map === "") {
+            if (Object.keys(json.expr_map).length === 0) {
                 ExprMap = buildExprMap(tree, json.var_names);
             }
             else {
-                ExprMap = JSON.parse(json.expr_map);
+                ExprMap = json.expr_map;
             }
 
             this.setState({
@@ -308,10 +308,12 @@ class App extends Component<Props, State> {
                 >
                     <h2>Final invariant</h2>
                     <button onClick={this.closeStarModal.bind(this)}>Close</button>
-                    <StarModal
+                    {/* <StarModal
+                        exp_path = {this.props.exp_path}
                         PobLemmasMap = {this.state.PobLemmasMap}
                         ExprMap = {this.state.ExprMap}
-                    />
+                        saveExprs = {this.saveExprMap.bind(this)}
+                        /> */}
                 </Modal>
                 { main }
                 <Aside
