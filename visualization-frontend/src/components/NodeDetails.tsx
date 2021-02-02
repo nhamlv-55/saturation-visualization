@@ -15,7 +15,8 @@ type Props = {
     layout: string,
     expr_layout: "SMT" | "JSON",
     saveExprs: () => void,
-    relatedExprMap: any
+    relatedExprMap: any,
+    solvingCompleted: boolean
 };
 
 type State = {
@@ -277,7 +278,10 @@ export default class NodeDetails extends React.Component<Props, State> {
                             {lemma_list.length > 0 && <section className={classNameBottom}>
                                 <article>
                                     {lemma_list}
+
+                                    {this.props.solvingCompleted?
                                     <button onClick={this.openModal.bind(this)}>Open Editor</button>
+                                    : ""}
                                 </article>
                             </section>}
                         </div>

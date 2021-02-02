@@ -23,7 +23,8 @@ type Props = {
     layout: string,
     expr_layout: "SMT"|"JSON",
     saveExprs: () => void,
-    name: string
+    name: string,
+    solvingCompleted: boolean
 };
 
 type State = {
@@ -63,7 +64,7 @@ class Aside extends React.Component<Props, State> {
                        expr_layout ={this.props.expr_layout}
                        saveExprs = {this.props.saveExprs}
                        relatedExprMap = {this.state.relatedExprMap}
-                       
+                       solvingCompleted = {this.props.solvingCompleted}
             />;
         } else {
             return <section className={ 'component-node-details overview' }>
