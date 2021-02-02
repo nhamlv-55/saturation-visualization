@@ -82,7 +82,7 @@ function parseResult(lst, sep) {
         return lst[0] + ": (" + parseResult(lst[1], "") + ")";
     }
 
-    return lst;
+    return lst.toString();
 }
 
 export function replaceVarNames(expr, varList) {
