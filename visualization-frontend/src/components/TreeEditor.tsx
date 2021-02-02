@@ -7,7 +7,7 @@ const _ = require("lodash");
 type Props = {
     name: string,
     input: string,
-    onBlast: (tStack: Transformer[])=>void,
+    onBlast: (tStack: Transformer[])=>void| null,
     isModal: boolean,
     saveExprs?: ()=> void,
     onTransformExprs?: (t: string)=> Promise<void>,
@@ -256,20 +256,20 @@ class TreeEditor extends React.Component<Props, State> {
                     </div>
                 </div>
                 <div className="editor-options-card" id="transformer-container">
-                    <h3>Transformer Queue</h3>
-                    <pre>{`
+                    {/* <h3>Transformer Queue</h3>
+                        <pre>{`
                         Condition examples:
                         - apply the transformation for all the node
                         whose token pass the regex test "ab+c"
-                          /ab+c/.test(node.token)
+                        /ab+c/.test(node.token)
                         - apply the transformation for all the node
                         whose token is either x, y, or z
-                          ["x_", "y_", "z_"].includes(node.token)
+                        ["x_", "y_", "z_"].includes(node.token)
                         - apply the transformation for all the node
                         at depth 2
-                          ast.nodeDepth(node) === 2
-                    `}</pre>
-                    {tStack}
+                        ast.nodeDepth(node) === 2
+                        `}</pre>
+                        {tStack} */}
                     <button onClick={this.applyStack.bind(this)}>Apply for the current AST</button>
                     <button onClick={this.props.onBlast.bind(this, this.transformerStack)}>Blast</button>
                     <button onClick={this.learnTransformationFromInputOutput.bind(this)}>Learn</button>
