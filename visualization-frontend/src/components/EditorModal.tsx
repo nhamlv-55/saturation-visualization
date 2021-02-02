@@ -73,7 +73,7 @@ export class EditorModal extends React.Component<Props, State> {
                         <h2>Original</h2>
                         {/* <button onClick={this.openEditor.bind(this, )}>Open Editor</button> */}
                         {this.props.inputList.map((input, key) => (
-                        <button key={key} onClick={this.openEditor.bind(this, input)}>
+                        <button key={key} onClick={this.openEditor.bind(this, input)} className="formula-button">
                                 <pre>
                                     {input}
                                 </pre>
