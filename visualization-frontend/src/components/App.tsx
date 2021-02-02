@@ -99,6 +99,8 @@ class App extends Component<Props, State> {
                 tree[i].expr = {
                     raw: rawWithVars,
                     readable: readable,
+                    editedRaw: rawWithVars,
+                    editedReadable: readable
                 };
             }
             const state = "loaded";

@@ -190,7 +190,7 @@ class TreeEditor extends React.Component<Props, State> {
         }
 
         console.log("payload", payload);
-        const response = await fetch("http://localhost:5000/spacer/learn_transformation_modified", {
+        const response = await fetch("http://localhost:5000/spacer/learn_transformation", {
             method: 'POST',
             mode :'cors',
             headers: {
