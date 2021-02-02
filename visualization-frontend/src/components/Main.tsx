@@ -16,6 +16,8 @@ type Props = {
     onCurrentTimeChange: (newState: number) => void,
     layout: string,
     PobLemmasMap: any,
+    solvingCompleted: boolean
+
 };
 export default class Main extends React.Component<Props, {}> {
 

@@ -35,8 +35,9 @@ type State = {
     PobLemmasMap: {},
     ExprMap: {},
     multiselect: boolean,
-    varNames: string
-    starModalIsOpen: boolean
+    varNames: string,
+    starModalIsOpen: boolean,
+    solvingCompleted: boolean
 }
 
 class App extends Component<Props, State> {
@@ -55,7 +56,8 @@ class App extends Component<Props, State> {
         ExprMap: {},
         multiselect: false,
         varNames: "",
-        starModalIsOpen: false
+        starModalIsOpen: false,
+        solvingCompleted: false
     };
 
     async componentDidMount() {
@@ -121,7 +123,8 @@ class App extends Component<Props, State> {
                 state: state,
                 PobLemmasMap: PobLemmasMap,
                 ExprMap: ExprMap,
-                varNames: json.var_names
+                varNames: json.var_names,
+                solvingCompleted: !(json.spacer_state === "running")
             });
             console.log("state is set")
         } catch (error) {
@@ -131,6 +134,7 @@ class App extends Component<Props, State> {
             this.setState({
                 state: "error",
                 messages_q: [`Error: ${error["message"]}`],
+                solvingCompleted: false,
             });
         }
     }
@@ -291,11 +295,12 @@ class App extends Component<Props, State> {
                     onCurrentTimeChange = { this.updateCurrentTime.bind(this) }
                     layout = { layout }
                     PobLemmasMap = { PobLemmasMap }
+                solvingCompleted = {this.state.solvingCompleted}
                 />
             );
         } else {
             main = (
-                <main>
+                <main >
                     <section className= "slider-placeholder" />
                 </main>
             );
@@ -337,6 +342,7 @@ class App extends Component<Props, State> {
                     expr_layout ={expr_layout}
                     saveExprs = {this.saveExprMap.bind(this)}
                     name = {this.state.exp_path}
+                    solvingCompleted = {this.state.solvingCompleted}
                 />
                 </div>
         );
