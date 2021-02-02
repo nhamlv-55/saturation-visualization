@@ -67,7 +67,7 @@ export class EditorModal extends React.Component<Props, State> {
         }
 
         return (
-            <section className="component-menu">
+            <section className="editor-modal">
                 <section className="editor">
                     <div id="editor-wrapper">
                         <h2>Original</h2>
