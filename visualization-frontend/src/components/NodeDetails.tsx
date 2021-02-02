@@ -119,7 +119,7 @@ export default class NodeDetails extends React.Component<Props, State> {
                             for (let i = 0; i < keys.length; i++){
                                 let exprData = this.props.relatedExprMap[keys[i]];
                                if (expr === exprData.editedReadable) {
-                                   expr = exprData.edited;
+                                   expr = exprData.editedReadable;
                                    break;
                                }
                             }
@@ -182,8 +182,8 @@ export default class NodeDetails extends React.Component<Props, State> {
             let responseData = await response.json();
             let tExprMap = responseData["response"];
             Object.keys(tExprMap).forEach((key) => {
-                this.props.ExprMap[key].editedRaw = tExprMap[key]['Raw'];
-                this.props.ExprMap[key].editedReadable = tExprMap[key]['Readable'];
+                this.props.ExprMap[key].editedRaw = tExprMap[key]['raw'];
+                this.props.ExprMap[key].editedReadable = tExprMap[key]['readable'];
             });
             this.props.saveExprs();
             this.setState({
