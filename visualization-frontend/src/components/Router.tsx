@@ -5,7 +5,7 @@ import { Menu } from './Menu';
 import { RouteComponentProps } from 'react-router';
 import Dashboard from "./Dashboard";
 import DashboardLanding from "./DashboardLanding";
-import { Editor } from "./Editor";
+import { EditorPage } from "./EditorPage";
 type State = {
     problem: string,
     problemName: string,
@@ -66,10 +66,9 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
                     this.displayVisualization(match.params.fileId)
                 }/>
                 <Route exact path="/editor/" render={() =>
-                    <Editor
+                    <EditorPage
                         name=""
                         input=""
-                        isModal ={false}
                     />
                 }/>
             </HashRouter>
