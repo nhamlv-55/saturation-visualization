@@ -6,7 +6,7 @@ import {toDiff} from "../helpers/diff";
 import {lemmaColours} from "../helpers/network";
 import {getCleanExprList} from "../helpers/readable";
 import Modal from 'react-modal';
-import {Editor} from './Editor';
+import {EditorModal} from './EditorModal';
 type Props = {
     nodes: any,
     name: string
@@ -27,7 +27,7 @@ type State = {
     possibleTransformations: {humanReadableAst: string, xmlAst: string}[]
     transformationSelected: string,
     editorIsOpen: boolean,
-    editorTextInput: string,
+    editorTextInputList: string[],
 }
 
 export default class NodeDetails extends React.Component<Props, State> {
@@ -43,7 +43,7 @@ export default class NodeDetails extends React.Component<Props, State> {
             possibleTransformations: [],
             transformationSelected: "",
             editorIsOpen: false,
-            editorTextInput: "",
+            editorTextInputList: [],
         }
     }
 
@@ -84,7 +84,7 @@ export default class NodeDetails extends React.Component<Props, State> {
         return result
     }
 
-    getLemmaExprs(node){
+    getLemmaExprs(node): string[]{
         /*
         Convert all lemmas under a pob to input to Editor
         */
@@ -200,8 +200,8 @@ export default class NodeDetails extends React.Component<Props, State> {
     }
     
     openModal() {
-        let editorTextInput = this.getLemmaExprs(this.props.nodes[0]).join("\n\n");
-        this.setState({editorIsOpen: true, editorTextInput: editorTextInput});
+        let editorTextInputList = this.getLemmaExprs(this.props.nodes[0]);
+        this.setState({editorIsOpen: true, editorTextInputList: editorTextInputList});
     }
 
     afterOpenModal() {
@@ -230,10 +230,9 @@ export default class NodeDetails extends React.Component<Props, State> {
                 >
                     <h2>Editor</h2>
                     <button onClick={this.closeModal.bind(this)}>Close</button>
-                    <Editor
+                    <EditorModal
                         name={this.props.name}
-                        input={this.state.editorTextInput}
-                        isModal={true}
+                        inputList={this.state.editorTextInputList}
                         onTransformExprs = {this.transformExprsFromText.bind(this)}
                         saveExprs={this.props.saveExprs.bind(this)}
                     />
@@ -255,7 +254,7 @@ export default class NodeDetails extends React.Component<Props, State> {
 
                     let expr = node.expr.readable;
                     if (this.props.expr_layout==="SMT") {
-                        console.log(node.expr);
+                        {/* console.log(node.expr); */}
                     }
                     else {
                         /* expr = JSON.stringify(this.props.node.ast_json, null, 2); */
@@ -288,52 +287,6 @@ export default class NodeDetails extends React.Component<Props, State> {
                     );
                 })}
             </div>
-    );
-
-
-
-
-        /* let additional_info ="type:" + this.props.node.event_type + " level:" + this.props.node.level */
-        /* let lemma_list = new Array(); */
-
-        //if(this.props.node.event_type == "EType.EXP_POB"){
-        //    lemma_list.push(<h2 key ="lemma-title"> Lemmas summarization </h2>)
-        //    if(this.props.node.exprID in this.props.PobLemmasMap){
-        //        let lemmas = this.props.PobLemmasMap[this.props.node.exprID]
-        //        for (const lemma of lemmas){
-        //            lemma_list.push(<h3 key={"lemma-header-"+ lemma[0]}>ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h3>)
-        //            lemma_list.push(<pre key={"lemma-expr-"+lemma[0]}>{this.props.ExprMap[lemma[0]]}</pre>)
-        //        }
-        //    }
-        //}
-
-        //let expr = ""
-        //if(this.props.expr_layout=="SMT"){
-        //    expr = this.props.node.expr
-        //}else{
-        //    /* expr = JSON.stringify(this.props.node.ast_json, null, 2); */
-        //    if(this.props.node.ast_json){
-        //        expr += this.node_to_string(this.props.node.ast_json, true);
-        //    }
-        //}
-
-        //return (
-        //    <div >
-        //        <section className= { 'component-node-details details-top'} >
-        //        <article>
-        //        <h2>Node <strong>{this.props.node.nodeID}, </strong>Expr < strong > { this.props.node.exprID } </strong>, Parent <strong> {this.props.node.pobID}  </strong></h2 >
-        //        <h3>{additional_info}</h3>
-        //        <pre>{expr}</pre>
-        //        </article>
-        //        </section>
-        //        <section className= { 'component-node-details details-bottom'} >
-        //            <article>
-        //                {lemma_list}
-        //            </article>
-        //        </section>
-        //    </div>
-        //);
-
+        );
     }
-
 }
