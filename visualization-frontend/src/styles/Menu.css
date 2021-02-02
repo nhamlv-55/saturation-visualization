@@ -27,11 +27,20 @@
   color: #64656e;
 }
 
-
-
+.component-menu .editor {
+  display: flex;
+  flex-grow: 1;
+  background: #f8f9fb;
+}
 
 /* INPUT */
-
+.component-menu .editor-spacer {
+    width: 100%;
+    padding: 1.5rem 2rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
 .component-menu main {
   display: flex;
   flex-direction: column;
