@@ -27,16 +27,8 @@
     background: #fff;
     color: rgba(0, 0, 0, .5);
 }
-.tree-editor{
-    display: flex;
-    flex-direction: row;
-}
-.tree-editor #graph-container{
-    display: flex;
-    flex-direction: column;
-    flex: 0 0 70%;
-    padding: 1rem;
-}
+
+
 
 .editor-string-rep{
     max-width: 60rem;
@@ -46,7 +38,7 @@
 }
 
 .tree-editor .editor-component-graph{
-    display:flex;
+    /* display:flex; */
     height: 90rem;
     background: #fff;
 
@@ -55,9 +47,11 @@
 
 
 .tree-editor #transformer-container{
-    display: inline-block;
-    flex: 0 0 28%;
+    position: absolute;
+    top: 10rem;
+    right: 1.5rem;
     padding: 1rem;
+    box-shadow: 1px 3px 10px 0 rgba(0, 0, 0, .1);
 }
 
 .editor-menu{
@@ -78,4 +72,10 @@
 
 .highlighted {
     color: red;
+}
+
+.formula-button{
+    text-align:left;
+    width: 100%;
+    overflow: scroll;
 }
