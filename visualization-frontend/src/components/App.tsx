@@ -295,7 +295,7 @@ class App extends Component<Props, State> {
                     onCurrentTimeChange = { this.updateCurrentTime.bind(this) }
                     layout = { layout }
                     PobLemmasMap = { PobLemmasMap }
-                solvingCompleted = {this.state.solvingCompleted}
+                    solvingCompleted = {this.state.solvingCompleted}
                 />
             );
         } else {
@@ -315,12 +315,11 @@ class App extends Component<Props, State> {
                 >
                     <h2>Final invariant</h2>
                     <button onClick={this.closeStarModal.bind(this)}>Close</button>
-                    {/* <StarModal
+                    <StarModal
                         exp_path = {this.props.exp_path}
                         PobLemmasMap = {this.state.PobLemmasMap}
                         ExprMap = {this.state.ExprMap}
-                        saveExprs = {this.saveExprMap.bind(this)}
-                        /> */}
+                    />
                 </Modal>
                 { main }
                 <Aside
