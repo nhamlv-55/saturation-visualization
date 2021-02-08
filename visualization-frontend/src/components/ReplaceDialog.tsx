@@ -36,10 +36,12 @@ class ReplaceDialog extends React.Component<Props, State> {
         })
     }
 
-
+    handleKeyUp(event) {
+        event.stopPropagation();
+    }
     render() {
         return (
-            <div>
+            <div onKeyUp={this.handleKeyUp}>
                 {`Replace: `}<input type="text" defaultValue="" onChange={this.handleSourceChange.bind(this)} />
                 {` with: `}<input type="text" defaultValue="" onChange={this.handleTargetChange.bind(this)}/>
                 {`\tRegex?`}
