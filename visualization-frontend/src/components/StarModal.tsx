@@ -2,9 +2,8 @@ import * as React from 'react';
 import '../styles/StarModal.css';
 
 import TransformerTable from './TransformerTable';
-const icons = require('../resources/icons/all.svg') as string;
-
 const _ = require("lodash");
+
 type Props = {
     exp_path: string,
     PobLemmasMap: {},
@@ -21,14 +20,12 @@ type State = {
 
 export class StarModal extends React.Component<Props, State> {
     state: State = {
-        localExprMap: this.props.ExprMap,
+        localExprMap: _.cloneDeep(this.props.ExprMap),
         input: "()",
         output: "",
         finalLemmas: this.getFinalInvariant()
     };
 
-
-    
     getFinalInvariant(){
         let finalLemmas: Set<any[]> = new Set<any[]>();
         for(const pob in this.props.PobLemmasMap){
@@ -51,7 +48,10 @@ export class StarModal extends React.Component<Props, State> {
     }
 
     reset(){
-        this.setState({finalLemmas: this.getFinalInvariant()});
+        this.setState({
+            localExprMap: _.cloneDeep(this.props.ExprMap),
+            finalLemmas: this.getFinalInvariant()
+        });
     }
 
     sortByLevel(){
@@ -68,8 +68,7 @@ export class StarModal extends React.Component<Props, State> {
     }
 
     renderFinalInvariant(){
-        let finalLemEdited: JSX.Element[] = [];
-        let finalLemRaw: JSX.Element[] = [];
+        let lemRows: JSX.Element[] = [];
 
         for (const lemma of this.state.finalLemmas){
             const lemma_id = lemma[0];
@@ -80,14 +79,20 @@ export class StarModal extends React.Component<Props, State> {
                 expr_edited = this.state.localExprMap[lemma_id].raw;
                 expr_raw = this.props.ExprMap[lemma_id].raw;
             }
-
-            finalLemEdited.push(<h4 key={"lemma-header-edited-"+ lemma_id}>ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h4>);
-            finalLemEdited.push(<pre>{expr_raw}</pre>);
-
-            finalLemRaw.push(<h4 key={"lemma-header-"+ lemma_id}>ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h4>);
-            finalLemRaw.push(<pre>{expr_edited}</pre>);
+            lemRows.push(<tr>
+                <td>
+                    <h4 key={"lemma-header-edited-"+ lemma_id}>ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h4>
+                </td>
+                <td>
+                </td>
+            </tr>)
+            lemRows.push(<tr>
+                <td><pre>{expr_raw}</pre></td>
+                <td><pre>{expr_edited}</pre></td>
+            </tr>)
         }
-        return {"raw": finalLemRaw, "edited": finalLemEdited};       
+
+        return <table>{lemRows}</table>;
     }
 
 
@@ -110,13 +115,9 @@ export class StarModal extends React.Component<Props, State> {
                     <button onClick={this.reset.bind(this)}>Reset</button>
                 </div> 
                 <div className="star-modal-content">
-                    <div className="raw-inv">
-                        {resJSX["raw"]}
+                    <div className="lemma-table">
+                        {resJSX}
                     </div>
-                    <div className="edited-inv">
-                        {resJSX["edited"]}
-                    </div>
-
                     <div className="learned-ts">
                         <TransformerTable
                             exp_path={this.props.exp_path}

@@ -3,12 +3,10 @@
     flex-direction:row;
 }
 
-.star-modal-content .raw-inv {
-    flex: 0 0 40%;
+.star-modal-content .lemma-table {
+    flex: 0 0 80%;
 }
-.star-modal-content .edited-inv {
-    flex: 0 0 40%;
-}
+
 .star-modal-content .learned-ts {
     flex: 0 0 20%;
 }
