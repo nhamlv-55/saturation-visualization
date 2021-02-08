@@ -71,7 +71,6 @@ export class EditorModal extends React.Component<Props, State> {
                 <section className="editor">
                     <div id="editor-wrapper">
                         <h2>Original</h2>
-                        {/* <button onClick={this.openEditor.bind(this, )}>Open Editor</button> */}
                         {this.props.inputList.map((input, key) => (
                         <button key={key} onClick={this.openEditor.bind(this, input)} className="formula-button">
                                 <pre>
@@ -81,7 +80,6 @@ export class EditorModal extends React.Component<Props, State> {
                             </button>
                         ))}
                     </div>
-                    {/* <TransformerTable/> */}
                     <TreeEditor
                         name ={this.props.name}
                         input = {this.state.selectedInput}
