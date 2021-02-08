@@ -15,9 +15,7 @@ type State = {
     localExprMap: {},
     input: string,
     output: string,
-    finalLemmas: any[][],
-    /* finalLemListRaw: JSX.Element[], */
-    /* finalLemListEdited: JSX.Element[] */
+    finalLemmas: any[][]
 }
 
 
@@ -27,8 +25,6 @@ export class StarModal extends React.Component<Props, State> {
         input: "()",
         output: "",
         finalLemmas: this.getFinalInvariant()
-        /* finalLemListEdited: [], */
-        /* finalLemListRaw: [] */
     };
 
 
@@ -72,9 +68,6 @@ export class StarModal extends React.Component<Props, State> {
     }
 
     renderFinalInvariant(){
-        /* if(finalLemmas === null){
-         *     finalLemmas = this.state.finalLemmas;
-         * } */
         let finalLemEdited: JSX.Element[] = [];
         let finalLemRaw: JSX.Element[] = [];
 

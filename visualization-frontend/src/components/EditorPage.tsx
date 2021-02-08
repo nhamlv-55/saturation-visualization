@@ -120,8 +120,6 @@ export class EditorPage extends React.Component<Props, State> {
                         <h2>Transformed</h2>
                         <textarea ref="output" id="output" rows={30} value={this.state.output} readOnly></textarea>
                     </div>
-                    {/* <TransformerTable/> */}
-
                      <TreeEditor
                          name ={this.props.name}
                          input = {this.state.input}
