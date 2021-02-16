@@ -103,8 +103,8 @@ export class Menu extends React.Component<Props, State>{
                 <Modal
                     isOpen={this.state.uploadModalIsOpen}
                     onRequestClose={this.closeUploadModal.bind(this)}
-                    overlayClassName="editor-modal"
-                    contentLabel="Example Modal"
+                    className ="upload-modal"
+                    overlayClassName ="upload-modal-overlay"
                 >
                     <button onClick={this.closeUploadModal.bind(this)}>Close</button>
                     <UploadSpacerLogModal/>
