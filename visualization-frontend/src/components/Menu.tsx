@@ -5,7 +5,8 @@ import * as Monaco from 'monaco-editor'
 import ExpTable from './ExpTable';
 import { assert } from '../model/util';
 import MenuOptions from "./MenuOptions";
-
+import {UploadSpacerLogModal} from "./UploadSpacerLogModal";
+import Modal from 'react-modal';
 const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
@@ -24,12 +25,21 @@ type Props = {
     onChangeVariables: (newValue: string) => void
 }
 
-export class Menu extends React.Component<Props, {}> {
+type State = {
+    uploadModalIsOpen: boolean
+}
+
+export class Menu extends React.Component<Props, State>{
+    state = {
+        uploadModalIsOpen: false
+    }
     // private isChromeOrFirefox = navigator.userAgent.indexOf('Chrome') > -1 || navigator.userAgent.indexOf('Firefox') > -1;
     private isChromeOrFirefox = true;
     private fileUpload = React.createRef<HTMLInputElement>();
     monacoDiv = React.createRef<HTMLDivElement>();
     monaco: Monaco.editor.IStandaloneCodeEditor | null = null
+
+
 
     componentDidMount() {
         if (!this.isChromeOrFirefox) {
@@ -66,6 +76,14 @@ export class Menu extends React.Component<Props, {}> {
             this.monaco!.setValue(this.props.problem);
         }
     }
+    openUploadModal(){
+        this.setState({uploadModalIsOpen: true});
+    }
+
+    closeUploadModal(){
+        this.setState({uploadModalIsOpen: false});
+    }
+
 
     render() {
         if (!this.isChromeOrFirefox) {
@@ -82,13 +100,22 @@ export class Menu extends React.Component<Props, {}> {
         return (
             <section className="component-menu">
                 <h1>Spacer Visualization</h1>
-
+                <Modal
+                    isOpen={this.state.uploadModalIsOpen}
+                    onRequestClose={this.closeUploadModal.bind(this)}
+                    overlayClassName="editor-modal"
+                    contentLabel="Example Modal"
+                >
+                    <button onClick={this.closeUploadModal.bind(this)}>Close</button>
+                    <UploadSpacerLogModal/>
+                </Modal>
                 <section className="editor">
                     <div className="editor-spacer">
                         <main>
                             <div className="headline-wrapper">
                                 <h2>Input</h2>
                                 <small className="file-name">{this.props.problemName}</small>
+                                <button onClick={this.openUploadModal.bind(this)} >Upload spacer.log</button>
                                 <button title="Pick a new file" onClick={this.chooseFile.bind(this)}>
                                     <svg viewBox="0 0 24 24" className="icon big">
                                         <use xlinkHref={`${icons}#graph-upload`}/>
