@@ -10,7 +10,6 @@ type State = {
     problem: string,
     problemName: string,
     spacerUserOptions: string,
-    hideBracketsAssoc: boolean,
     nonStrictForNegatedStrictInequalities: boolean,
     orientClauses: boolean
     varNames: string
@@ -23,7 +22,6 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
         problem: "",
         problemName: "",
         spacerUserOptions: "",
-        hideBracketsAssoc: true,
         nonStrictForNegatedStrictInequalities: true,
         orientClauses: true,
         varNames: "",
@@ -38,13 +36,11 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
                         problem={this.state.problem}
                                 problemName={this.state.problemName}
                                 spacerUserOptions={this.state.spacerUserOptions}
-                                hideBracketsAssoc={this.state.hideBracketsAssoc}
                                 nonStrictForNegatedStrictInequalities={this.state.nonStrictForNegatedStrictInequalities}
                                 orientClauses={this.state.orientClauses}
                                 onChangeProblem={this.changeProblem.bind(this)}
                                 onChangeProblemName={this.changeProblemName.bind(this)}
                                 onChangeSpacerUserOptions={this.changeSpacerUserOptions.bind(this)}
-                                onChangeHideBracketsAssoc={this.changeHideBracketsAssoc.bind(this)}
                                 onChangeNonStrictForNegatedStrictInequalities={this.changeNonStrictForNegatedStrictInequalities.bind(this)}
                                 onChangeOrientClauses={this.changeOrientClauses.bind(this)}
                                 onChangeVariables={this.changeVariables.bind(this)}
@@ -83,7 +79,6 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
         mode={mode}
         problem={this.state.problem!}
         spacerUserOptions={spacerUserOptions}
-        hideBracketsAssoc={this.state.hideBracketsAssoc}
         nonStrictForNegatedStrictInequalities={this.state.nonStrictForNegatedStrictInequalities}
         orientClauses={this.state.orientClauses}
         varNames={this.state.varNames}
@@ -110,9 +105,7 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
     changeSpacerUserOptions(spacerUserOptions: string) {
         this.setState({spacerUserOptions: spacerUserOptions});
     }
-    changeHideBracketsAssoc(newValue: boolean) {
-        this.setState({hideBracketsAssoc: newValue});
-    }
+
     changeNonStrictForNegatedStrictInequalities(newValue: boolean) {
         this.setState({nonStrictForNegatedStrictInequalities: newValue});
     }
