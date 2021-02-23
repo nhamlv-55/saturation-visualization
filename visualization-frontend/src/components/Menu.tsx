@@ -107,9 +107,6 @@ class Menu extends React.Component<{} & RouteComponentProps<{}>, State>{
                 console.log("redirect to ", newPath)
                 console.log(this.props.history);
                 this.props.history.push(newPath);
-
-
-
             } else {
                 assert(json.status === "error");
                 const errorMess = json.message;
@@ -183,7 +180,7 @@ class Menu extends React.Component<{} & RouteComponentProps<{}>, State>{
                         <aside>
                             <MenuOptions 
                                 spacerUserOptions = {this.state.spacerUserOptions}
-                                onChangeVariables = {this.onChangeVariables.bind(this)}
+                                onChangeVariables = {this.changeVariables.bind(this)}
                                 changeSpacerUserOptions={this.changeSpacerUserOptions.bind(this)}
                             />
                             <ExpTable/>
@@ -212,13 +209,10 @@ class Menu extends React.Component<{} & RouteComponentProps<{}>, State>{
     changeSpacerUserOptions(spacerUserOptions: string) {
         this.setState({spacerUserOptions: spacerUserOptions});
     }
-    changeVariables(newValue: string){
+    changeVariables(e){
         this.setState({
-            varNames: newValue
+            varNames: e.target.value
         });
-    }
-    onChangeVariables(e) {
-        this.changeVariables(e.target.value);
     }
 
     uploadEncoding(event: React.ChangeEvent<HTMLInputElement>) {
