@@ -8,7 +8,6 @@ type Props = {
     exp_path: string,
     spacerUserOptions: string,
     mode: "proof" | "replay" | "iterative"
-    hideBracketsAssoc: boolean,
     nonStrictForNegatedStrictInequalities: boolean, 
     orientClauses: boolean,
     varNames: string
@@ -24,7 +23,6 @@ export class AppWrapper extends React.Component<Props, {}> {
                     exp_path = {this.props.exp_path}
                     spacerUserOptions={this.props.spacerUserOptions}
                     mode={this.props.mode}
-                    hideBracketsAssoc={this.props.hideBracketsAssoc}
                     nonStrictForNegatedStrictInequalities={this.props.nonStrictForNegatedStrictInequalities}
                     orientClauses={this.props.orientClauses}
                     varNames={this.props.varNames}

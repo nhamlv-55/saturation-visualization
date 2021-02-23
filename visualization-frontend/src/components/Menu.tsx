@@ -13,13 +13,11 @@ type Props = {
     problem: string,
     problemName: string,
     spacerUserOptions: string,
-    hideBracketsAssoc: boolean,
     nonStrictForNegatedStrictInequalities: boolean
     orientClauses: boolean,
     onChangeProblem: (problem: string) => void,
     onChangeProblemName: (problemName: string) => void,
     onChangeSpacerUserOptions: (spacerUserOptions: string) => void,
-    onChangeHideBracketsAssoc: (newValue: boolean) => void,
     onChangeNonStrictForNegatedStrictInequalities: (newValue: boolean) => void,
     onChangeOrientClauses: (newValue: boolean) => void
     onChangeVariables: (newValue: string) => void
@@ -115,7 +113,12 @@ export class Menu extends React.Component<Props, State>{
                             <div className="headline-wrapper">
                                 <h2>Input</h2>
                                 <small className="file-name">{this.props.problemName}</small>
-                                <button onClick={this.openUploadModal.bind(this)} >Upload spacer.log</button>
+
+                                <button title="Upload Spacer log " onClick={this.openUploadModal.bind(this)}>
+                                    <svg viewBox="0 0 24 24" className="icon big">
+                                        <use xlinkHref={`${icons}#graph-s`}/>
+                                    </svg>
+                                </button>
                                 <button title="Pick a new file" onClick={this.chooseFile.bind(this)}>
                                     <svg viewBox="0 0 24 24" className="icon big">
                                         <use xlinkHref={`${icons}#graph-upload`}/>

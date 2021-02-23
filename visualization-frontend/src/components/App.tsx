@@ -16,7 +16,6 @@ type Props = {
     mode: "proof" | "replay" | "iterative",
     problem: string,
     spacerUserOptions: string,
-    hideBracketsAssoc: boolean,
     nonStrictForNegatedStrictInequalities: boolean,
     orientClauses: boolean,
     varNames: string
