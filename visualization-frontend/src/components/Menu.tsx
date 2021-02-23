@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {Link} from 'react-router-dom';
 import '../styles/Menu.css';
 import * as Monaco from 'monaco-editor'
 import ExpTable from './ExpTable';
@@ -7,37 +6,37 @@ import { assert } from '../model/util';
 import MenuOptions from "./MenuOptions";
 import {UploadSpacerLogModal} from "./UploadSpacerLogModal";
 import Modal from 'react-modal';
+import { RouteComponentProps } from 'react-router';
+import { withRouter } from 'react-router-dom';
+
 const icons = require('../resources/icons/all.svg') as string;
 
-type Props = {
+
+type State = {
+    uploadModalIsOpen: boolean,
     problem: string,
     problemName: string,
     spacerUserOptions: string,
-    nonStrictForNegatedStrictInequalities: boolean
-    orientClauses: boolean,
-    onChangeProblem: (problem: string) => void,
-    onChangeProblemName: (problemName: string) => void,
-    onChangeSpacerUserOptions: (spacerUserOptions: string) => void,
-    onChangeNonStrictForNegatedStrictInequalities: (newValue: boolean) => void,
-    onChangeOrientClauses: (newValue: boolean) => void
-    onChangeVariables: (newValue: string) => void
+    varNames: string,
+    messagesQ: string[],
+    newProblemUploaded: boolean
 }
 
-type State = {
-    uploadModalIsOpen: boolean
-}
-
-export class Menu extends React.Component<Props, State>{
+class Menu extends React.Component<{} & RouteComponentProps<{}>, State>{
     state = {
-        uploadModalIsOpen: false
+        uploadModalIsOpen: false,
+        problem: "",
+        problemName: "",
+        spacerUserOptions: "",
+        varNames: "",
+        messagesQ: [],
+        newProblemUploaded: false
     }
     // private isChromeOrFirefox = navigator.userAgent.indexOf('Chrome') > -1 || navigator.userAgent.indexOf('Firefox') > -1;
     private isChromeOrFirefox = true;
     private fileUpload = React.createRef<HTMLInputElement>();
     monacoDiv = React.createRef<HTMLDivElement>();
     monaco: Monaco.editor.IStandaloneCodeEditor | null = null
-
-
 
     componentDidMount() {
         if (!this.isChromeOrFirefox) {
@@ -62,16 +61,17 @@ export class Menu extends React.Component<Props, State>{
             wordWrap: 'wordWrapColumn'
             // fontFamily: "Monaco" TODO: decide which font to use. By default, multiple fonts are loaded, which is quite slow
         });
-        this.monaco.setValue(this.props.problem);
+        this.monaco.setValue(this.state.problem);
         this.monaco.getModel()!.onDidChangeContent(() => {
-            this.props.onChangeProblem(this.monaco!.getModel()!.getValue());
+            this.changeProblem(this.monaco!.getModel()!.getValue());
         });
     }
 
-    componentDidUpdate(prevProps: Props) {
+    componentDidUpdate(prevState: State) {
         assert(this.isChromeOrFirefox);
-        if (this.props.problem !== prevProps.problem) {
-            this.monaco!.setValue(this.props.problem);
+        if (this.state.newProblemUploaded) {
+            this.monaco!.setValue(this.state.problem);
+            this.setState({newProblemUploaded: false});
         }
     }
     openUploadModal(){
@@ -80,6 +80,52 @@ export class Menu extends React.Component<Props, State>{
 
     closeUploadModal(){
         this.setState({uploadModalIsOpen: false});
+    }
+
+    async runSpacer() {
+        const fetchedJSON = await fetch('http://localhost:5000/spacer/start_iterative', {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: this.state.problemName,
+                file: this.state.problem,
+                spacerUserOptions: this.state.spacerUserOptions,
+                varNames: this.state.varNames
+            })
+        });
+
+        try {
+            const json = await fetchedJSON.json();
+            console.log("backend response:", json);
+            if (json.status === "success") {
+                //Redirect when success
+                const newPath = "/replay/"+json.exp_name;
+                console.log("redirect to ", newPath)
+                console.log(this.props.history);
+                this.props.history.push(newPath);
+
+
+
+            } else {
+                assert(json.status === "error");
+                const errorMess = json.message;
+                assert(errorMess !== undefined && errorMess !== null);
+                this.setState({
+                    messagesQ: [errorMess],
+                });
+            }
+        } catch (error) {
+            if (error.name === "SatVisAssertionError") {
+                throw error;
+            }
+            this.setState({
+                messagesQ: [`Error: ${error["message"]}`],
+            });
+        }
     }
 
 
@@ -112,7 +158,7 @@ export class Menu extends React.Component<Props, State>{
                         <main>
                             <div className="headline-wrapper">
                                 <h2>Input</h2>
-                                <small className="file-name">{this.props.problemName}</small>
+                                <small className="file-name">{this.state.problemName}</small>
 
                                 <button title="Upload Spacer log " onClick={this.openUploadModal.bind(this)}>
                                     <svg viewBox="0 0 24 24" className="icon big">
@@ -136,9 +182,9 @@ export class Menu extends React.Component<Props, State>{
 
                         <aside>
                             <MenuOptions 
-                                spacerUserOptions = {this.props.spacerUserOptions}
+                                spacerUserOptions = {this.state.spacerUserOptions}
                                 onChangeVariables = {this.onChangeVariables.bind(this)}
-                                changeSpacerUserOptions={this.props.onChangeSpacerUserOptions.bind(this)}
+                                changeSpacerUserOptions={this.changeSpacerUserOptions.bind(this)}
                             />
                             <ExpTable/>
                         </aside>
@@ -146,7 +192,7 @@ export class Menu extends React.Component<Props, State>{
                 </section>
 
                 <section className="run-menu">
-                    <Link to="/iterative/" className="fake-button">Hit and Run</Link>
+                    <button onClick={this.runSpacer.bind(this)}>Hit and Run</button>
                 </section>
             </section>
         );
@@ -157,9 +203,22 @@ export class Menu extends React.Component<Props, State>{
             this.fileUpload.current.click();
         }
     }
-
+    changeProblem(problem: string) {
+        this.setState({problem: problem});
+    }
+    changeProblemName(problemName: string) {
+        this.setState({problemName: problemName});
+    }
+    changeSpacerUserOptions(spacerUserOptions: string) {
+        this.setState({spacerUserOptions: spacerUserOptions});
+    }
+    changeVariables(newValue: string){
+        this.setState({
+            varNames: newValue
+        });
+    }
     onChangeVariables(e) {
-        this.props.onChangeVariables(e.target.value);
+        this.changeVariables(e.target.value);
     }
 
     uploadEncoding(event: React.ChangeEvent<HTMLInputElement>) {
@@ -170,11 +229,12 @@ export class Menu extends React.Component<Props, State>{
             // callback which will be executed when readAsText is called
             reader.onloadend = () => {
                 const text = (reader.result ? reader.result : '') as string;
-                this.props.onChangeProblem(text);
-                this.props.onChangeProblemName(file.name);
-
+                this.changeProblem(text);
+                this.changeProblemName(file.name);
+                this.setState({newProblemUploaded: true});
             };
             reader.readAsText(file);
         }
     }
 }
+export default withRouter(Menu);

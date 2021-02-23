@@ -7,7 +7,6 @@ const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
     messages_q: string[],
-    mode: "proof" | "replay" | "iterative",
     tree: any | null,
     nodeSelection: number[],
     onUpdateNodeSelection: (selection: number[]) => void,
@@ -82,7 +81,6 @@ class Aside extends React.Component<Props, State> {
     }
 
     render() {
-        console.log(this.props.mode);
         return(
             <aside>
                 <article>
