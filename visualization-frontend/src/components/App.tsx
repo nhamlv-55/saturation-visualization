@@ -11,14 +11,7 @@ import {replaceVarNames, toReadable} from "../helpers/readable";
 
 import Modal from 'react-modal';
 type Props = {
-    name: string,
     exp_path: string,
-    mode: "proof" | "replay" | "iterative",
-    problem: string,
-    spacerUserOptions: string,
-    nonStrictForNegatedStrictInequalities: boolean,
-    orientClauses: boolean,
-    varNames: string
 };
 
 type State = {
@@ -60,13 +53,7 @@ class App extends Component<Props, State> {
     };
 
     async componentDidMount() {
-        if(this.props.mode === "iterative"){
-            // call Spacer on given input problem
-            await this.runSpacer(this.props.problem, this.props.spacerUserOptions, this.props.mode);
-        }
-        else {
-            await this.poke();
-        }
+        await this.poke();
     }
 
     async poke() {
@@ -152,58 +139,6 @@ class App extends Component<Props, State> {
         });
     }
 
-    async runSpacer(problem: string, spacerUserOptions: string, mode: "proof" | "replay" | "iterative") {
-        this.setState({
-            state: "waiting",
-            messages_q: ["Waiting for Spacer..."],
-        });
-
-        const fetchedJSON = await fetch('http://localhost:5000/spacer/start_iterative', {
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                name: this.props.name,
-                file: problem,
-                spacerUserOptions: spacerUserOptions,
-                varNames: this.props.varNames
-            })
-        });
-
-        try {
-            const json = await fetchedJSON.json();
-            console.log("backend response:", json);
-            if (json.status === "success") {
-                const state = (mode === "iterative" && json.spacer_state === "running") ? "loaded iterative" : "loaded";
-                const messages_q = ["Hit Poke to update graph"];
-                this.setState({
-                    exp_path: json.exp_name,
-                    messages_q: messages_q,
-                    state: state,
-                });
-            } else {
-                assert(json.status === "error");
-                const errorMess = json.message;
-                assert(errorMess !== undefined && errorMess !== null);
-                this.setState({
-                    state: "error",
-                    messages_q: [errorMess],
-                });
-            }
-        } catch (error) {
-            if (error.name === "SatVisAssertionError") {
-                throw error;
-            }
-            this.setState({
-                state: "error",
-                messages_q: [`Error: ${error["message"]}`],
-            });
-        }
-    }
-
     updateNodeSelection(nodeSelection: number[]) {
         if (this.state.multiselect) {
             let tempNodeSelection = this.state.nodeSelection.slice(this.state.nodeSelection.length-1).concat(nodeSelection);
@@ -284,7 +219,6 @@ class App extends Component<Props, State> {
             const hL = Object.keys(tree).length;
             main = (
                 <Main
-                    mode = { this.props.mode }
                     runCmd = {runCmd}
                     tree = { tree }
                     onNodeSelectionChange = { this.updateNodeSelection.bind(this) }
@@ -323,7 +257,6 @@ class App extends Component<Props, State> {
                 { main }
                 <Aside
                     messages_q = {messages_q}
-                    mode = { this.props.mode }
                     tree = { tree }
                     nodeSelection = { nodeSelection }
                     onUpdateNodeSelection = { this.updateNodeSelection.bind(this) }

@@ -1,30 +1,18 @@
 import * as React from 'react';
 import { HashRouter, Route} from "react-router-dom";
-import { AppWrapper } from './AppWrapper'
-import { Menu } from './Menu';
+import App from './App';
+import Menu from './Menu';
 import { RouteComponentProps } from 'react-router';
 import Dashboard from "./Dashboard";
 import DashboardLanding from "./DashboardLanding";
 import { EditorPage } from "./EditorPage";
+import '../styles/AppWrapper.css';
 type State = {
-    problem: string,
-    problemName: string,
-    spacerUserOptions: string,
-    nonStrictForNegatedStrictInequalities: boolean,
-    orientClauses: boolean
-    varNames: string
     rawData: {name: string, id: string, content: string}[]
 }
 
 export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, State> {
-
     state: State = {
-        problem: "",
-        problemName: "",
-        spacerUserOptions: "",
-        nonStrictForNegatedStrictInequalities: true,
-        orientClauses: true,
-        varNames: "",
         rawData: []
     };
 
@@ -32,25 +20,10 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
         return (
             <HashRouter>
                 <Route path="/" exact render={() => 
-                    <Menu 
-                        problem={this.state.problem}
-                                problemName={this.state.problemName}
-                                spacerUserOptions={this.state.spacerUserOptions}
-                                nonStrictForNegatedStrictInequalities={this.state.nonStrictForNegatedStrictInequalities}
-                                orientClauses={this.state.orientClauses}
-                                onChangeProblem={this.changeProblem.bind(this)}
-                                onChangeProblemName={this.changeProblemName.bind(this)}
-                                onChangeSpacerUserOptions={this.changeSpacerUserOptions.bind(this)}
-                                onChangeNonStrictForNegatedStrictInequalities={this.changeNonStrictForNegatedStrictInequalities.bind(this)}
-                                onChangeOrientClauses={this.changeOrientClauses.bind(this)}
-                                onChangeVariables={this.changeVariables.bind(this)}
-                    />
+                    <Menu />
                 }/>
                 <Route path="/replay/:exp_id" render={({match}) => 
-                    this.appComponent("replay", match.params.exp_id)
-                }/>
-                <Route path="/iterative/" render={() => 
-                    this.appComponent("iterative", "")
+                    this.appComponent(match.params.exp_id)
                 }/>
                 <Route exact path="/dashboard/" render={() =>
                     <DashboardLanding 
@@ -71,18 +44,14 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
         );
     }
 
-    appComponent(mode: "replay" | "iterative", exp_path: string) {
-        const spacerUserOptions = `${this.state.spacerUserOptions}`;
-        return <AppWrapper
-        name={this.state.problemName}
-        exp_path ={exp_path}
-        mode={mode}
-        problem={this.state.problem!}
-        spacerUserOptions={spacerUserOptions}
-        nonStrictForNegatedStrictInequalities={this.state.nonStrictForNegatedStrictInequalities}
-        orientClauses={this.state.orientClauses}
-        varNames={this.state.varNames}
-        />
+    appComponent(exp_path: string) {
+        return (
+            <div id="appWrapper">
+            <App 
+            exp_path = {exp_path}
+            />
+        </div>
+        )
     }
     
     displayVisualization(fileId: string) {
@@ -94,28 +63,6 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
                 />
             );
         }
-    }
-
-    changeProblem(problem: string) {
-        this.setState({problem: problem});
-    }
-    changeProblemName(problemName: string) {
-        this.setState({problemName: problemName});
-    }
-    changeSpacerUserOptions(spacerUserOptions: string) {
-        this.setState({spacerUserOptions: spacerUserOptions});
-    }
-
-    changeNonStrictForNegatedStrictInequalities(newValue: boolean) {
-        this.setState({nonStrictForNegatedStrictInequalities: newValue});
-    }
-    changeOrientClauses(newValue: boolean) {
-        this.setState({orientClauses: newValue});
-    }
-    changeVariables(newValue: string){
-        this.setState({
-            varNames: newValue
-        });
     }
     
     changeRawData(newValue: {name:string, id:string, content:string}){
