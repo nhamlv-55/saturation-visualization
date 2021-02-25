@@ -5,7 +5,7 @@ import { DataSet, Network, Node, Edge } from 'vis'
 import ReplaceDialog from './ReplaceDialog'
 const _ = require("lodash");
 type Props = {
-    name: string,
+    expName: string,
     input: string,
     onBlast: (tStack: Transformer[])=>void| null,
     isModal: boolean,
@@ -182,7 +182,7 @@ class TreeEditor extends React.Component<Props, State> {
             "inputOutputExamples":[{"input": inputAST.toString(-1, inputAST.nodeList[0]),
                                  "output": outputAST.toString(-1, outputAST.nodeList[0]),
                                  "aux": [""]}],
-            "exp_path": this.props.name,
+            "expName": this.props.expName,
             "type": this.transformerStack[0].action
         };
         if (payload["type"] === "replace") {

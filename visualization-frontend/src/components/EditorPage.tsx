@@ -7,7 +7,7 @@ const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
     input: string,
-    name: string,
+    expName: string,
     onTransformExprs?: (t: string)=> Promise<void>,
     saveExprs?: ()=> void,
 }
@@ -121,7 +121,7 @@ export class EditorPage extends React.Component<Props, State> {
                         <textarea ref="output" id="output" rows={30} value={this.state.output} readOnly></textarea>
                     </div>
                      <TreeEditor
-                         name ={this.props.name}
+                         expName ={this.props.expName}
                          input = {this.state.input}
                          onBlast = {this.blast.bind(this)}
                          isModal = {false}

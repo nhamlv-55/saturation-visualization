@@ -22,8 +22,8 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
                 <Route path="/" exact render={() => 
                     <Menu />
                 }/>
-                <Route path="/replay/:exp_id" render={({match}) => 
-                    this.appComponent(match.params.exp_id)
+                <Route path="/replay/:expName" render={({match}) => 
+                    this.appComponent(match.params.expName)
                 }/>
                 <Route exact path="/dashboard/" render={() =>
                     <DashboardLanding 
@@ -36,7 +36,7 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
                 }/>
                 <Route exact path="/editor/" render={() =>
                     <EditorPage
-                        name=""
+                        expName=""
                         input=""
                     />
                 }/>
@@ -44,11 +44,11 @@ export class AppRouter extends React.Component<{} & RouteComponentProps<{}>, Sta
         );
     }
 
-    appComponent(exp_path: string) {
+    appComponent(expName: string) {
         return (
             <div id="appWrapper">
             <App 
-            exp_path = {exp_path}
+            expName = {expName}
             />
         </div>
         )

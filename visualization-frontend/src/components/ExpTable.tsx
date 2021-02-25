@@ -27,7 +27,7 @@ export default class ExpTable extends React.Component<Props, State> {
         return (
                 <div>
                 {this.state.exps.map((item, index) => (
-                        <h5 key = {item.name}><Link to={{pathname: `/replay/${item.name}`}} >{item.name}</Link> ${item.done}</h5>
+                        <h5 key = {item.exp_name}><Link to={{pathname: `/replay/${item.exp_name}`}} >{item.exp_name}</Link> ${item.done}</h5>
                 ))}
                 <p>{this.state.isFetching ? 'Fetching experiments...' : ''}</p>
                 </div>

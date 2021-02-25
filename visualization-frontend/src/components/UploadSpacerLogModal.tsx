@@ -66,6 +66,7 @@ export class UploadSpacerLogModal extends React.Component<Props, State> {
                 expName: this.state.expName,
                 inputProblem: this.state.inputProblem,
                 spacerLog: this.state.spacerLog,
+                spacerState: "uploaded"
             })
         })
 

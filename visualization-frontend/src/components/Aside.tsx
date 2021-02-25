@@ -22,7 +22,7 @@ type Props = {
     layout: string,
     expr_layout: "SMT"|"JSON",
     saveExprs: () => void,
-    name: string,
+    expName: string,
     solvingCompleted: boolean
 };
 
@@ -56,7 +56,7 @@ class Aside extends React.Component<Props, State> {
             }
             return <NodeDetails
                        nodes={nodes}
-                       name={this.props.name}
+                       expName={this.props.expName}
                        PobLemmasMap = { this.props.PobLemmasMap }
                        ExprMap = { this.props.ExprMap }
                        layout = { this.props.layout }
@@ -93,6 +93,7 @@ class Aside extends React.Component<Props, State> {
                         { this.createButton("SatVis", this.props.SatVisLayout, "node-parents") }
                         { this.createButton("PobVis", this.props.PobVisLayout, "node-children") }
                         { this.createButton("MultiSelect", this.props.MultiSelectMode, "history-forward") }
+                        {/* NHAM: Seems like new pyparser broke my ast to json parser in the backend. */}
                         <button
                             title = "SMT"
                             onClick = { this.props.SMTLayout }
@@ -113,7 +114,7 @@ class Aside extends React.Component<Props, State> {
                 </article>
                 { this.getNodeDetails() }
                 <ExprMapSelector
-                    name = {this.props.name}
+                    expName = {this.props.expName}
                     updateRelatedExprMap = {this.updateRelatedExprMap.bind(this)}
                 />
             </aside>

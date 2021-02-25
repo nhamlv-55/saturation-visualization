@@ -67,6 +67,11 @@ class Menu extends React.Component<{} & RouteComponentProps<{}>, State>{
         });
     }
 
+    componentWillUnmount(){
+        this.monaco = null;
+    }
+
+
     componentDidUpdate(prevState: State) {
         assert(this.isChromeOrFirefox);
         if (this.state.newProblemUploaded) {
@@ -91,7 +96,7 @@ class Menu extends React.Component<{} & RouteComponentProps<{}>, State>{
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                name: this.state.problemName,
+                expName: this.state.problemName,
                 file: this.state.problem,
                 spacerUserOptions: this.state.spacerUserOptions,
                 varNames: this.state.varNames
