@@ -6,10 +6,12 @@ import Aside from './Aside';
 import {StarModal} from './StarModal';
 import '../styles/App.css';
 import { assert } from '../model/util';
-import {buildExprMap, buildPobLemmasMap} from "../helpers/network";
+import {ExprItem, buildExprMap, buildPobLemmasMap} from "../helpers/network";
 import {replaceVarNames, toReadable} from "../helpers/readable";
-
+import DumbReplaceModal from "./DumbReplaceModal";
 import Modal from 'react-modal';
+const _ = require("lodash");
+
 type Props = {
     expName: string,
 };
@@ -81,8 +83,7 @@ class App extends Component<Props, State> {
         try {
             const json = await fetchedJSON.json();
             console.log("backend response:", json);
-            message_q = ["Get response from Backend."]
-            let tree = json.nodes_list;
+            let tree = json["nodes_list"];
             for (let i = 0; i < Object.keys(tree).length; i++){
                 let rawWithVars = replaceVarNames(tree[i].expr, json.var_names);
                 let readable = toReadable(rawWithVars);
@@ -140,6 +141,26 @@ class App extends Component<Props, State> {
             })
         });
     }
+
+    applyDumbReplaceMap(newReplaceMap: string){
+        try{
+            var newReplaceMapJSON: {};
+            newReplaceMapJSON = JSON.parse(newReplaceMap);
+
+            var newExprMap = _.cloneDeep(this.state.ExprMap);
+            for(let key in newExprMap) {
+                for (let source in newReplaceMapJSON){
+                    newExprMap[key].readable = newExprMap[key].readable.replaceAll(source, newReplaceMapJSON[source]);
+                    newExprMap[key].editedReadable = newExprMap[key].editedReadable.replaceAll(source, newReplaceMapJSON[source]);
+                }
+            }
+
+            this.setState({dumbReplaceMap: newReplaceMapJSON, ExprMap: newExprMap});
+        }catch(error){
+            this.setState({messages_q: [`Error in applyDumbReplaceMap: ${error["message"]}`]});
+        }
+    }
+
 
     updateNodeSelection(nodeSelection: number[]) {
         if (this.state.multiselect) {
@@ -258,6 +279,10 @@ class App extends Component<Props, State> {
                     />
                 </Modal>
                 { main }
+                <DumbReplaceModal
+                    dumbReplaceMap ={this.state.dumbReplaceMap}
+                    onApplyDumbReplaceMap={this.applyDumbReplaceMap.bind(this)}
+                />
                 <Aside
                     messages_q = {messages_q}
                     tree = { tree }
