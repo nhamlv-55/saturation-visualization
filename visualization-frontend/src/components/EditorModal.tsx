@@ -1,8 +1,7 @@
 import * as React from 'react';
 import '../styles/Editor.css';
 import TreeEditor from "./TreeEditor";
-import { AST, ASTTransformer, Transformer} from "../helpers/transformers";
-const icons = require('../resources/icons/all.svg') as string;
+import { Transformer } from "../helpers/transformers";
 
 type Props = {
     inputList: string[],
@@ -36,21 +35,6 @@ export class EditorModal extends React.Component<Props, State> {
 
     blast(tStack: Transformer[]){
         return;
-        /* let transformer = new ASTTransformer();
-
-
-         * console.log(all_formulas);
-         * console.log(tStack);
-         * console.log("pew pew !");
-
-         * let output=""
-         * for(var f of all_formulas){
-         *     let ast = new AST(f);
-         *     let new_ast = transformer.runStack(ast, tStack);
-         *     let new_f = new_ast.toString(-1, new_ast.nodeList[0]);
-         *     output+=new_f+"\n\n";
-         * }
-         * this.setState({output: output}); */
     }
     
     render() {
