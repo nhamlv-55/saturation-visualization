@@ -50,7 +50,7 @@ function parseResult(lst, sep) {
 
     //handles indexing into an array
     if (lst[0] === "select") {
-        return lst[1] + "[" + lst[2] + "]";
+        return lst[1] + "[" + parseResult(lst[2], "") + "]";
     }
 
     //Adds not symbol (!) to beginning of clause
