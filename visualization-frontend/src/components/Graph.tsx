@@ -16,16 +16,7 @@ type Props = {
     PobLemmasMap: any,
 };
 
-type State = {
-    metaPressed: boolean,
-};
-
 export default class Graph extends React.Component<Props, {}> {
-
-    state: State = {
-        metaPressed: false,
-    };
-
     network: Network | null = null;
     networkNodes = new DataSet<Node>([]);
     networkEdges = new DataSet<Edge>([]);
