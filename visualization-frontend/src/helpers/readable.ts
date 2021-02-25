@@ -74,7 +74,7 @@ function parseResult(lst, sep) {
 
     //handler for negative numbers which come in the form (- x)
     if (lst[0] === "-"){
-        return lst[0] + lst[1];
+        return lst[0] + parseResult(lst[1], "");
     }
 
     //handler for denoting invariants. Ex. Inv (...)
