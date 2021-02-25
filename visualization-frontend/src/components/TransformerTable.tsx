@@ -3,7 +3,7 @@ import '../styles/NodeMenu.css';
 import {Link} from 'react-router-dom';
 
 type Props = {
-    exp_path: string,
+    expName: string,
     ExprMap: {},
     onUpdateLocalExprMap: ({}) => void
 };
@@ -55,7 +55,7 @@ export default class TransformerTable extends React.Component<Props, State> {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }, body : JSON.stringify({
-                exp_path: this.props.exp_path,
+                expName: this.props.expName,
                 selectedProgram: programs,
                 lemmas: this.props.ExprMap
             })
@@ -95,7 +95,7 @@ export default class TransformerTable extends React.Component<Props, State> {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }, body : JSON.stringify({
-                "exp_path": this.props.exp_path
+                "expName": this.props.expName
             })
         });
 

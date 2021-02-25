@@ -1,13 +1,12 @@
 import * as React from 'react';
 import '../styles/Editor.css';
-import * as Monaco from 'monaco-editor'
 import TreeEditor from "./TreeEditor";
 import { AST, ASTTransformer, Transformer} from "../helpers/transformers";
 const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
     inputList: string[],
-    name: string,
+    expName: string,
     onTransformExprs?: (t: string)=> Promise<void>,
     saveExprs?: ()=> void,
 }
@@ -55,17 +54,6 @@ export class EditorModal extends React.Component<Props, State> {
     }
     
     render() {
-        if (!this.isChromeOrFirefox) {
-            return (
-                <section className="unsupported-message">
-                    <svg viewBox="0 0 24 24" className="icon">
-                        <use xlinkHref={`${icons}#alert-triangle`}/>
-                    </svg>
-                    <span>Your current browser is not supported. Please use Chrome or Firefox!</span>
-                </section>
-            );
-        }
-
         return (
             <section className="formula-editor-modal">
                 <section className="editor">
@@ -81,7 +69,7 @@ export class EditorModal extends React.Component<Props, State> {
                         ))}
                     </div>
                     <TreeEditor
-                        name ={this.props.name}
+                        expName ={this.props.expName}
                         input = {this.state.selectedInput}
                         onBlast = {this.blast.bind(this)}
                         isModal = {true}

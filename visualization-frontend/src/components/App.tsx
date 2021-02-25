@@ -11,11 +11,11 @@ import {replaceVarNames, toReadable} from "../helpers/readable";
 
 import Modal from 'react-modal';
 type Props = {
-    exp_path: string,
+    expName: string,
 };
 
 type State = {
-    exp_path: string,
+    expName: string,
     state: "loaded" | "loaded iterative" | "waiting" | "layouting" | "error",
     trees: any[],
     runCmd: string,
@@ -35,7 +35,7 @@ type State = {
 class App extends Component<Props, State> {
 
     state: State = {
-        exp_path: this.props.exp_path,
+        expName: this.props.expName,
         state: "waiting",
         trees: [],
         runCmd: "Run command:",
@@ -72,7 +72,7 @@ class App extends Component<Props, State> {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }, body : JSON.stringify({
-                exp_path: this.state.exp_path,
+                expName: this.state.expName,
             })
         });
 
@@ -133,7 +133,7 @@ class App extends Component<Props, State> {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }, body : JSON.stringify({
-                exp_path: this.state.exp_path,
+                expName: this.state.expName,
                 expr_map: JSON.stringify(this.state.ExprMap)
             })
         });
@@ -249,7 +249,7 @@ class App extends Component<Props, State> {
                     <h2>Final invariant</h2>
                     <button onClick={this.closeStarModal.bind(this)}>Close</button>
                     <StarModal
-                        exp_path = {this.props.exp_path}
+                        expName = {this.props.expName}
                         PobLemmasMap = {this.state.PobLemmasMap}
                         ExprMap = {this.state.ExprMap}
                     />
@@ -272,7 +272,7 @@ class App extends Component<Props, State> {
                     layout = { layout }
                     expr_layout ={expr_layout}
                     saveExprs = {this.saveExprMap.bind(this)}
-                    name = {this.state.exp_path}
+                    expName = {this.state.expName}
                     solvingCompleted = {this.state.solvingCompleted}
                 />
                 </div>

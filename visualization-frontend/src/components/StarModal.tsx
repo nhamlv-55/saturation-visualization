@@ -5,7 +5,7 @@ import TransformerTable from './TransformerTable';
 const _ = require("lodash");
 
 type Props = {
-    exp_path: string,
+    expName: string,
     PobLemmasMap: {},
     ExprMap: {},
 }
@@ -120,7 +120,7 @@ export class StarModal extends React.Component<Props, State> {
                     </div>
                     <div className="learned-ts">
                         <TransformerTable
-                            exp_path={this.props.exp_path}
+                            expName={this.props.expName}
                             ExprMap ={this.state.localExprMap}
                             onUpdateLocalExprMap = {this.updateLocalExprMap.bind(this)}
                         />

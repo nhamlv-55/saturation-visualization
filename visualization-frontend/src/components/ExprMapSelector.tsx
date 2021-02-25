@@ -2,7 +2,7 @@ import * as React from 'react';
 import {getProblemName} from "../helpers/readable";
 
 type Props = {
-    name: string
+    expName: string
     updateRelatedExprMap: (exprMap) => void
 }
 
@@ -29,7 +29,7 @@ class ExprMapSelector extends React.Component<Props, State> {
     }
 
     getMatchingFiles() {
-        let data = this.state.exps.filter(exp => exp.name.includes(getProblemName(this.props.name)) && exp.name !== this.props.name);
+        let data = this.state.exps.filter(exp => exp["exp_name"].includes(getProblemName(this.props.expName)) && exp["exp_name"] !== this.props.expName);
         
         if (data.length > 0){
             this.setState({
@@ -98,7 +98,7 @@ class ExprMapSelector extends React.Component<Props, State> {
             <section className={"component-node-details details-top-right"}>
                 <select id="exprs" onChange={this.updateSelected.bind(this)}>
                 {this.state.matchingFiles.length > 0 && this.state.matchingFiles.map((exp, key) => (
-                    <option key={key} value={exp.name}>{exp.name}</option>
+                    <option key={key} value={exp["exp_name"]}>{exp["exp_name"]}</option>
                 ))}
                 </select>
                 <button onClick={this.getMatchingExprMap.bind(this)}>Get Expr Map</button>

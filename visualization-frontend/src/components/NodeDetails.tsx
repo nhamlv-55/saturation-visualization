@@ -9,7 +9,7 @@ import Modal from 'react-modal';
 import {EditorModal} from './EditorModal';
 type Props = {
     nodes: any,
-    name: string
+    expName: string
     PobLemmasMap: {},
     ExprMap: {},
     layout: string,
@@ -173,7 +173,7 @@ export default class NodeDetails extends React.Component<Props, State> {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }, body : JSON.stringify({
-                exp_path: this.props.name,
+                expName: this.props.expName,
                 selectedProgram: this.state.transformationSelected
             })
         });
@@ -231,7 +231,7 @@ export default class NodeDetails extends React.Component<Props, State> {
                     <h2>Editor</h2>
                     <button onClick={this.closeModal.bind(this)}>Close</button>
                     <EditorModal
-                        name={this.props.name}
+                        expName={this.props.expName}
                         inputList={this.state.editorTextInputList}
                         onTransformExprs = {this.transformExprsFromText.bind(this)}
                         saveExprs={this.props.saveExprs.bind(this)}
@@ -259,7 +259,7 @@ export default class NodeDetails extends React.Component<Props, State> {
                     else {
                         /* expr = JSON.stringify(this.props.node.ast_json, null, 2); */
                         if (node.ast_json) {
-                            expr += this.node_to_string(node.ast_json, true);
+                            expr = this.node_to_string(node.ast_json, true);
                         }
                     }
                     const classNameTop = "component-node-details details-top-" + key;
