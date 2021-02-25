@@ -1,5 +1,13 @@
 const styleTemplates = require('../resources/styleTemplates');
 
+export interface ExprItem {
+    raw: string,
+    readable: string,
+    editedRaw: string,
+    editedReadable: string
+}
+
+
 export const lemmaColours = [
     "#e6194B",
     "#f58231",
@@ -15,13 +23,6 @@ export const lemmaColours = [
 
 //BUILD POB LEMMAS MAP////////////////////
 export function buildPobLemmasMap(tree: any, varList: string[]): any{
-    // construct exprID->expr map
-    let ExprMap = new Map<number, string>();
-    for (const nodeID in tree) {
-        const node = tree[nodeID];
-        ExprMap[node.exprID] = node.expr;
-    }
-
     // construct PobExprID->a list of lemmas
     let PobLemmasMap = {};
     for (const nodeID in tree) {
@@ -64,15 +65,14 @@ export function buildPobLemmasMap(tree: any, varList: string[]): any{
 
 //BUILD EXPR MAP////////////////////////
 export function buildExprMap(tree: any, varList: string[]): any{
-    let ExprMap = new Map<number, Object>();
+    let ExprMap = new Map<number, ExprItem>();
     for (const nodeID in tree) {
         const node = tree[nodeID];
-        const exprMapItem = {
+        const exprMapItem: ExprItem = {
             raw: node.expr.raw,
             readable: node.expr.readable,
             editedRaw: node.expr.raw,
             editedReadable: node.expr.readable
-            
         };
         ExprMap[node.exprID] = exprMapItem;
     }
