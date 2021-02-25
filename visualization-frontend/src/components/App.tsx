@@ -29,7 +29,8 @@ type State = {
     multiselect: boolean,
     varNames: string,
     starModalIsOpen: boolean,
-    solvingCompleted: boolean
+    solvingCompleted: boolean,
+    dumbReplaceMap: {}
 }
 
 class App extends Component<Props, State> {
@@ -49,7 +50,8 @@ class App extends Component<Props, State> {
         multiselect: false,
         varNames: "",
         starModalIsOpen: false,
-        solvingCompleted: false
+        solvingCompleted: false,
+        dumbReplaceMap: {}
     };
 
     async componentDidMount() {
@@ -209,7 +211,8 @@ class App extends Component<Props, State> {
             layout,
             expr_layout,
             PobLemmasMap,
-            ExprMap
+            ExprMap,
+            dumbReplaceMap
         } = this.state;
         let tree;
         let main;
