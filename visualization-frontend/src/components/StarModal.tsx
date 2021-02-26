@@ -76,7 +76,7 @@ export class StarModal extends React.Component<Props, State> {
             let expr_raw = '';
             let expr_edited = '';
             if(this.state.localExprMap[lemma_id]){
-                expr_edited = this.state.localExprMap[lemma_id].raw;
+                expr_edited = this.state.localExprMap[lemma_id].editedReadable;
                 expr_raw = this.props.ExprMap[lemma_id].raw;
             }
             lemRows.push(<tr>

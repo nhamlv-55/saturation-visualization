@@ -107,6 +107,7 @@ export default class NodeDetails extends React.Component<Props, State> {
             lemma_list.push(<h2 key ="lemma-title"> Lemmas summarization </h2>);
             if (node.exprID in this.props.PobLemmasMap){
                 let lemmas = this.props.PobLemmasMap[node.exprID];
+                console.log(lemmas);
                 for (const lemma of lemmas){
                     let colorIndex = lemmas.indexOf(lemma);
                     let lemmaStyle = {
@@ -241,7 +242,7 @@ export default class NodeDetails extends React.Component<Props, State> {
                 {this.props.nodes.length > 1 && <section className='component-node-details details-diff'>
                     <article>
                         <h2>Diff (Node: <strong>{node1.nodeID}</strong> vs. Node: <strong>{node2.nodeID}</strong>)</h2>
-                        {toDiff(node1.expr.readable, node2.expr.readable).map((part, key) => (
+                        {toDiff(node1.expr.editedReadable, node2.expr.editedReadable).map((part, key) => (
                             <span key={key} className={part.added ? "green" : part.removed ? "red" : "black"}>
                                 {part.value}
                             </span>
@@ -252,16 +253,8 @@ export default class NodeDetails extends React.Component<Props, State> {
                     let additional_info ="type:" + node.event_type + " level:" + node.level;
                     let lemma_list = this.getLemmaList(node);
 
-                    let expr = node.expr.readable;
-                    if (this.props.expr_layout==="SMT") {
-                        {/* console.log(node.expr); */}
-                    }
-                    else {
-                        /* expr = JSON.stringify(this.props.node.ast_json, null, 2); */
-                        if (node.ast_json) {
-                            expr = this.node_to_string(node.ast_json, true);
-                        }
-                    }
+                    let expr = this.props.ExprMap[node.exprID].editedReadable;
+
                     const classNameTop = "component-node-details details-top-" + key;
                     const classNameBottom = "component-node-details details-bottom-" + key;
                     return (

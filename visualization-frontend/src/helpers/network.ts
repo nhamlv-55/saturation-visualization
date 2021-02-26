@@ -1,12 +1,12 @@
+import { toReadable } from "./readable";
+
 const styleTemplates = require('../resources/styleTemplates');
 
 export interface ExprItem {
     raw: string,
-    readable: string,
     editedRaw: string,
     editedReadable: string
 }
-
 
 export const lemmaColours = [
     "#e6194B",
@@ -65,16 +65,31 @@ export function buildPobLemmasMap(tree: any, varList: string[]): any{
 
 //BUILD EXPR MAP////////////////////////
 export function buildExprMap(tree: any, varList: string[]): any{
+    // for (let i = 0; i < Object.keys(tree).length; i++){
+    //     let rawWithVars = replaceVarNames(tree[i].expr, json.var_names);
+    //     let readable = toReadable(rawWithVars);
+    //     tree[i].expr = {
+    //         raw: rawWithVars,
+    //         editedRaw: rawWithVars,
+    //         editedReadable: readable
+    //     };
+    // }
+
+
+
+
     let ExprMap = new Map<number, ExprItem>();
     for (const nodeID in tree) {
         const node = tree[nodeID];
+
+        let readable = toReadable(node["expr"]);
+        // console.log(node["expr"], readable);
         const exprMapItem: ExprItem = {
-            raw: node.expr.raw,
-            readable: node.expr.readable,
-            editedRaw: node.expr.raw,
-            editedReadable: node.expr.readable
+            raw: node.expr,
+            editedRaw: node.expr,
+            editedReadable: readable
         };
-        ExprMap[node.exprID] = exprMapItem;
+        ExprMap[node["exprID"]] = exprMapItem;
     }
     return ExprMap
 

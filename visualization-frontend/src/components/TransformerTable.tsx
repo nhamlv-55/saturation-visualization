@@ -67,7 +67,7 @@ export default class TransformerTable extends React.Component<Props, State> {
             console.log("tExprMap", tExprMap);
             Object.keys(tExprMap).forEach((key) => {
                 localExprMap[key].raw = tExprMap[key]['raw'];
-                localExprMap[key].readable = tExprMap[key]['readable'];
+                localExprMap[key].editedReadable = tExprMap[key]['readable'];
             });
 
             this.setState({

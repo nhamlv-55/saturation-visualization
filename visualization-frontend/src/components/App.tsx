@@ -19,7 +19,7 @@ type Props = {
 type State = {
     expName: string,
     state: "loaded" | "loaded iterative" | "waiting" | "layouting" | "error",
-    trees: any[],
+    tree: any,
     runCmd: string,
     messages_q: string[],
     nodeSelection: number[],
@@ -40,7 +40,7 @@ class App extends Component<Props, State> {
     state: State = {
         expName: this.props.expName,
         state: "waiting",
-        trees: [],
+        tree: {},
         runCmd: "Run command:",
         messages_q: [""],
         nodeSelection: [],
@@ -83,17 +83,8 @@ class App extends Component<Props, State> {
         try {
             const json = await fetchedJSON.json();
             console.log("backend response:", json);
-            let tree = json["nodes_list"];
-            for (let i = 0; i < Object.keys(tree).length; i++){
-                let rawWithVars = replaceVarNames(tree[i].expr, json.var_names);
-                let readable = toReadable(rawWithVars);
-                tree[i].expr = {
-                    raw: rawWithVars,
-                    readable: readable,
-                    editedRaw: rawWithVars,
-                    editedReadable: readable
-                };
-            }
+            const tree = json["nodes_list"];
+            
             const state = "loaded";
             const PobLemmasMap = buildPobLemmasMap(tree, json.var_names);
             // NOTE: use varNames in state, not in props. The one in state is returned by the backend.
@@ -106,7 +97,7 @@ class App extends Component<Props, State> {
             }
 
             this.setState({
-                trees: [tree],
+                tree: tree,
                 runCmd: json.run_cmd,
                 messages_q: ["Spacer is "+json.spacer_state],
                 state: state,
@@ -150,7 +141,6 @@ class App extends Component<Props, State> {
             var newExprMap = _.cloneDeep(this.state.ExprMap);
             for(let key in newExprMap) {
                 for (let source in newReplaceMapJSON){
-                    newExprMap[key].readable = newExprMap[key].readable.replaceAll(source, newReplaceMapJSON[source]);
                     newExprMap[key].editedReadable = newExprMap[key].editedReadable.replaceAll(source, newReplaceMapJSON[source]);
                 }
             }
@@ -172,8 +162,7 @@ class App extends Component<Props, State> {
     }
     
     updateCurrentTime(currentTime: number) {
-        const trees = this.state.trees;
-        assert(trees.length > 0);
+        /* assert(this.state.tree); */
         this.setState({
             currentTime: currentTime
         });
@@ -224,7 +213,7 @@ class App extends Component<Props, State> {
     render() {
         const {
             state,
-            trees,
+            tree,
             runCmd,
             messages_q,
             nodeSelection,
@@ -235,11 +224,8 @@ class App extends Component<Props, State> {
             ExprMap,
             dumbReplaceMap
         } = this.state;
-        let tree;
         let main;
         if (state === "loaded") {
-            assert(trees.length > 0);
-            tree = trees[trees.length - 1];
             const hL = Object.keys(tree).length;
             main = (
                 <Main
