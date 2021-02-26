@@ -1,7 +1,8 @@
 import * as React from 'react';
 import '../styles/NodeMenu.css';
 import {Link} from 'react-router-dom';
-
+import {replaceVarNames, toReadable} from "../helpers/readable";
+const _ = require("lodash");
 type Props = {
     expName: string,
     ExprMap: {},
@@ -43,7 +44,17 @@ export default class TransformerTable extends React.Component<Props, State> {
         )
     }
     async multiTransformExprs(programs: string) {
-        let localExprMap = this.props.ExprMap;
+        let tmpExprMap = _.cloneDeep(this.props.ExprMap);
+
+        //NHAM: since I dont want to touch prose backend, and Prose expect input in the field "raw",
+        //we set the field raw in here to be the same as editedRaw
+        for(const key in tmpExprMap){
+            tmpExprMap[key].raw = tmpExprMap[key].editedRaw;
+        }
+
+
+
+
         this.setState({
             transformationFlag: false,
             transformationErrorFlag: false
@@ -57,17 +68,19 @@ export default class TransformerTable extends React.Component<Props, State> {
             }, body : JSON.stringify({
                 expName: this.props.expName,
                 selectedProgram: programs,
-                lemmas: this.props.ExprMap
+                lemmas: tmpExprMap
             })
         });
 
         if (response.status === 200){
+            tmpExprMap = null;
+            let localExprMap = _.cloneDeep(this.props.ExprMap);
             let responseData = await response.json();
             let tExprMap = responseData["response"];
             console.log("tExprMap", tExprMap);
             Object.keys(tExprMap).forEach((key) => {
-                localExprMap[key].raw = tExprMap[key]['raw'];
-                localExprMap[key].editedReadable = tExprMap[key]['readable'];
+                localExprMap[key].editedRaw = tExprMap[key]['raw'];
+                localExprMap[key].editedReadable = toReadable(tExprMap[key]['raw']);
             });
 
             this.setState({

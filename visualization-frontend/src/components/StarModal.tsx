@@ -1,7 +1,6 @@
 import * as React from 'react';
 import '../styles/StarModal.css';
 
-import TransformerTable from './TransformerTable';
 const _ = require("lodash");
 
 type Props = {
@@ -11,7 +10,6 @@ type Props = {
 }
 
 type State = {
-    localExprMap: {},
     input: string,
     output: string,
     finalLemmas: any[][]
@@ -20,7 +18,6 @@ type State = {
 
 export class StarModal extends React.Component<Props, State> {
     state: State = {
-        localExprMap: _.cloneDeep(this.props.ExprMap),
         input: "()",
         output: "",
         finalLemmas: this.getFinalInvariant()
@@ -43,13 +40,12 @@ export class StarModal extends React.Component<Props, State> {
 
     getLemmaHeader(lemma: any[]): string{
         const lemma_id = lemma[0];
-        const lemma_header = this.state.localExprMap[lemma_id].raw.split("\n")[0];
+        const lemma_header = this.props.ExprMap[lemma_id].raw.split("\n")[0];
         return lemma_header;
     }
 
     reset(){
         this.setState({
-            localExprMap: _.cloneDeep(this.props.ExprMap),
             finalLemmas: this.getFinalInvariant()
         });
     }
@@ -75,8 +71,8 @@ export class StarModal extends React.Component<Props, State> {
             if(lemma[2]!=="oo"){continue;}
             let expr_raw = '';
             let expr_edited = '';
-            if(this.state.localExprMap[lemma_id]){
-                expr_edited = this.state.localExprMap[lemma_id].editedReadable;
+            if(this.props.ExprMap[lemma_id]){
+                expr_edited = this.props.ExprMap[lemma_id].editedReadable;
                 expr_raw = this.props.ExprMap[lemma_id].raw;
             }
             lemRows.push(<tr>
@@ -97,13 +93,9 @@ export class StarModal extends React.Component<Props, State> {
 
 
 
-    updateLocalExprMap(newExprMap: {}){
-        console.log("newExprMap", newExprMap);
-        this.setState({localExprMap: newExprMap});
-    }
-
 
     render() {
+        console.log(this.props.ExprMap);
         const resJSX = this.renderFinalInvariant();
         /* console.log(this.props.PobLemmasMap); */
         return (
@@ -118,13 +110,7 @@ export class StarModal extends React.Component<Props, State> {
                     <div className="lemma-table">
                         {resJSX}
                     </div>
-                    <div className="learned-ts">
-                        <TransformerTable
-                            expName={this.props.expName}
-                            ExprMap ={this.state.localExprMap}
-                            onUpdateLocalExprMap = {this.updateLocalExprMap.bind(this)}
-                        />
-                    </div>
+
                 </div>
             </section>
         );

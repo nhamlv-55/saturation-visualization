@@ -1,0 +1,14 @@
+.transformer-menu{
+    padding: 1rem;
+    flex: 0 0 20%;
+    z-index: 100;
+}
+
+textarea{
+    width: 100%;
+    height: 30rem;
+}
+.ts-button {
+    width: 100%;
+    text-align: left;
+}

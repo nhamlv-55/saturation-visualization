@@ -1,5 +1,6 @@
 import {parse} from "s-exify";
 
+const _ = require("lodash");
 export const negateMap = {
     "<=": ">",
     ">=": "<",
@@ -12,14 +13,60 @@ export const negateMap = {
     "not": ""
 };
 
+const sortableOps = ["+", "and", "or", "*"];
 const logSym = ["&&", "||", "=>"];
 
-export function toReadable(expr) {
+
+export function toReadable(expr): string{
+    //NHAM: the current toReadable is so broken with anything other than
+    //simple_bakery, so temporary disable it
+    return expr;
+}
+
+
+export function oldToReadable(expr): string {
     if (expr[0] !== "("){
         expr = "(" + expr + ")";
     }
     return parseResult(parse(expr), "");
+    // return parseResult(sortLST(parse(expr)), "");
 }
+
+
+function sortLST(lst){
+    //XXX: Fix me
+    if(_.isString(lst)){
+        return lst;
+    }
+
+    if(lst.length < 1){
+        return lst;
+    }
+
+    if(sortableOps.includes(lst[0])){
+        var args = _.cloneDeep(lst.slice(1));
+        args.sort(function(x, y) {
+            if (sortLST(x).toString() < sortLST(y).toString()) {
+                return -1;
+            }
+            if (sortLST(x).toString() > sortLST(y).toString()) {
+                return 1;
+            }
+            return 0;
+        });
+        
+        return [lst[0]].concat(args);
+    }
+    // return lst;
+    else{
+        var newLst = [lst[0]];
+        for(let i = 1; i < lst.length; i++){
+            newLst.push(sortLST(lst[i]));
+        }
+        return newLst;
+    }
+}
+
 
 function parseResult(lst, sep) {
     //symbols for logical relations
@@ -30,7 +77,7 @@ function parseResult(lst, sep) {
 
     //symbols for mathematical operations
     //Note: "-" is not included because negative numbers are in the form (- x)
-    let logOp = ["!=", "=", "<=", ">=", ">", "<", "+", "*", "/"];
+    let logOp = ["!=", "=", "<=", ">=", ">", "<", "+", "*", "/", "=>"];
 
     //empty list should return empty string
     if (lst.length < 1){

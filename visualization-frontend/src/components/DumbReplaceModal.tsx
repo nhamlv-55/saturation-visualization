@@ -1,16 +1,21 @@
 import * as React from 'react';
 import {ChangeEvent} from "react";
-const icons = require('../resources/icons/all.svg') as string;
+import TransformerTable from './TransformerTable';
+import '../styles/TransformerMenu.css';
+import {ExprItem} from "../helpers/network";
 
 
 type Props = {
+    expName: string,
+    ExprMap: {}
     dumbReplaceMap: {},
     onApplyDumbReplaceMap:(newReplaceMap: string)=>void
+    onUpdateExprMap: ({}) => void
 }
 type State = {
     localReplaceMap: string
 }
-export default class DumbReplaceModal extends React.Component<Props, State> {
+export default class TransformerMenu extends React.Component<Props, State> {
     state = {
         localReplaceMap: JSON.stringify(this.props.dumbReplaceMap, null, 2)
     }
@@ -25,14 +30,19 @@ export default class DumbReplaceModal extends React.Component<Props, State> {
     }
     render() {
         return (
-            <div onKeyUp={this.handleKeyUp}>
+            <div className ="transformer-menu" onKeyUp={this.handleKeyUp}>
                 <section className="dumb-replace-wrapper">
                     <label>Replacement map:</label>
                     <br/>
                     <textarea value={this.state.localReplaceMap} onChange={this.handleTextareaChange.bind(this)}/>
                     <br/>
-                    <button onClick={this.props.onApplyDumbReplaceMap.bind(this, this.state.localReplaceMap)}>Apply</button>
+                    <button onClick={this.props.onApplyDumbReplaceMap.bind(this, this.state.localReplaceMap)}>Apply Text Replacement</button>
                 </section>
+                    <TransformerTable
+                        expName={this.props.expName}
+                        ExprMap ={this.props.ExprMap}
+                        onUpdateLocalExprMap = {this.props.onUpdateExprMap.bind(this)}
+                    />
             </div>
         );
     }
