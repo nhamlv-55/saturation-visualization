@@ -19,11 +19,6 @@ type Props = {
 
 };
 export default class Main extends React.Component<Props, {}> {
-
-    // TODO: remove this, after supporting button clicks in Aside while the modal is active
-    componentDidMount() {
-    }
-
     render() {
         return (
             <main>
