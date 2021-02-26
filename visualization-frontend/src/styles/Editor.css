@@ -74,3 +74,33 @@
     width: 100%;
     overflow: scroll;
 }
+.editor-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent !important;
+    z-index: 1000;
+}
+
+.editor-modal {
+    width: calc(90%) !important;
+    position: absolute;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    background: white;
+    padding: 1rem !important;
+    inset: 5rem 3rem 6rem !important;
+    top: 5rem !important;
+    left: 3rem !important;
+    bottom: 6rem !important;
+    border: none !important;
+    border-radius: 2px !important;
+    box-shadow: 5px 5px 50px 0 rgba(0, 0, 0, 0.2) !important;
+    box-sizing: border-box !important;
+    z-index: 100;
+    overflow: scroll;
+}

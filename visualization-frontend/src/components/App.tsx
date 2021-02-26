@@ -8,7 +8,7 @@ import '../styles/App.css';
 import { assert } from '../model/util';
 import {ExprItem, buildExprMap, buildPobLemmasMap} from "../helpers/network";
 import {replaceVarNames, toReadable} from "../helpers/readable";
-import DumbReplaceModal from "./DumbReplaceModal";
+import TransformerMenu from "./DumbReplaceModal";
 import Modal from 'react-modal';
 const _ = require("lodash");
 
@@ -150,6 +150,15 @@ class App extends Component<Props, State> {
             this.setState({messages_q: [`Error in applyDumbReplaceMap: ${error["message"]}`]});
         }
     }
+    updateExprMap(newExprMap: {}){
+        console.log("newExprMap", newExprMap);
+        try{
+            this.setState({ExprMap: newExprMap});
+        }catch(error){
+            this.setState({messages_q: [`Error in updateExprMap: ${error["message"]}`]});
+        }
+    }
+
 
 
     updateNodeSelection(nodeSelection: number[]) {
@@ -253,8 +262,9 @@ class App extends Component<Props, State> {
                 <Modal
                     isOpen={this.state.starModalIsOpen}
                     onRequestClose={this.closeStarModal.bind(this)}
-                    overlayClassName="editor-modal"
-                    contentLabel="Example Modal"
+                    overlayClassName="star-modal-overlay"
+                    className="star-modal"
+                    shouldCloseOnOverlayClick={false}
                 >
                     <h2>Final invariant</h2>
                     <button onClick={this.closeStarModal.bind(this)}>Close</button>
@@ -265,9 +275,12 @@ class App extends Component<Props, State> {
                     />
                 </Modal>
                 { main }
-                <DumbReplaceModal
+                <TransformerMenu
                     dumbReplaceMap ={this.state.dumbReplaceMap}
                     onApplyDumbReplaceMap={this.applyDumbReplaceMap.bind(this)}
+                    expName={this.props.expName}
+                    ExprMap ={this.state.ExprMap}
+                    onUpdateExprMap={this.updateExprMap.bind(this)}
                 />
                 <Aside
                     messages_q = {messages_q}
