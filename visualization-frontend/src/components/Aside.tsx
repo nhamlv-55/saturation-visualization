@@ -113,10 +113,10 @@ class Aside extends React.Component<Props, State> {
                     </section>
                 </article>
                 { this.getNodeDetails() }
-                <ExprMapSelector
+                {/* <ExprMapSelector
                     expName = {this.props.expName}
                     updateRelatedExprMap = {this.updateRelatedExprMap.bind(this)}
-                />
+                    /> */}
             </aside>
         );
     }
