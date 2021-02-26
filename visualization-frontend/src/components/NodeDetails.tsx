@@ -226,8 +226,8 @@ export default class NodeDetails extends React.Component<Props, State> {
                 <Modal
                     isOpen={this.state.editorIsOpen}
                     onRequestClose={this.closeModal.bind(this)}
-                    overlayClassName="editor-modal"
-                    contentLabel="Example Modal"
+                    overlayClassName="editor-modal-overlay"
+                    className="editor-modal"
                 >
                     <h2>Editor</h2>
                     <button onClick={this.closeModal.bind(this)}>Close</button>
@@ -254,7 +254,7 @@ export default class NodeDetails extends React.Component<Props, State> {
                     let lemma_list = this.getLemmaList(node);
 
                     let expr = this.props.ExprMap[node.exprID].editedReadable;
-
+                    console.log("top expr", expr);
                     const classNameTop = "component-node-details details-top-" + key;
                     const classNameBottom = "component-node-details details-bottom-" + key;
                     return (
