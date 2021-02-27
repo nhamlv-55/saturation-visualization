@@ -14,7 +14,6 @@ type Props = {
     ExprMap: {},
     layout: string,
     expr_layout: "SMT" | "JSON",
-    saveExprs: () => void,
     relatedExprMap: any,
     solvingCompleted: boolean
 };
@@ -184,10 +183,10 @@ export default class NodeDetails extends React.Component<Props, State> {
             let responseData = await response.json();
             let tExprMap = responseData["response"];
             Object.keys(tExprMap).forEach((key) => {
+                //NHAM: ParseResult is broken in the prose side so we just use raw stuffs in here
                 this.props.ExprMap[key].editedRaw = tExprMap[key]['raw'];
-                this.props.ExprMap[key].editedReadable = tExprMap[key]['readable'];
+                this.props.ExprMap[key].editedReadable = tExprMap[key]['raw'];
             });
-            this.props.saveExprs();
             this.setState({
                 transformationFlag: true,
             });
@@ -235,7 +234,6 @@ export default class NodeDetails extends React.Component<Props, State> {
                         expName={this.props.expName}
                         inputList={this.state.editorTextInputList}
                         onTransformExprs = {this.transformExprsFromText.bind(this)}
-                        saveExprs={this.props.saveExprs.bind(this)}
                     />
                 </Modal>
 

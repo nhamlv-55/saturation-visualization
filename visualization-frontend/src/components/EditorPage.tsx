@@ -9,7 +9,6 @@ type Props = {
     input: string,
     expName: string,
     onTransformExprs?: (t: string)=> Promise<void>,
-    saveExprs?: ()=> void,
 }
 
 type State = {

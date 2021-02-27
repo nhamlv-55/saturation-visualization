@@ -21,7 +21,6 @@ type Props = {
     ExprMap: {},
     layout: string,
     expr_layout: "SMT"|"JSON",
-    saveExprs: () => void,
     expName: string,
     solvingCompleted: boolean
 };
@@ -61,7 +60,6 @@ class Aside extends React.Component<Props, State> {
                        ExprMap = { this.props.ExprMap }
                        layout = { this.props.layout }
                        expr_layout ={this.props.expr_layout}
-                       saveExprs = {this.props.saveExprs}
                        relatedExprMap = {this.state.relatedExprMap}
                        solvingCompleted = {this.props.solvingCompleted}
             />;
