@@ -1,12 +1,6 @@
 import { toReadable } from "./readable";
-
+import {ExprItem} from "./datatypes";
 const styleTemplates = require('../resources/styleTemplates');
-
-export interface ExprItem {
-    raw: string,
-    editedRaw: string,
-    editedReadable: string
-}
 
 export const lemmaColours = [
     "#e6194B",
@@ -85,6 +79,7 @@ export function buildExprMap(tree: any, varList: string[]): any{
         let readable = toReadable(node["expr"]);
         // console.log(node["expr"], readable);
         const exprMapItem: ExprItem = {
+            exprType: "UNK",
             raw: node.expr,
             editedRaw: node.expr,
             editedReadable: readable

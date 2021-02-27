@@ -2,11 +2,12 @@ import * as React from 'react';
 import '../styles/Editor.css';
 import TreeEditor from "./TreeEditor";
 import { Transformer } from "../helpers/transformers";
-
+import {inOutExample} from "../helpers/datatypes";
 type Props = {
     inputList: string[],
     expName: string,
     onTransformExprs?: (t: string)=> Promise<void>,
+    onAddInputOutputExample: (example: inOutExample)=>void,
 }
 
 type State = {
@@ -57,6 +58,7 @@ export class EditorModal extends React.Component<Props, State> {
                         onBlast = {this.blast.bind(this)}
                         isModal = {true}
                         onTransformExprs = {this.props.onTransformExprs!.bind(this)}
+                        onAddInputOutputExample ={this.props.onAddInputOutputExample.bind(this)}
                     /> 
                 </section>
 

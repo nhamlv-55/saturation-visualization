@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { AST, ASTTransformer, Transformer, ProseTransformation} from "../helpers/transformers";
+import {inOutExample} from "../helpers/datatypes";
 import { assert } from '../model/util';
 import { DataSet, Network, Node, Edge } from 'vis'
 import ReplaceDialog from './ReplaceDialog'
@@ -7,7 +8,8 @@ const _ = require("lodash");
 type Props = {
     expName: string,
     input: string,
-    onBlast: (tStack: Transformer[])=>void| null,
+    onAddInputOutputExample: (example: inOutExample)=>void,
+    onBlast?: (tStack: Transformer[])=>void| null,
     isModal: boolean,
     onTransformExprs?: (t: string)=> Promise<void>,
 }
@@ -60,8 +62,6 @@ class TreeEditor extends React.Component<Props, State> {
             this.setState({stringRep: ast.toHTML(_.last(this.state.selectedNodeIDs), ast.nodeList[0])});
         }
     }
-
-
 
     componentDidUpdate(prevProps: Props){
         if(prevProps.input !== this.props.input){
@@ -169,46 +169,21 @@ class TreeEditor extends React.Component<Props, State> {
             this.redrawAST();
         }
     }
-    async learnTransformationFromInputOutput() {
+
+    addInputOutputExample(){
         let inputAST = this.astStack[0];
         let outputAST = this.astStack[this.astStack.length - 1];
         console.log("transformer stack", this.transformerStack);
-
-        let payload = {
-            "inputOutputExamples":[{"input": inputAST.toString(-1, inputAST.nodeList[0]),
-                                 "output": outputAST.toString(-1, outputAST.nodeList[0]),
-                                 "aux": [""]}],
-            "expName": this.props.expName,
-            "type": this.transformerStack[0].action
-        };
-        if (payload["type"] === "replace") {
-            payload["params"] = this.transformerStack.map((item) => {return item.params});
+        const inputOutputExample: inOutExample = {"input": inputAST.toString(-1, inputAST.nodeList[0]),
+                                                  "output": outputAST.toString(-1, outputAST.nodeList[0]),
+                                                  "tStack": this.transformerStack,
         }
-
-        console.log("payload", payload);
-        const response = await fetch("http://localhost:5000/spacer/learn_transformation", {
-            method: 'POST',
-            mode :'cors',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }, body : JSON.stringify(payload)
-        });
-        if (response.status === 200){
-            const responseJson = await response.json();
-            let possiblePrograms = responseJson["response"];
-            console.log(possiblePrograms);
-            this.setState({
-                possibleTransformations: possiblePrograms
-            });
-        }
-        else {
-            this.setState({
-                possibleTransformations: []
-            });
-        }
+        this.props.onAddInputOutputExample(inputOutputExample);
     }
-    
+
+
+
+
     updateTransformationSelected(e) {
         this.setState({
             transformationSelected: e.target.value
@@ -232,6 +207,7 @@ class TreeEditor extends React.Component<Props, State> {
                     <div className="editor-menu">
                         {`Hint: Long click to select multiple nodes`}
                         <br/>
+                        <button onClick={this.undo.bind(this)}>Undo</button>
                         <button onClick={this.applyLocal.bind(this, "flipCmp", {})}>Flip Cmp</button>
                         <button onClick={this.applyLocal.bind(this, "toImp", {})}>To Imp</button>
                         <button onClick={this.applyLocal.bind(this, "move", {"direction": "l"})}>Move Left</button>
@@ -243,14 +219,14 @@ class TreeEditor extends React.Component<Props, State> {
                             onApply = {this.applyLocal.bind(this)}
                         />
                         <br/>
-
-                        <button onClick={this.undo.bind(this)}>Undo</button>
+                        <button onClick={this.addInputOutputExample.bind(this)}>Add to Learn</button>
                         <pre className="editor-string-rep" dangerouslySetInnerHTML={{ __html: this.state.stringRep }} />
                     </div>
                     <div className= "editor-component-graph" ref = { this.graphContainer }>
                         <canvas/>
                     </div>
                 </div>
+                {this.props.isModal?"":
                 <div className="editor-options-card" id="transformer-container">
                     {/* <h3>Transformer Queue</h3>
                         <pre>{`
@@ -266,13 +242,14 @@ class TreeEditor extends React.Component<Props, State> {
                         ast.nodeDepth(node) === 2
                         `}</pre>
                         {tStack} */}
-                    <button onClick={this.applyStack.bind(this)}>Apply for the current AST</button>
-                    <button onClick={this.props.onBlast.bind(this, this.transformerStack)}>Blast</button>
-                    <button onClick={this.learnTransformationFromInputOutput.bind(this)}>Learn</button>
+                    {this.props.isModal?""
+                     :<button onClick={this.props.onBlast!.bind(this, this.transformerStack)}>Blast</button>
+                    }
                     <h3>Possible Transformations</h3>
                     {possibleTs}
                     {this.props.isModal?<button onClick={this.props.onTransformExprs!.bind(this, this.state.transformationSelected)}>Apply Everywhere</button>:''}
                 </div>
+                }
             </div>
         );
     }

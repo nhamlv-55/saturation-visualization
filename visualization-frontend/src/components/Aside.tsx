@@ -3,11 +3,12 @@ import * as React from 'react';
 import '../styles/NodeMenu.css';
 import NodeDetails from './NodeDetails';
 import ExprMapSelector from "./ExprMapSelector";
+import { inOutExample, treeNode} from "../helpers/datatypes";
 const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
     messages_q: string[],
-    tree: any | null,
+    tree: {number: treeNode} | null,
     nodeSelection: number[],
     onUpdateNodeSelection: (selection: number[]) => void,
     onPoke: () => void,
@@ -23,6 +24,7 @@ type Props = {
     expr_layout: "SMT"|"JSON",
     expName: string,
     solvingCompleted: boolean
+    onAddInputOutputExample: (example: inOutExample)=>void,
 };
 
 type State = {
@@ -49,7 +51,7 @@ class Aside extends React.Component<Props, State> {
     }
     getNodeDetails() {
         if (this.props.nodeSelection.length >= 1  && this.props.tree != null) {
-            let nodes: any[] = [];
+            let nodes: treeNode[] = [];
             for (let node of this.props.nodeSelection){
                 nodes.push(this.props.tree[node]);
             }
@@ -62,6 +64,7 @@ class Aside extends React.Component<Props, State> {
                        expr_layout ={this.props.expr_layout}
                        relatedExprMap = {this.state.relatedExprMap}
                        solvingCompleted = {this.props.solvingCompleted}
+                       onAddInputOutputExample ={this.props.onAddInputOutputExample.bind(this)}
             />;
         } else {
             return <section className={ 'component-node-details overview' }>

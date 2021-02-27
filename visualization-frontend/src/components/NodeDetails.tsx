@@ -6,16 +6,18 @@ import {toDiff} from "../helpers/diff";
 import {lemmaColours} from "../helpers/network";
 import {getCleanExprList} from "../helpers/readable";
 import Modal from 'react-modal';
+import { inOutExample, treeNode} from "../helpers/datatypes";
 import {EditorModal} from './EditorModal';
 type Props = {
-    nodes: any,
+    nodes: treeNode[],
     expName: string
     PobLemmasMap: {},
     ExprMap: {},
     layout: string,
     expr_layout: "SMT" | "JSON",
     relatedExprMap: any,
-    solvingCompleted: boolean
+    solvingCompleted: boolean,
+    onAddInputOutputExample: (example: inOutExample)=>void,
 };
 
 type State = {
@@ -83,7 +85,7 @@ export default class NodeDetails extends React.Component<Props, State> {
         return result
     }
 
-    getLemmaExprs(node): string[]{
+    getLemmaExprs(node: treeNode): string[]{
         /*
         Convert all lemmas under a pob to input to Editor
         */
@@ -213,11 +215,30 @@ export default class NodeDetails extends React.Component<Props, State> {
     }
 
     render() {
-        let node1, node2;
-        
+        let node1: treeNode, node2: treeNode;
+
+        let detailfDiffJSX: JSX.Element;
+
         if (this.props.nodes.length > 1){
             node1 = this.props.nodes[0];
             node2 = this.props.nodes[1];
+
+            detailfDiffJSX = (
+                <section className='component-node-details details-diff'>
+                    <article>
+                        <h2>Diff (Node: <strong>{node1.nodeID}</strong> vs. Node: <strong>{node2.nodeID}</strong>)</h2>
+                        {toDiff(this.props.ExprMap[node1.exprID].editedReadable,
+                                this.props.ExprMap[node2.exprID].editedReadable).map((part, key) => (
+                                    <span key={key} className={part.added ? "green" : part.removed ? "red" : "black"}>
+                                        {part.value}
+                                    </span>
+                        ))}
+                    </article>
+                </section>
+            )
+
+        }else{
+            detailfDiffJSX = <div></div>;
         }
         return (
             <div>
@@ -234,19 +255,11 @@ export default class NodeDetails extends React.Component<Props, State> {
                         expName={this.props.expName}
                         inputList={this.state.editorTextInputList}
                         onTransformExprs = {this.transformExprsFromText.bind(this)}
+                        onAddInputOutputExample ={this.props.onAddInputOutputExample.bind(this)}
                     />
                 </Modal>
 
-                {this.props.nodes.length > 1 && <section className='component-node-details details-diff'>
-                    <article>
-                        <h2>Diff (Node: <strong>{node1.nodeID}</strong> vs. Node: <strong>{node2.nodeID}</strong>)</h2>
-                        {toDiff(node1.expr.editedReadable, node2.expr.editedReadable).map((part, key) => (
-                            <span key={key} className={part.added ? "green" : part.removed ? "red" : "black"}>
-                                {part.value}
-                            </span>
-                        ))}
-                    </article>
-                </section>}
+                {detailfDiffJSX}
                 {this.props.nodes.map((node, key) => {
                     let additional_info ="type:" + node.event_type + " level:" + node.level;
                     let lemma_list = this.getLemmaList(node);

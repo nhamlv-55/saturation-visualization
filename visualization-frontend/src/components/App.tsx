@@ -6,10 +6,10 @@ import Aside from './Aside';
 import {StarModal} from './StarModal';
 import '../styles/App.css';
 import { assert } from '../model/util';
-import {ExprItem, buildExprMap, buildPobLemmasMap} from "../helpers/network";
-import {replaceVarNames, toReadable} from "../helpers/readable";
+import {buildExprMap, buildPobLemmasMap} from "../helpers/network";
 import TransformerMenu from "./DumbReplaceModal";
 import Modal from 'react-modal';
+import { inOutExample } from '../helpers/datatypes';
 const _ = require("lodash");
 
 type Props = {
@@ -32,7 +32,8 @@ type State = {
     varNames: string,
     starModalIsOpen: boolean,
     solvingCompleted: boolean,
-    dumbReplaceMap: {}
+    dumbReplaceMap: {},
+    inputOutputExamples: inOutExample[],
 }
 
 class App extends Component<Props, State> {
@@ -53,7 +54,8 @@ class App extends Component<Props, State> {
         varNames: "",
         starModalIsOpen: false,
         solvingCompleted: false,
-        dumbReplaceMap: {}
+        dumbReplaceMap: {},
+        inputOutputExamples: []
     };
 
     async componentDidMount() {
@@ -219,34 +221,27 @@ class App extends Component<Props, State> {
         this.setState({starModalIsOpen: false});
     }
 
+
+    addInputOutputExample(example: inOutExample){
+        this.setState({inputOutputExamples: [...this.state.inputOutputExamples, example]});
+    }
+
     render() {
-        const {
-            state,
-            tree,
-            runCmd,
-            messages_q,
-            nodeSelection,
-            currentTime,
-            layout,
-            expr_layout,
-            PobLemmasMap,
-            ExprMap,
-            dumbReplaceMap
-        } = this.state;
+
         let main;
-        if (state === "loaded") {
-            const hL = Object.keys(tree).length;
+        if (this.state.state === "loaded") {
+            const hL = Object.keys(this.state.tree).length;
             main = (
                 <Main
-                    runCmd = {runCmd}
-                    tree = { tree }
+                    runCmd = {this.state.runCmd}
+                    tree = { this.state.tree }
                     onNodeSelectionChange = { this.updateNodeSelection.bind(this) }
-                    nodeSelection = { nodeSelection }
+                    nodeSelection = { this.state.nodeSelection }
                     historyLength = { hL }
-                    currentTime = { currentTime }
+                    currentTime = { this.state.currentTime }
                     onCurrentTimeChange = { this.updateCurrentTime.bind(this) }
-                    layout = { layout }
-                    PobLemmasMap = { PobLemmasMap }
+                    layout = { this.state.layout }
+                    PobLemmasMap = { this.state.PobLemmasMap }
                     solvingCompleted = {this.state.solvingCompleted}
                 />
             );
@@ -281,11 +276,12 @@ class App extends Component<Props, State> {
                     expName={this.props.expName}
                     ExprMap ={this.state.ExprMap}
                     onUpdateExprMap={this.updateExprMap.bind(this)}
+                    inputOutputExamples={this.state.inputOutputExamples}
                 />
                 <Aside
-                    messages_q = {messages_q}
-                    tree = { tree }
-                    nodeSelection = { nodeSelection }
+                    messages_q = {this.state.messages_q}
+                    tree = { this.state.tree }
+                    nodeSelection = { this.state.nodeSelection }
                     onUpdateNodeSelection = { this.updateNodeSelection.bind(this) }
                     onPoke = {this.poke.bind(this)}
                     onOpenStarModal = {this.openStarModal.bind(this)}
@@ -294,12 +290,13 @@ class App extends Component<Props, State> {
                     MultiSelectMode= { this.setMultiSelect.bind(this) }
                     SMTLayout = { this.setSMTLayout.bind(this) }
                     JSONLayout = { this.setJSONLayout.bind(this) }
-                    PobLemmasMap = { PobLemmasMap }
-                    ExprMap = { ExprMap }
-                    layout = { layout }
-                    expr_layout ={expr_layout}
+                    PobLemmasMap = { this.state.PobLemmasMap }
+                    ExprMap = { this.state.ExprMap }
+                    layout = { this.state.layout }
+                    expr_layout ={this.state.expr_layout}
                     expName = {this.state.expName}
                     solvingCompleted = {this.state.solvingCompleted}
+                    onAddInputOutputExample ={this.addInputOutputExample.bind(this)}
                 />
                 </div>
         );
