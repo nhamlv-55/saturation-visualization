@@ -94,7 +94,6 @@ class Aside extends React.Component<Props, State> {
                         { this.createButton("SatVis", this.props.SatVisLayout, "node-parents") }
                         { this.createButton("PobVis", this.props.PobVisLayout, "node-children") }
                         { this.createButton("MultiSelect", this.props.MultiSelectMode, "history-forward") }
-                        {/* NHAM: Seems like new pyparser broke my ast to json parser in the backend. */}
                         <button
                             title = "SMT"
                             onClick = { this.props.SMTLayout }
