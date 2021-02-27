@@ -7,6 +7,7 @@ type Props = {
     expName: string,
     ExprMap: {},
     onUpdateLocalExprMap: ({}) => void
+    key: string
 };
 type State = {
     transformationFlag: boolean,
@@ -51,9 +52,6 @@ export default class TransformerTable extends React.Component<Props, State> {
         for(const key in tmpExprMap){
             tmpExprMap[key].raw = tmpExprMap[key].editedRaw;
         }
-
-
-
 
         this.setState({
             transformationFlag: false,
@@ -125,6 +123,4 @@ export default class TransformerTable extends React.Component<Props, State> {
             });
         }
     }
-
-
 }

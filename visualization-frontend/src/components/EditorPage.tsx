@@ -3,6 +3,7 @@ import '../styles/Editor.css';
 import * as Monaco from 'monaco-editor'
 import TreeEditor from "./TreeEditor";
 import { AST, ASTTransformer, Transformer} from "../helpers/transformers";
+import {inOutExample} from "../helpers/datatypes";
 const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
@@ -13,7 +14,8 @@ type Props = {
 
 type State = {
     input: string,
-    output: string
+    output: string,
+    inputOutputExamples: inOutExample[]
 }
 
 
@@ -24,7 +26,8 @@ export class EditorPage extends React.Component<Props, State> {
 
     state: State = {
         input: "()",
-        output: ""
+        output: "",
+        inputOutputExamples: []
     };
 
 
@@ -61,7 +64,9 @@ export class EditorPage extends React.Component<Props, State> {
          *     this.props.onChangeProblem(this.monaco!.getModel()!.getValue());
          * }); */
     }
-
+    addInputOutputExample(example: inOutExample){
+        this.setState({inputOutputExamples: [...this.state.inputOutputExamples, example]});
+    }
     openEditor(){
         console.log("click Apply")
 
@@ -124,6 +129,7 @@ export class EditorPage extends React.Component<Props, State> {
                          input = {this.state.input}
                          onBlast = {this.blast.bind(this)}
                          isModal = {false}
+                         onAddInputOutputExample ={this.addInputOutputExample.bind(this)}
                      />
                 </section>
 
