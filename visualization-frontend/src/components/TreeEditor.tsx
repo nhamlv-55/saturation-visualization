@@ -73,7 +73,6 @@ class TreeEditor extends React.Component<Props, State> {
     }
 
     generateNetwork() {
-        console.log("I am Graph. I receive:", this.props)
         assert(this.graphContainer.current);
         assert(!this.network); // should only be called once
         this.network = new Network(this.graphContainer.current!, {
