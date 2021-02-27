@@ -298,7 +298,6 @@ class App extends Component<Props, State> {
                     ExprMap = { ExprMap }
                     layout = { layout }
                     expr_layout ={expr_layout}
-                    saveExprs = {this.saveExprMap.bind(this)}
                     expName = {this.state.expName}
                     solvingCompleted = {this.state.solvingCompleted}
                 />

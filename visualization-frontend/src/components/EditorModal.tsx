@@ -7,7 +7,6 @@ type Props = {
     inputList: string[],
     expName: string,
     onTransformExprs?: (t: string)=> Promise<void>,
-    saveExprs?: ()=> void,
 }
 
 type State = {
@@ -58,7 +57,6 @@ export class EditorModal extends React.Component<Props, State> {
                         onBlast = {this.blast.bind(this)}
                         isModal = {true}
                         onTransformExprs = {this.props.onTransformExprs!.bind(this)}
-                        saveExprs = {this.props.saveExprs!.bind(this)}
                     /> 
                 </section>
 

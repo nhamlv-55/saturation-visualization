@@ -9,7 +9,6 @@ type Props = {
     input: string,
     onBlast: (tStack: Transformer[])=>void| null,
     isModal: boolean,
-    saveExprs?: ()=> void,
     onTransformExprs?: (t: string)=> Promise<void>,
 }
 type State = {
@@ -37,9 +36,6 @@ class TreeEditor extends React.Component<Props, State> {
     transformer = new ASTTransformer();
     localSelectedNodeIDs = [-1];
     componentDidMount() {
-        if(this.props.isModal){
-            this.props.saveExprs!();
-        }
         this.generateNetwork();
         if(this.props.input !== "()"){
             this.astStack = [new AST(this.props.input)];
