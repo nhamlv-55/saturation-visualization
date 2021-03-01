@@ -36,7 +36,7 @@ class ReplaceDialog extends React.Component<Props, State> {
         })
     }
 
-    handleKeyUp(event) {
+    handleKeyUp(event: React.KeyboardEvent) {
         event.stopPropagation();
     }
     render() {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from 'react';
 import './../styles/Dashboard.css';
 import * as d3 from 'd3';

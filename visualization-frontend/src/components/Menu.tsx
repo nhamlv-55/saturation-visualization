@@ -2,7 +2,7 @@ import * as React from 'react';
 import '../styles/Menu.css';
 import * as Monaco from 'monaco-editor'
 import ExpTable from './ExpTable';
-import { assert } from '../model/util';
+import { assert } from '../helpers/util';
 import MenuOptions from "./MenuOptions";
 import {UploadSpacerLogModal} from "./UploadSpacerLogModal";
 import Modal from 'react-modal';
@@ -72,7 +72,7 @@ class Menu extends React.Component<{} & RouteComponentProps<{}>, State>{
     }
 
 
-    componentDidUpdate(prevState: State) {
+    componentDidUpdate() {
         assert(this.isChromeOrFirefox);
         if (this.state.newProblemUploaded) {
             this.monaco!.setValue(this.state.problem);
@@ -214,7 +214,7 @@ class Menu extends React.Component<{} & RouteComponentProps<{}>, State>{
     changeSpacerUserOptions(spacerUserOptions: string) {
         this.setState({spacerUserOptions: spacerUserOptions});
     }
-    changeVariables(e){
+    changeVariables(e: React.ChangeEvent<HTMLInputElement>){
         this.setState({
             varNames: e.target.value
         });

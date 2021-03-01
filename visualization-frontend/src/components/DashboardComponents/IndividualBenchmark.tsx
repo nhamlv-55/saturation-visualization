@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from 'react';
 import TimeChart from "./TimeChart";
 import {potholeToNormal} from "../../helpers/naming";

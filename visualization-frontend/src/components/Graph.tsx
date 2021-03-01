@@ -2,18 +2,19 @@ import * as React from 'react';
 import { DataSet, Network, Node, Edge } from 'vis'
 
 import '../styles/Graph.css'
-import { assert } from '../model/util';
+import { assert } from '../helpers/util';
 import {PobVisLayout, toVisEdge, toVisNode} from "../helpers/network";
 import {findClosestNode} from "../helpers/navigation";
+import { ITree, IPobLemmasMap } from '../helpers/datatypes';
 
 
 type Props = {
-    tree: any,
+    tree: ITree,
     onNodeSelectionChange: (selection: number[]) => void,
     nodeSelection: number[],
     currentTime: number,
     layout: string,
-    PobLemmasMap: any,
+    PobLemmasMap: IPobLemmasMap,
 };
 
 export default class Graph extends React.Component<Props, {}> {
@@ -92,13 +93,13 @@ export default class Graph extends React.Component<Props, {}> {
         }
     }
 
-    visLayout(ATree){
+    visLayout(ATree: ITree ){
         let nodeHasBeenSelected = this.props.nodeSelection.length > 0;
         let currentNodeExprID = Number.MIN_SAFE_INTEGER;
-        let InvList:{id: string, start: string, end: string}[] = [];
+        let InvList:{id: number, start: number, end: number}[] = [];
         if(nodeHasBeenSelected) {
             currentNodeExprID = ATree[this.props.nodeSelection[0]].exprID;
-            InvList = currentNodeExprID in this.props.PobLemmasMap ? this.props.PobLemmasMap[currentNodeExprID].map((exprInfo) => {
+            InvList = currentNodeExprID in this.props.PobLemmasMap ? this.props.PobLemmasMap[currentNodeExprID].map((exprInfo ) => {
                 return {
                     id: exprInfo[0],
                     start: exprInfo[1],
@@ -109,19 +110,19 @@ export default class Graph extends React.Component<Props, {}> {
         const visNodes = new Array<Node>();
         const visEdges = new Array<Edge>();
         let edgeId = 0;
-        
 
 
         for (const nodeID in ATree){
             let node = ATree[nodeID];
+            const level = node.level==="oo"?Number.MAX_SAFE_INTEGER:parseInt(node.level);
             if(!node.to_be_vis) continue;
             let visNode;
-            let FinalInvList = node.exprID in this.props.PobLemmasMap ? this.props.PobLemmasMap[node.exprID].filter(exprInfo => exprInfo[2] === "oo") : [];
-            let finalInv = (FinalInvList.filter(x => x[1] === node.level || x[1] === "oo").length);
+            let FinalInvList = node.exprID in this.props.PobLemmasMap ? this.props.PobLemmasMap[node.exprID].filter(exprInfo => exprInfo[2] === Number.MAX_SAFE_INTEGER) : [];
+            let finalInv = (FinalInvList.filter(x => x[1] === level).length);
             //Prioritize related nodes
             if (node.exprID === currentNodeExprID) {
                 visNode = toVisNode(node, "sameExprID", this.props.nodeSelection, finalInv)
-            } else if (InvList.length > 0 && InvList.filter(exprInfo => exprInfo.id === node.exprID).length > 0){
+            } else if (InvList.length > 0 && InvList.filter(exprInfo =>exprInfo.id === node.exprID).length > 0){
                 visNode = toVisNode(node, "lemma", this.props.nodeSelection, finalInv, InvList.findIndex(x => x.id === node.exprID) % 10);
             } else if (node.nodeID > this.props.currentTime) {
                 visNode = toVisNode(node, "activated", this.props.nodeSelection, finalInv);
@@ -141,10 +142,10 @@ export default class Graph extends React.Component<Props, {}> {
 
     }
 
-    keyupHandler(event) {
+    keyupHandler(event: KeyboardEvent) {
         if(this.props.nodeSelection.length !== 1 ) return;
         const selected_node = this.props.nodeSelection[0];
-        let closest_node = findClosestNode(selected_node, event.key, this.network);
+        let closest_node = findClosestNode(selected_node, event.key, this.network!);
         this.props.onNodeSelectionChange([closest_node]);
     }
 }

@@ -6,7 +6,7 @@ import { inOutExample, ITreeNode, IExprMap} from "../helpers/datatypes";
 const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
-    tree: {number: ITreeNode} | null,
+    tree: {[nodeID: number]: ITreeNode},
     nodeSelection: number[],
     onUpdateNodeSelection: (selection: number[]) => void,
     onPoke: () => void,
@@ -38,7 +38,7 @@ class Aside extends React.Component<Props, State> {
         }
     }
 
-    createButton(title, onClick, svg) {
+    createButton(title: string, onClick: ()=>void, svg: string) {
         return <button
                    title={title}
                    onClick = { onClick }
@@ -64,6 +64,7 @@ class Aside extends React.Component<Props, State> {
                        relatedExprMap = {this.state.relatedExprMap}
                        solvingCompleted = {this.props.solvingCompleted}
                        onAddInputOutputExample ={this.props.onAddInputOutputExample.bind(this)}
+                       onPushToMessageQ={this.props.onPushToMessageQ.bind(this)}
             />;
         } else {
             return <section className={ 'component-node-details overview' }>
@@ -72,7 +73,7 @@ class Aside extends React.Component<Props, State> {
             </section>
         }
     }
-    updateRelatedExprMap(exprMap) {
+    updateRelatedExprMap(exprMap: IExprMap) {
         this.setState({
             relatedExprMap: exprMap 
         });

@@ -20,7 +20,7 @@ export interface ITreeNode{
     event_type: string,
     expr: string,
     exprID: number,
-    level: number,
+    level: string,
     nodeID: number,
     parent: number,
     pobID: number,
@@ -28,5 +28,13 @@ export interface ITreeNode{
 }
 
 export interface IExprMap{
-    string: IExprItem
+    [nodeID: number]: IExprItem
+}
+
+export interface ITree{
+    [nodeID: number]: ITreeNode
+}
+
+export interface IPobLemmasMap{
+    [nodeID: number]: number[][]
 }

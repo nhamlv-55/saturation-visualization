@@ -69,7 +69,7 @@ class MenuOptions extends React.Component<Props, State> {
         this.props.changeSpacerUserOptions(fullOptionString);
     }
 
-    storeSpacerOptions(e) {
+    storeSpacerOptions(e: React.ChangeEvent<HTMLFormElement>) {
         e.preventDefault();
         e.target.reset();
         if (this.state.optionName === "" || (this.state.optionType !== "custom" && this.state.optionValue === "")) return;
@@ -97,7 +97,7 @@ class MenuOptions extends React.Component<Props, State> {
         return []
     }
 
-    updateOptionValue(e){
+    updateOptionValue(e: React.ChangeEvent<HTMLInputElement>){
         this.setState({
             optionValue: e.target.value
         });
@@ -108,8 +108,8 @@ class MenuOptions extends React.Component<Props, State> {
             this.setState({
                 optionTypeHTML:
                     <React.Fragment>
-                        <input type="radio" name={name} value="true" onClick={this.updateOptionValue.bind(this)}/>True
-                        <input type="radio" name={name} value="false" onClick={this.updateOptionValue.bind(this)}/>False
+                        <input type="radio" name={name} value="true" onChange={this.updateOptionValue.bind(this)}/>True
+                        <input type="radio" name={name} value="false" onChange={this.updateOptionValue.bind(this)}/>False
                         <button className="fake-button" type="submit" value="Submit">+</button>
                     </React.Fragment>
             });

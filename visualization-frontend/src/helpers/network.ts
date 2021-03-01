@@ -1,7 +1,7 @@
 import { toReadable } from "./readable";
-import {IExprItem} from "./datatypes";
+import { IExprItem, ITree, IPobLemmasMap, IExprMap} from "./datatypes";
 const styleTemplates = require('../resources/styleTemplates');
-
+const _ = require("lodash");
 export const lemmaColours = [
     "#e6194B",
     "#f58231",
@@ -16,21 +16,20 @@ export const lemmaColours = [
 ];
 
 //BUILD POB LEMMAS MAP////////////////////
-export function buildPobLemmasMap(tree: any, varList: string[]): any{
+export function buildPobLemmasMap(tree: ITree, varList: string[]): IPobLemmasMap{
     // construct PobExprID->a list of lemmas
-    let PobLemmasMap = {};
+    let PobLemmasMap:IPobLemmasMap = {};
     for (const nodeID in tree) {
         let node = tree[nodeID];
         if (node.event_type !== "EType.ADD_LEM") {
             continue
         }
         const lemmaExprID = node.exprID;
-        const level = node.level;
+        const level = node.level==="oo"?Number.MAX_SAFE_INTEGER:parseInt(node.level);
         const pobID = node.pobID;
         if (!(pobID in PobLemmasMap)) {
-            PobLemmasMap[pobID] = new Array<{}>();
+            PobLemmasMap[pobID] =  [];
         }
-
         //traverse the list, if lemmaExprID is already in the list, update its min max
         let existPrevLemma = false;
         for (const lemma of PobLemmasMap[pobID]) {
@@ -39,7 +38,7 @@ export function buildPobLemmasMap(tree: any, varList: string[]): any{
                 let prev_min = lemma[1];
                 let prev_max = lemma[2];
 
-                if (level > prev_max || level === "oo") {
+                if (level > prev_max) {
                     lemma[2] = level
                 }
                 if (level < prev_min) {
@@ -58,8 +57,8 @@ export function buildPobLemmasMap(tree: any, varList: string[]): any{
 
 
 //BUILD EXPR MAP////////////////////////
-export function buildExprMap(tree: any, varList: string[]): {string: IExprItem}{
-    let ExprMap = {} as {string: IExprItem};
+export function buildExprMap(tree: any, varList: string[]): IExprMap{
+    let ExprMap = {} as IExprMap;
     for (const nodeID in tree) {
         const node = tree[nodeID];
 
@@ -76,8 +75,8 @@ export function buildExprMap(tree: any, varList: string[]): {string: IExprItem}{
     return ExprMap;
 }
 
-export function PobVisLayout(tree): any{
-    let treeCloned = JSON.parse(JSON.stringify(tree));
+export function PobVisLayout(tree: ITree): ITree{
+    let treeCloned = _.cloneDeep(tree);
 
     for (const nodeID in treeCloned){
         let node = treeCloned[nodeID];
@@ -123,7 +122,7 @@ export function PobVisLayout(tree): any{
     return treeCloned
 }
 
-export function toVisNode(node: any, style: string, nodeSelection, finalInv: number, color:number = -1): any {
+export function toVisNode(node: any, style: string, nodeSelection: number[], finalInv: number, color:number = -1): any {
     const styleData = styleTemplates[style];
     const isMarked = nodeSelection.includes(node.nodeID);
 
@@ -169,8 +168,3 @@ export function toVisEdge(edgeId: number, parentNodeId: number, nodeID: number, 
         hidden: hidden
     }
 }
-
-export function getSliderValue(slider): number {
-    return slider.current ? parseInt(slider.current.value, 10) : 0;
-}
-
