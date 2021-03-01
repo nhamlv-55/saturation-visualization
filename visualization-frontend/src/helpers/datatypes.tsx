@@ -8,14 +8,14 @@ export interface inOutExample{
 }
 
 
-export interface ExprItem {
+export interface IExprItem {
     exprType: "LEMMA"|"POB"|"UNK",
     raw: string,
     editedRaw: string,
     editedReadable: string
 }
 
-export interface treeNode{
+export interface ITreeNode{
     children: number[],
     event_type: string,
     expr: string,
@@ -25,4 +25,8 @@ export interface treeNode{
     parent: number,
     pobID: number,
     to_be_vis: boolean
+}
+
+export interface IExprMap{
+    string: IExprItem
 }

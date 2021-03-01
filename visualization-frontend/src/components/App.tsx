@@ -9,7 +9,7 @@ import { assert } from '../model/util';
 import {buildExprMap, buildPobLemmasMap} from "../helpers/network";
 import TransformerMenu from "./DumbReplaceModal";
 import Modal from 'react-modal';
-import { inOutExample } from '../helpers/datatypes';
+import { inOutExample, ITreeNode, IExprItem, IExprMap } from '../helpers/datatypes';
 const _ = require("lodash");
 
 type Props = {
@@ -19,15 +19,15 @@ type Props = {
 type State = {
     expName: string,
     state: "loaded" | "loaded iterative" | "waiting" | "layouting" | "error",
-    tree: any,
+    tree: {number: ITreeNode},
     runCmd: string,
-    messages_q: string[],
+    messageQ: {string: string[]},
     nodeSelection: number[],
     currentTime: number,
     layout: string,
     expr_layout: "SMT" | "JSON",
     PobLemmasMap: {},
-    ExprMap: {},
+    ExprMap: IExprMap,
     multiselect: boolean,
     varNames: string,
     starModalIsOpen: boolean,
@@ -41,15 +41,15 @@ class App extends Component<Props, State> {
     state: State = {
         expName: this.props.expName,
         state: "waiting",
-        tree: {},
+        tree: {} as {number: ITreeNode},
         runCmd: "Run command:",
-        messages_q: [""],
+        messageQ: {} as {string: string[]},
         nodeSelection: [],
         currentTime: 0,
         layout: "PobVis",
         expr_layout: "SMT",
         PobLemmasMap: {},
-        ExprMap: {},
+        ExprMap: {} as {string: IExprItem},
         multiselect: false,
         varNames: "",
         starModalIsOpen: false,
@@ -62,13 +62,23 @@ class App extends Component<Props, State> {
         await this.poke();
     }
 
-    async poke() {
-        let message_q = ["Poking Spacer..."];
+    pushToMessageQ(channel: string, msg: string){
+        let current_messageQ = _.cloneDeep(this.state.messageQ);
+        if(channel in current_messageQ){
+            current_messageQ[channel].push(msg);
+        }else{
+            current_messageQ[channel] = [msg];
+        }
+        this.setState({messageQ: current_messageQ});
+    }
 
+
+
+    async poke() {
+        this.pushToMessageQ("App", "Poking Spacer...");
         console.log("poking...")
         this.setState({
             state: "waiting",
-            messages_q: message_q,
         });
 
         const fetchedJSON = await fetch('http://localhost:5000/spacer/poke', {
@@ -86,11 +96,10 @@ class App extends Component<Props, State> {
             const json = await fetchedJSON.json();
             console.log("backend response:", json);
             const tree = json["nodes_list"];
-            
             const state = "loaded";
             const PobLemmasMap = buildPobLemmasMap(tree, json.var_names);
             // NOTE: use varNames in state, not in props. The one in state is returned by the backend.
-            let ExprMap;
+            let ExprMap:{string: IExprItem};
             if (Object.keys(json.expr_map).length === 0) {
                 ExprMap = buildExprMap(tree, json.var_names);
             }
@@ -101,7 +110,6 @@ class App extends Component<Props, State> {
             this.setState({
                 tree: tree,
                 runCmd: json.run_cmd,
-                messages_q: ["Spacer is "+json.spacer_state],
                 state: state,
                 PobLemmasMap: PobLemmasMap,
                 ExprMap: ExprMap,
@@ -109,15 +117,16 @@ class App extends Component<Props, State> {
                 solvingCompleted: !(json.spacer_state === "running")
             });
             console.log("state is set")
+            this.pushToMessageQ("App", "Spacer is "+json.spacer_state);
         } catch (error) {
             if (error.name === "SatVisAssertionError") {
                 throw error;
             }
             this.setState({
                 state: "error",
-                messages_q: [`Error: ${error["message"]}`],
                 solvingCompleted: false,
             });
+            this.pushToMessageQ("App", `Error: ${error["message"]}`);
         }
     }
 
@@ -158,15 +167,15 @@ class App extends Component<Props, State> {
 
             this.setState({dumbReplaceMap: newReplaceMapJSON, ExprMap: newExprMap});
         }catch(error){
-            this.setState({messages_q: [`Error in applyDumbReplaceMap: ${error["message"]}`]});
+            this.pushToMessageQ("App", `Error in applyDumbReplaceMap: ${error["message"]}`);
         }
     }
-    updateExprMap(newExprMap: {}){
+    updateExprMap(newExprMap: IExprMap){
         console.log("newExprMap", newExprMap);
         try{
             this.setState({ExprMap: newExprMap});
         }catch(error){
-            this.setState({messages_q: [`Error in updateExprMap: ${error["message"]}`]});
+            this.pushToMessageQ("App", `Error in updateExprMap: ${error["message"]}`);
         }
     }
 
@@ -202,14 +211,10 @@ class App extends Component<Props, State> {
                 });
             }
             else {
-                this.setState({
-                    messages_q: ["Hit Poke to update graph"]
-                })
+                this.pushToMessageQ("Hint", "Hit Poke to update graph");
             }
         } else {
-            this.setState({
-                messages_q: ["Select Up to 2 nodes"]
-            });
+            this.pushToMessageQ("Hint", "Select Up to 2 nodes");
         }
         this.setState({
             multiselect: !this.state.multiselect
@@ -242,6 +247,7 @@ class App extends Component<Props, State> {
             const hL = Object.keys(this.state.tree).length;
             main = (
                 <Main
+                    messageQ = {this.state.messageQ}
                     runCmd = {this.state.runCmd}
                     tree = { this.state.tree }
                     onNodeSelectionChange = { this.updateNodeSelection.bind(this) }
@@ -252,6 +258,7 @@ class App extends Component<Props, State> {
                     layout = { this.state.layout }
                     PobLemmasMap = { this.state.PobLemmasMap }
                     solvingCompleted = {this.state.solvingCompleted}
+                    onPushToMessageQ={this.pushToMessageQ.bind(this)}
                 />
             );
         } else {
@@ -287,9 +294,9 @@ class App extends Component<Props, State> {
                     onUpdateExprMap={this.updateExprMap.bind(this)}
                     inputOutputExamples={this.state.inputOutputExamples}
                     onSaveExprMap={this.saveExprMap.bind(this)}
+                    onPushToMessageQ={this.pushToMessageQ.bind(this)}
                 />
                 <Aside
-                    messages_q = {this.state.messages_q}
                     tree = { this.state.tree }
                     nodeSelection = { this.state.nodeSelection }
                     onUpdateNodeSelection = { this.updateNodeSelection.bind(this) }
@@ -307,6 +314,7 @@ class App extends Component<Props, State> {
                     expName = {this.state.expName}
                     solvingCompleted = {this.state.solvingCompleted}
                     onAddInputOutputExample ={this.addInputOutputExample.bind(this)}
+                    onPushToMessageQ={this.pushToMessageQ.bind(this)}
                 />
                 </div>
         );
