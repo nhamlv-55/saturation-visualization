@@ -1,11 +1,10 @@
 // @ts-nocheck
 import {assert} from "./util";
-import { Network } from "vis";
 
-export function findClosestNode(nodeId: number, direction: string, network: Network| null ){
+export function findClosestNode(nodeId: number, direction, network){
     assert(network);
     assert("body" in network!);
-    const currentNode = network!.data;
+    const currentNode = network!.body.nodes[nodeId];
     let closestNode = currentNode.id;
     let min_distance = Number.MAX_SAFE_INTEGER;
 
