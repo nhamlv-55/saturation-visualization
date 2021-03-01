@@ -29,7 +29,8 @@ class ExprMapSelector extends React.Component<Props, State> {
     }
 
     getMatchingFiles() {
-        let data = this.state.exps.filter(exp => exp["exp_name"].includes(getProblemName(this.props.expName)) && exp["exp_name"] !== this.props.expName);
+        //NHAM: allow same name expmap to appear in the list
+        let data = this.state.exps.filter(exp => exp["exp_name"].includes(getProblemName(this.props.expName)));
         
         if (data.length > 0){
             this.setState({
@@ -53,6 +54,7 @@ class ExprMapSelector extends React.Component<Props, State> {
 
         try {
             const json = await fetchedJSON.json();
+            console.log(json);
             this.props.updateRelatedExprMap(JSON.parse(json.expr_map));
         } catch (error) {
             if (error.name === "SatVisAssertionError") {
@@ -76,7 +78,9 @@ class ExprMapSelector extends React.Component<Props, State> {
 
         try {
             const json = await fetchedJSON.json();
+            console.log(json);
             this.setState({exps: json.exps_list})
+
         } catch (error) {
             if (error.name === "SatVisAssertionError") {
                 throw error;
@@ -95,15 +99,14 @@ class ExprMapSelector extends React.Component<Props, State> {
     
     render() {
         return (
-            <section className={"component-node-details details-top-right"}>
+            <div>
                 <select id="exprs" onChange={this.updateSelected.bind(this)}>
-                {this.state.matchingFiles.length > 0 && this.state.matchingFiles.map((exp, key) => (
-                    <option key={key} value={exp["exp_name"]}>{exp["exp_name"]}</option>
-                ))}
+                    {this.state.matchingFiles.length > 0 && this.state.matchingFiles.map((exp, key) => (
+                        <option key={key} value={exp["exp_name"]}>{exp["exp_name"]}</option>
+                    ))}
                 </select>
                 <button onClick={this.getMatchingExprMap.bind(this)}>Get Expr Map</button>
-            </section>
-
+            </div>
         );
     }
 }

@@ -5,11 +5,13 @@ import '../styles/TransformerMenu.css';
 import { inOutExample } from '../helpers/datatypes';
 import { uuid } from 'uuidv4';
 
+import ExprMapSelector from "./ExprMapSelector";
 type Props = {
     expName: string,
     ExprMap: {}
     dumbReplaceMap: {},
-    onApplyDumbReplaceMap:(newReplaceMap: string)=>void
+    onApplyDumbReplaceMap:(newReplaceMap: string)=>void,
+    onSaveExprMap: () => void,
     onUpdateExprMap: ({}) => void,
     inputOutputExamples: inOutExample[]
 }
@@ -58,11 +60,25 @@ export default class TransformerMenu extends React.Component<Props, State> {
             }
         }
     }
-    
+
+    updateRelatedExprMap(exprMap) {
+        /* this.setState({
+         *     relatedExprMap: exprMap 
+         * }); */
+    }
+
+
     render() {
         return (
             <div className ="transformer-menu" onKeyUp={this.handleKeyUp}>
                 <section className="dumb-replace-wrapper">
+                    <button onClick={this.props.onSaveExprMap.bind(this)}>Save</button>
+                    
+                    <ExprMapSelector
+                        expName = {this.props.expName}
+                        updateRelatedExprMap = {this.updateRelatedExprMap.bind(this)}
+                    />
+
                     <label>Replacement map:</label>
                     <br/>
                     <textarea value={this.state.localReplaceMap} onChange={this.handleTextareaChange.bind(this)}/>
