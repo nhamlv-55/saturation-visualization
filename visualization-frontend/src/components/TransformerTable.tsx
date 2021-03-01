@@ -6,7 +6,7 @@ import { IExprMap } from '../helpers/datatypes';
 const _ = require("lodash");
 type Props = {
     expName: string,
-    ExprMap: {},
+    ExprMap: IExprMap,
     onUpdateLocalExprMap: (exprMap: IExprMap) => void
     key: string
 };

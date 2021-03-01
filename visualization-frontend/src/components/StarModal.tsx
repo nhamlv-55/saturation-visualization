@@ -1,12 +1,13 @@
 import * as React from 'react';
 import '../styles/StarModal.css';
+import { IExprMap } from '../helpers/datatypes';
 
 const _ = require("lodash");
 
 type Props = {
     expName: string,
     PobLemmasMap: {},
-    ExprMap: {},
+    ExprMap: IExprMap,
 }
 
 type State = {
