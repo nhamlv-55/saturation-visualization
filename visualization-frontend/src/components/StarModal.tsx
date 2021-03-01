@@ -12,7 +12,8 @@ type Props = {
 type State = {
     input: string,
     output: string,
-    finalLemmas: any[][]
+    finalLemmas: any[][],
+    debugMode: boolean,
 }
 
 
@@ -20,7 +21,8 @@ export class StarModal extends React.Component<Props, State> {
     state: State = {
         input: "()",
         output: "",
-        finalLemmas: this.getFinalInvariant()
+        finalLemmas: this.getFinalInvariant(),
+        debugMode: false
     };
 
     getFinalInvariant(){
@@ -75,23 +77,27 @@ export class StarModal extends React.Component<Props, State> {
                 expr_edited = this.props.ExprMap[lemma_id].editedReadable;
                 expr_raw = this.props.ExprMap[lemma_id].raw;
             }
-            lemRows.push(<tr>
+            lemRows.push(<tr key={"lemma-header-"+ lemma_id}>
                 <td>
-                    <h4 key={"lemma-header-edited-"+ lemma_id}>ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h4>
+                    <h4 >ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h4>
                 </td>
                 <td>
                 </td>
             </tr>)
-            lemRows.push(<tr>
-                <td><pre>{expr_raw}</pre></td>
+            lemRows.push(<tr key={"lemma-content-"+ lemma_id}>
                 <td><pre>{expr_edited}</pre></td>
+                {this.state.debugMode?<td><pre>{expr_raw}</pre></td>:""}
             </tr>)
         }
 
-        return <table>{lemRows}</table>;
+        return <table><tbody>{lemRows}</tbody></table>;
     }
 
-
+    handleDebugModeChange(e: React.ChangeEvent<HTMLInputElement>){
+        this.setState({
+            debugMode: e.target.checked
+        })
+    }
 
 
     render() {
@@ -102,6 +108,11 @@ export class StarModal extends React.Component<Props, State> {
 
             <section className="star-modal-wrapper">
                 <div className="star-modal-menu">
+                    <label>Debug mode:</label>
+                    <input type="checkbox"
+                           defaultChecked={this.state.debugMode}
+                           onChange={this.handleDebugModeChange.bind(this)} 
+                    />
                     <button onClick={this.sortByHeader.bind(this)}>Order by header</button>
                     <button onClick={this.sortByLevel.bind(this)}>Order by level</button>
                     <button onClick={this.reset.bind(this)}>Reset</button>
