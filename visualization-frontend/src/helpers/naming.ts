@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 export function potholeToNormal(input) {
     let words = input.split("_");
     for (let i = 0; i < words.length; i++){

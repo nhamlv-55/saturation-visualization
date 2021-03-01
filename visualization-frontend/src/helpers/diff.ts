@@ -1,6 +1,6 @@
 import * as diff from 'diff';
-export function toDiff(expr1, expr2){
-    let result : {value:string, added:boolean, removed:boolean}[] = [];
+export function toDiff(expr1: string, expr2: string){
+    let result : diff.Change[] = [];
     let expr1List = expr1.split("\n");
     let expr2List = expr2.split("\n");
     for (let i = 0; i < Math.min(expr1List.length, expr2List.length); i++){

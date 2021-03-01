@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Node, Edge } from 'vis';
 import { assert } from "./util";
 import {parse, isSExpNode, SExp, SExpNode} from './uber-s-exify';

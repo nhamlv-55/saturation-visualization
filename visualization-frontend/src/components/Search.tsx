@@ -1,5 +1,5 @@
+// @ts-nocheck
 import * as React from 'react';
-
 import { Dag } from '../model/dag';
 import '../styles/Search.css';
 import SatNode from '../model/sat-node';
@@ -24,7 +24,6 @@ export default class Search extends React.Component<Props, State> {
   private searchField1 = React.createRef<HTMLInputElement>();
   private searchField2 = React.createRef<HTMLInputElement>();
   private searchField3 = React.createRef<HTMLInputElement>();
-
   componentDidUpdate(prevProps) {
     if (this.props.dag !== prevProps.dag || this.props.currentTime !== prevProps.currentTime) {
       this.searchField1.current!.value = "";

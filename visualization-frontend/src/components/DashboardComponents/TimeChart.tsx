@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from 'react';
 import * as d3 from 'd3';
 import SunburstChart, {Node} from "sunburst-chart";

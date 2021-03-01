@@ -1,9 +1,10 @@
 import * as React from 'react';
 import {getProblemName} from "../helpers/readable";
+import { IExprMap } from '../helpers/datatypes';
 
 type Props = {
     expName: string
-    updateRelatedExprMap: (exprMap) => void
+    updateRelatedExprMap: (exprMap: IExprMap) => void
 }
 
 type State = {
@@ -91,7 +92,7 @@ class ExprMapSelector extends React.Component<Props, State> {
         }
     }
     
-    updateSelected(e) {
+    updateSelected(e: React.ChangeEvent<HTMLSelectElement>) {
         this.setState({
             selected: e.target.value
         });

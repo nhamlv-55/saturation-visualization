@@ -1,12 +1,12 @@
 import * as React from 'react';
 import '../styles/StarModal.css';
-import { IExprMap } from '../helpers/datatypes';
+import { IExprMap, IPobLemmasMap } from '../helpers/datatypes';
 
 const _ = require("lodash");
 
 type Props = {
     expName: string,
-    PobLemmasMap: {},
+    PobLemmasMap: IPobLemmasMap,
     ExprMap: IExprMap,
 }
 
@@ -32,7 +32,7 @@ export class StarModal extends React.Component<Props, State> {
             /* console.log(pob); */
             let lemmas = this.props.PobLemmasMap[pob];
             for(const lemma of lemmas){
-                if(lemma instanceof Array && lemma[2]==="oo"){
+                if(lemma instanceof Array && lemma[2]===Number.MAX_SAFE_INTEGER){
                     finalLemmas.add(lemma);
                 }
             }

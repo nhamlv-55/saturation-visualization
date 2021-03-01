@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { AST, ASTTransformer, Transformer, ProseTransformation} from "../helpers/transformers";
 import {inOutExample} from "../helpers/datatypes";
-import { assert } from '../model/util';
+import { assert } from '../helpers/util';
 import { DataSet, Network, Node, Edge } from 'vis'
 import ReplaceDialog from './ReplaceDialog'
 const _ = require("lodash");
@@ -183,7 +183,7 @@ class TreeEditor extends React.Component<Props, State> {
 
 
 
-    updateTransformationSelected(e) {
+    updateTransformationSelected(e: React.ChangeEvent<HTMLInputElement>) {
         this.setState({
             transformationSelected: e.target.value
         })
@@ -195,7 +195,7 @@ class TreeEditor extends React.Component<Props, State> {
         let possibleTs = this.state.possibleTransformations.map((transformation: ProseTransformation,key) => (
             <div key={key}>
                 <input type="radio" name={"transformation"} value={transformation.xmlAst}
-                       onClick={this.updateTransformationSelected!.bind(this)}/>{transformation.humanReadableAst}
+                       onChange={this.updateTransformationSelected!.bind(this)}/>{transformation.humanReadableAst}
             </div>
         ))
 

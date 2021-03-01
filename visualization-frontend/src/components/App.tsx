@@ -5,11 +5,11 @@ import Main from './Main';
 import Aside from './Aside';
 import {StarModal} from './StarModal';
 import '../styles/App.css';
-import { assert } from '../model/util';
+import { assert } from '../helpers/util';
 import {buildExprMap, buildPobLemmasMap} from "../helpers/network";
 import TransformerMenu from "./DumbReplaceModal";
 import Modal from 'react-modal';
-import { inOutExample, ITreeNode, IExprItem, IExprMap } from '../helpers/datatypes';
+import { inOutExample, ITreeNode, IExprItem, IExprMap, ITree } from '../helpers/datatypes';
 const _ = require("lodash");
 
 type Props = {
@@ -19,7 +19,7 @@ type Props = {
 type State = {
     expName: string,
     state: "loaded" | "loaded iterative" | "waiting" | "layouting" | "error",
-    tree: {number: ITreeNode},
+    tree: ITree,
     runCmd: string,
     messageQ: {string: string[]},
     nodeSelection: number[],
@@ -32,7 +32,7 @@ type State = {
     varNames: string,
     starModalIsOpen: boolean,
     solvingCompleted: boolean,
-    dumbReplaceMap: {},
+    dumbReplaceMap: {[source: string]: string},
     inputOutputExamples: inOutExample[],
 }
 
@@ -41,7 +41,7 @@ class App extends Component<Props, State> {
     state: State = {
         expName: this.props.expName,
         state: "waiting",
-        tree: {} as {number: ITreeNode},
+        tree: {} as ITree,
         runCmd: "Run command:",
         messageQ: {} as {string: string[]},
         nodeSelection: [],
@@ -49,12 +49,12 @@ class App extends Component<Props, State> {
         layout: "PobVis",
         expr_layout: "SMT",
         PobLemmasMap: {},
-        ExprMap: {} as {string: IExprItem},
+        ExprMap: {} as IExprMap,
         multiselect: false,
         varNames: "",
         starModalIsOpen: false,
         solvingCompleted: false,
-        dumbReplaceMap: {},
+        dumbReplaceMap: {} as {string: string},
         inputOutputExamples: []
     };
 
@@ -99,7 +99,7 @@ class App extends Component<Props, State> {
             const state = "loaded";
             const PobLemmasMap = buildPobLemmasMap(tree, json.var_names);
             // NOTE: use varNames in state, not in props. The one in state is returned by the backend.
-            let ExprMap:{string: IExprItem};
+            let ExprMap:IExprMap;
             if (Object.keys(json.expr_map).length === 0) {
                 ExprMap = buildExprMap(tree, json.var_names);
             }
@@ -155,13 +155,15 @@ class App extends Component<Props, State> {
 
     applyDumbReplaceMap(newReplaceMap: string){
         try{
-            var newReplaceMapJSON: {};
+            var newReplaceMapJSON: {[source: string]: string};
             newReplaceMapJSON = JSON.parse(newReplaceMap);
 
             var newExprMap = _.cloneDeep(this.state.ExprMap);
             for(let key in newExprMap) {
-                for (let source in newReplaceMapJSON){
-                    newExprMap[key].editedReadable = newExprMap[key].editedReadable.replaceAll(source, newReplaceMapJSON[source]);
+                for (const source of Object.keys(newReplaceMapJSON)){
+                    const target:string = newReplaceMapJSON[source];
+                    newExprMap[key].editedReadable = newExprMap[key].editedReadable.replaceAll(source,
+                                                                                               target);
                 }
             }
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 class SatVisAssertionError extends Error {
     constructor(message) {
       super(message);

@@ -32,7 +32,7 @@ export default class TransformerMenu extends React.Component<Props, State> {
         })
     }
 
-    handleKeyUp(event) {
+    handleKeyUp(event: React.KeyboardEvent<HTMLDivElement>) {
         event.stopPropagation();
     }
 
@@ -62,7 +62,7 @@ export default class TransformerMenu extends React.Component<Props, State> {
         }
     }
 
-    updateRelatedExprMap(exprMap) {
+    updateRelatedExprMap(exprMap: IExprMap) {
         this.props.onPushToMessageQ("TransformerMenu", "")
         /* this.setState({
          *     relatedExprMap: exprMap 
