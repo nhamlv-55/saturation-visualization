@@ -122,7 +122,7 @@ class App extends Component<Props, State> {
     }
 
     async saveExprMap() {
-        await fetch('http://localhost:5000/spacer/save_exprs', {
+        const fetchedJSON = await fetch('http://localhost:5000/spacer/save_exprs', {
             method: 'POST',
             mode: 'cors',
             headers: {
@@ -133,6 +133,15 @@ class App extends Component<Props, State> {
                 expr_map: JSON.stringify(this.state.ExprMap)
             })
         });
+
+        try{
+            const json = await fetchedJSON.json();
+
+            console.log(json);
+        }catch(error){
+            throw error;
+        }
+
     }
 
     applyDumbReplaceMap(newReplaceMap: string){
@@ -277,6 +286,7 @@ class App extends Component<Props, State> {
                     ExprMap ={this.state.ExprMap}
                     onUpdateExprMap={this.updateExprMap.bind(this)}
                     inputOutputExamples={this.state.inputOutputExamples}
+                    onSaveExprMap={this.saveExprMap.bind(this)}
                 />
                 <Aside
                     messages_q = {this.state.messages_q}
