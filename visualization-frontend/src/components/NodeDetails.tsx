@@ -6,10 +6,10 @@ import {toDiff} from "../helpers/diff";
 import {lemmaColours} from "../helpers/network";
 import {getCleanExprList} from "../helpers/readable";
 import Modal from 'react-modal';
-import { inOutExample, treeNode} from "../helpers/datatypes";
+import { inOutExample, ITreeNode} from "../helpers/datatypes";
 import {EditorModal} from './EditorModal';
 type Props = {
-    nodes: treeNode[],
+    nodes: ITreeNode[],
     expName: string
     PobLemmasMap: {},
     ExprMap: {},
@@ -85,7 +85,7 @@ export default class NodeDetails extends React.Component<Props, State> {
         return result
     }
 
-    getLemmaExprs(node: treeNode): string[]{
+    getLemmaExprs(node: ITreeNode): string[]{
         /*
         Convert all lemmas under a pob to input to Editor
         */
@@ -215,7 +215,7 @@ export default class NodeDetails extends React.Component<Props, State> {
     }
 
     render() {
-        let node1: treeNode, node2: treeNode;
+        let node1: ITreeNode, node2: ITreeNode;
 
         let detailfDiffJSX: JSX.Element;
 

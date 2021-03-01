@@ -2,7 +2,7 @@ import * as React from 'react';
 import {ChangeEvent} from "react";
 import TransformerTable from './TransformerTable';
 import '../styles/TransformerMenu.css';
-import { inOutExample } from '../helpers/datatypes';
+import { inOutExample, IExprMap } from '../helpers/datatypes';
 import { uuid } from 'uuidv4';
 
 import ExprMapSelector from "./ExprMapSelector";
@@ -12,8 +12,9 @@ type Props = {
     dumbReplaceMap: {},
     onApplyDumbReplaceMap:(newReplaceMap: string)=>void,
     onSaveExprMap: () => void,
-    onUpdateExprMap: ({}) => void,
-    inputOutputExamples: inOutExample[]
+    onUpdateExprMap: (exprMap: IExprMap) => void,
+    onPushToMessageQ: (channel: string, msg: string)=>void,
+    inputOutputExamples: inOutExample[],
 }
 type State = {
     localReplaceMap: string,
@@ -62,6 +63,7 @@ export default class TransformerMenu extends React.Component<Props, State> {
     }
 
     updateRelatedExprMap(exprMap) {
+        this.props.onPushToMessageQ("TransformerMenu", "")
         /* this.setState({
          *     relatedExprMap: exprMap 
          * }); */

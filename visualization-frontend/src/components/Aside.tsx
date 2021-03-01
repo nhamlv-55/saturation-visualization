@@ -2,13 +2,11 @@ import * as React from 'react';
 
 import '../styles/NodeMenu.css';
 import NodeDetails from './NodeDetails';
-import ExprMapSelector from "./ExprMapSelector";
-import { inOutExample, treeNode} from "../helpers/datatypes";
+import { inOutExample, ITreeNode} from "../helpers/datatypes";
 const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
-    messages_q: string[],
-    tree: {number: treeNode} | null,
+    tree: {number: ITreeNode} | null,
     nodeSelection: number[],
     onUpdateNodeSelection: (selection: number[]) => void,
     onPoke: () => void,
@@ -25,6 +23,7 @@ type Props = {
     expName: string,
     solvingCompleted: boolean
     onAddInputOutputExample: (example: inOutExample)=>void,
+    onPushToMessageQ: (channel: string, msg: string)=>void,
 };
 
 type State = {
@@ -51,7 +50,7 @@ class Aside extends React.Component<Props, State> {
     }
     getNodeDetails() {
         if (this.props.nodeSelection.length >= 1  && this.props.tree != null) {
-            let nodes: treeNode[] = [];
+            let nodes: ITreeNode[] = [];
             for (let node of this.props.nodeSelection){
                 nodes.push(this.props.tree[node]);
             }
@@ -72,9 +71,7 @@ class Aside extends React.Component<Props, State> {
                 } </strong> selected</small >
             </section>
         }
-        
     }
-    
     updateRelatedExprMap(exprMap) {
         this.setState({
             relatedExprMap: exprMap 
@@ -85,9 +82,6 @@ class Aside extends React.Component<Props, State> {
         return(
             <aside>
                 <article>
-                    {this.props.messages_q.map((mess, key) => (
-                        <section  key={key} className="component-node-menu">{mess}</section>
-                    ))}
                     <section className="component-node-menu" >
                         { this.createButton("Poke", this.props.onPoke, "graph-undo") }
                         { this.createButton("Star", this.props.onOpenStarModal, "star") }
@@ -113,11 +107,7 @@ class Aside extends React.Component<Props, State> {
                     </section>
                 </article>
                 { this.getNodeDetails() }
-                {/* <ExprMapSelector
-                    expName = {this.props.expName}
-                    updateRelatedExprMap = {this.updateRelatedExprMap.bind(this)}
-                    /> */}
-            </aside>
+                   </aside>
         );
     }
 

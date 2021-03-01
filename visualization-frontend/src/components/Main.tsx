@@ -6,6 +6,7 @@ import ReactModal from 'react-modal';
 ReactModal.setAppElement('#root');
 
 type Props = {
+    messageQ: {string: string[]},
     tree: any,
     runCmd: string,
     onNodeSelectionChange: (selection: number[]) => void,
@@ -15,13 +16,14 @@ type Props = {
     onCurrentTimeChange: (newState: number) => void,
     layout: string,
     PobLemmasMap: any,
-    solvingCompleted: boolean
-
+    solvingCompleted: boolean,
+    onPushToMessageQ: (channel: string, msg: string)=>void,
 };
 export default class Main extends React.Component<Props, {}> {
     render() {
         return (
             <main>
+                <div>{JSON.stringify( this.props.messageQ)}</div>
                     <input type="text" value = {this.props.runCmd} readOnly></input>
                     <Graph
                         tree= { this.props.tree }

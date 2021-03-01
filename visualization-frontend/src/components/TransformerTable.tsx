@@ -2,11 +2,12 @@ import * as React from 'react';
 import '../styles/NodeMenu.css';
 import {Link} from 'react-router-dom';
 import {replaceVarNames, toReadable} from "../helpers/readable";
+import { IExprMap } from '../helpers/datatypes';
 const _ = require("lodash");
 type Props = {
     expName: string,
     ExprMap: {},
-    onUpdateLocalExprMap: ({}) => void
+    onUpdateLocalExprMap: (exprMap: IExprMap) => void
     key: string
 };
 type State = {

@@ -79,14 +79,16 @@ export class StarModal extends React.Component<Props, State> {
             }
             lemRows.push(<tr key={"lemma-header-"+ lemma_id}>
                 <td>
-                    <h4 >ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h4>
+                    <h4>ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h4>
                 </td>
                 <td>
                 </td>
             </tr>)
             lemRows.push(<tr key={"lemma-content-"+ lemma_id}>
                 <td><pre>{expr_edited}</pre></td>
-                {this.state.debugMode?<td><pre>{expr_raw}</pre></td>:""}
+                {this.state.debugMode?
+                 <td><pre>{expr_raw}</pre></td>:
+                 <td></td>}
             </tr>)
         }
 
