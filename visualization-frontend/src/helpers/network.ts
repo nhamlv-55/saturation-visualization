@@ -1,5 +1,5 @@
 import { toReadable } from "./readable";
-import {ExprItem} from "./datatypes";
+import {IExprItem} from "./datatypes";
 const styleTemplates = require('../resources/styleTemplates');
 
 export const lemmaColours = [
@@ -58,27 +58,14 @@ export function buildPobLemmasMap(tree: any, varList: string[]): any{
 
 
 //BUILD EXPR MAP////////////////////////
-export function buildExprMap(tree: any, varList: string[]): any{
-    // for (let i = 0; i < Object.keys(tree).length; i++){
-    //     let rawWithVars = replaceVarNames(tree[i].expr, json.var_names);
-    //     let readable = toReadable(rawWithVars);
-    //     tree[i].expr = {
-    //         raw: rawWithVars,
-    //         editedRaw: rawWithVars,
-    //         editedReadable: readable
-    //     };
-    // }
-
-
-
-
-    let ExprMap = new Map<number, ExprItem>();
+export function buildExprMap(tree: any, varList: string[]): {string: IExprItem}{
+    let ExprMap = {} as {string: IExprItem};
     for (const nodeID in tree) {
         const node = tree[nodeID];
 
         let readable = toReadable(node["expr"]);
         // console.log(node["expr"], readable);
-        const exprMapItem: ExprItem = {
+        const exprMapItem: IExprItem = {
             exprType: "UNK",
             raw: node.expr,
             editedRaw: node.expr,
@@ -86,8 +73,7 @@ export function buildExprMap(tree: any, varList: string[]): any{
         };
         ExprMap[node["exprID"]] = exprMapItem;
     }
-    return ExprMap
-
+    return ExprMap;
 }
 
 export function PobVisLayout(tree): any{

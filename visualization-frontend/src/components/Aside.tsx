@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import '../styles/NodeMenu.css';
 import NodeDetails from './NodeDetails';
-import { inOutExample, ITreeNode} from "../helpers/datatypes";
+import { inOutExample, ITreeNode, IExprMap} from "../helpers/datatypes";
 const icons = require('../resources/icons/all.svg') as string;
 
 type Props = {
@@ -17,7 +17,7 @@ type Props = {
     SMTLayout: () => void,
     JSONLayout:() => void,
     PobLemmasMap: {},
-    ExprMap: {},
+    ExprMap: IExprMap,
     layout: string,
     expr_layout: "SMT"|"JSON",
     expName: string,

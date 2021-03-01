@@ -6,13 +6,13 @@ import {toDiff} from "../helpers/diff";
 import {lemmaColours} from "../helpers/network";
 import {getCleanExprList} from "../helpers/readable";
 import Modal from 'react-modal';
-import { inOutExample, ITreeNode} from "../helpers/datatypes";
+import { inOutExample, ITreeNode, IExprMap} from "../helpers/datatypes";
 import {EditorModal} from './EditorModal';
 type Props = {
     nodes: ITreeNode[],
     expName: string
     PobLemmasMap: {},
-    ExprMap: {},
+    ExprMap: IExprMap,
     layout: string,
     expr_layout: "SMT" | "JSON",
     relatedExprMap: any,

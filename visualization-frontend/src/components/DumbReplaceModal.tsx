@@ -8,7 +8,7 @@ import { uuid } from 'uuidv4';
 import ExprMapSelector from "./ExprMapSelector";
 type Props = {
     expName: string,
-    ExprMap: {}
+    ExprMap: IExprMap,
     dumbReplaceMap: {},
     onApplyDumbReplaceMap:(newReplaceMap: string)=>void,
     onSaveExprMap: () => void,
