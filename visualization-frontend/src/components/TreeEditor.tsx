@@ -12,6 +12,7 @@ type Props = {
     onBlast?: (tStack: Transformer[])=>void| null,
     isModal: boolean,
     onTransformExprs?: (t: string)=> Promise<void>,
+    onPushToMessageQ: (channel: string, msg: string)=>void,
 }
 type State = {
     selectedNodeIDs: number[],

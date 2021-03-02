@@ -8,6 +8,7 @@ type Props = {
     expName: string,
     onTransformExprs?: (t: string)=> Promise<void>,
     onAddInputOutputExample: (example: inOutExample)=>void,
+    onPushToMessageQ: (channel: string, msg: string)=>void,
 }
 
 type State = {
@@ -59,6 +60,7 @@ export class EditorModal extends React.Component<Props, State> {
                         isModal = {true}
                         onTransformExprs = {this.props.onTransformExprs!.bind(this)}
                         onAddInputOutputExample ={this.props.onAddInputOutputExample.bind(this)}
+                        onPushToMessageQ={this.props.onPushToMessageQ}
                     /> 
                 </section>
 

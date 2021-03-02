@@ -198,6 +198,7 @@ export default class NodeDetails extends React.Component<Props, State> {
     }
 
     render() {
+        console.log(this.props.PobLemmasMap);
         let node1: ITreeNode, node2: ITreeNode;
 
         let detailfDiffJSX: JSX.Element;
@@ -239,6 +240,7 @@ export default class NodeDetails extends React.Component<Props, State> {
                         inputList={this.state.editorTextInputList}
                         onTransformExprs = {this.transformExprsFromText.bind(this)}
                         onAddInputOutputExample ={this.props.onAddInputOutputExample.bind(this)}
+                        onPushToMessageQ={this.props.onPushToMessageQ.bind(this)}
                     />
                 </Modal>
 

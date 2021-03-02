@@ -15,14 +15,14 @@
 }
 .component-node-details.details-top-0 {
     position: fixed;
-    top: 10rem;
+    top: 13rem;
     background: #f8f9fb;
     overflow: auto;
     width: 30rem;
 }
 .component-node-details.details-top-1 {
     position: fixed;
-    top: 10rem;
+    top: 13rem;
     background: #f8f9fb;
     overflow: auto;
     width: 30rem;
@@ -38,7 +38,7 @@
 }
 .component-node-details.details-diff {
     position: fixed;
-    top: 10rem;
+    top: 13rem;
     left: 68rem;
     background: #f8f9fb;
     overflow: auto;
