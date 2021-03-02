@@ -183,6 +183,8 @@ class App extends Component<Props, State> {
 
 
 
+
+
     updateNodeSelection(nodeSelection: number[]) {
         if (this.state.multiselect) {
             let tempNodeSelection = this.state.nodeSelection.slice(this.state.nodeSelection.length-1).concat(nodeSelection);
@@ -241,6 +243,7 @@ class App extends Component<Props, State> {
     render() {
 
         const hL = Object.keys(this.state.tree).length;
+
         return (
             <div className= "app" >
                 <Modal
