@@ -76,7 +76,6 @@ class App extends Component<Props, State> {
 
     async poke() {
         this.pushToMessageQ("App", "Poking Spacer...");
-        console.log("poking...")
         this.setState({
             state: "waiting",
         });
@@ -117,7 +116,8 @@ class App extends Component<Props, State> {
                 solvingCompleted: !(json.spacer_state === "running")
             });
             console.log("state is set")
-            this.pushToMessageQ("App", "Spacer is "+json.spacer_state);
+            this.pushToMessageQ("SpacerStatus", json.spacer_state);
+            this.pushToMessageQ("App", "Poking is done");
         } catch (error) {
             if (error.name === "SatVisAssertionError") {
                 throw error;
@@ -212,11 +212,6 @@ class App extends Component<Props, State> {
                     nodeSelection: [this.state.nodeSelection[this.state.nodeSelection.length - 1]]
                 });
             }
-            else {
-                this.pushToMessageQ("Hint", "Hit Poke to update graph");
-            }
-        } else {
-            this.pushToMessageQ("Hint", "Select Up to 2 nodes");
         }
         this.setState({
             multiselect: !this.state.multiselect
@@ -240,6 +235,7 @@ class App extends Component<Props, State> {
 
     addInputOutputExample(example: inOutExample){
         this.setState({inputOutputExamples: [...this.state.inputOutputExamples, example]});
+        this.pushToMessageQ("App", "Example added to inputOutputExamples");
     }
 
     render() {
@@ -285,6 +281,7 @@ class App extends Component<Props, State> {
                         expName = {this.props.expName}
                         PobLemmasMap = {this.state.PobLemmasMap}
                         ExprMap = {this.state.ExprMap}
+                        onPushToMessageQ={this.pushToMessageQ.bind(this)}
                     />
                 </Modal>
                 { main }

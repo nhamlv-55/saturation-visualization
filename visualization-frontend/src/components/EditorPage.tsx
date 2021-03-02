@@ -102,6 +102,9 @@ export class EditorPage extends React.Component<Props, State> {
         this.setState({output: output});
     }
 
+    pushToMessageQ(channel: string, msg: string){
+    }
+
     render() {
         if (!this.isChromeOrFirefox) {
             return (
@@ -130,6 +133,7 @@ export class EditorPage extends React.Component<Props, State> {
                          onBlast = {this.blast.bind(this)}
                          isModal = {false}
                          onAddInputOutputExample ={this.addInputOutputExample.bind(this)}
+                         onPushToMessageQ={this.pushToMessageQ.bind(this)}
                      />
                 </section>
 
