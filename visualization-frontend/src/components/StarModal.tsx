@@ -8,6 +8,7 @@ type Props = {
     expName: string,
     PobLemmasMap: IPobLemmasMap,
     ExprMap: IExprMap,
+    onPushToMessageQ: (channel: string, msg: string)=>void,
 }
 
 type State = {
@@ -32,7 +33,7 @@ export class StarModal extends React.Component<Props, State> {
             /* console.log(pob); */
             let lemmas = this.props.PobLemmasMap[pob];
             for(const lemma of lemmas){
-                if(lemma instanceof Array && lemma[2]===Number.MAX_SAFE_INTEGER){
+                if(lemma[2]===Number.MAX_SAFE_INTEGER){
                     finalLemmas.add(lemma);
                 }
             }
@@ -71,7 +72,6 @@ export class StarModal extends React.Component<Props, State> {
 
         for (const lemma of this.state.finalLemmas){
             const lemma_id = lemma[0];
-            if(lemma[2]!=="oo"){continue;}
             let expr_raw = '';
             let expr_edited = '';
             if(this.props.ExprMap[lemma_id]){
