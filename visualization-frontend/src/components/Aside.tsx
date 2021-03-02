@@ -89,22 +89,22 @@ class Aside extends React.Component<Props, State> {
                         { this.createButton("SatVis", this.props.SatVisLayout, "node-parents") }
                         { this.createButton("PobVis", this.props.PobVisLayout, "node-children") }
                         { this.createButton("MultiSelect", this.props.MultiSelectMode, "history-forward") }
-                        <button
+                        {/* <button
                             title = "SMT"
                             onClick = { this.props.SMTLayout }
-                        >
+                            >
                             <svg viewBox="0 0 30 30" className = "icon big" >
-                                <text x="50%" alignmentBaseline="middle" textAnchor="middle" y="50%" dominantBaseline="middle" fontWeight="light" stroke="none" fill="black" fontFamily="monospace">Raw</text>
+                            <text x="50%" alignmentBaseline="middle" textAnchor="middle" y="50%" dominantBaseline="middle" fontWeight="light" stroke="none" fill="black" fontFamily="monospace">Raw</text>
                             </svg>
-                        </button>
-                        <button
+                            </button>
+                            <button
                             title = "JSON"
                             onClick = { this.props.JSONLayout }
-                        >
+                            >
                             <svg viewBox="0 0 35 35" className = "icon big" >
-                                <text x="50%" alignmentBaseline="middle" textAnchor="middle" y="50%" dominantBaseline="middle" fontWeight="light" stroke="none" fill="black" fontFamily="monospace">Sort</text>
+                            <text x="50%" alignmentBaseline="middle" textAnchor="middle" y="50%" dominantBaseline="middle" fontWeight="light" stroke="none" fill="black" fontFamily="monospace">Sort</text>
                             </svg>
-                        </button>
+                            </button> */}
                     </section>
                 </article>
                 { this.getNodeDetails() }

@@ -6,6 +6,7 @@ import ReactModal from 'react-modal';
 ReactModal.setAppElement('#root');
 
 type Props = {
+    appState: "loaded" | "loaded iterative" | "waiting" | "layouting" | "error",
     messageQ: { [channel: string]: string[] },
     tree: any,
     runCmd: string,
@@ -25,7 +26,8 @@ export default class Main extends React.Component<Props, {}> {
         Object.keys(this.props.messageQ).forEach((key)=>{
             messageArea.push(
                 <div className="message-wrapper" key={"message-" + key}>
-                    <span>{key}:</span>
+                    <span>{key}</span>
+                    <br/>
                     {this.props.messageQ[key][this.props.messageQ[key].length - 1]}
                 </div>)
         })
@@ -35,6 +37,7 @@ export default class Main extends React.Component<Props, {}> {
             <main>
                 <div>{messageArea}</div>
                 <input type="text" value={this.props.runCmd} readOnly></input>
+                {this.props.appState ==="loaded"?
                 <Graph
                     tree={this.props.tree}
                     onNodeSelectionChange={this.props.onNodeSelectionChange}
@@ -42,16 +45,17 @@ export default class Main extends React.Component<Props, {}> {
                     currentTime={this.props.currentTime}
                     layout={this.props.layout}
                     PobLemmasMap={this.props.PobLemmasMap}
-                />
+                />:""}
+                {this.props.appState === "loaded"?
                 <Slider
                     historyLength={this.props.historyLength}
                     currentTime={this.props.currentTime}
                     onCurrentTimeChange={this.props.onCurrentTimeChange}
                     enabled={true}
                 />
+                :""}
             </main>
         );
     }
 
 }
-
