@@ -183,6 +183,8 @@ class App extends Component<Props, State> {
 
 
 
+
+
     updateNodeSelection(nodeSelection: number[]) {
         if (this.state.multiselect) {
             let tempNodeSelection = this.state.nodeSelection.slice(this.state.nodeSelection.length-1).concat(nodeSelection);
@@ -240,32 +242,8 @@ class App extends Component<Props, State> {
 
     render() {
 
-        let main;
-        if (this.state.state === "loaded") {
-            const hL = Object.keys(this.state.tree).length;
-            main = (
-                <Main
-                    messageQ = {this.state.messageQ}
-                    runCmd = {this.state.runCmd}
-                    tree = { this.state.tree }
-                    onNodeSelectionChange = { this.updateNodeSelection.bind(this) }
-                    nodeSelection = { this.state.nodeSelection }
-                    historyLength = { hL }
-                    currentTime = { this.state.currentTime }
-                    onCurrentTimeChange = { this.updateCurrentTime.bind(this) }
-                    layout = { this.state.layout }
-                    PobLemmasMap = { this.state.PobLemmasMap }
-                    solvingCompleted = {this.state.solvingCompleted}
-                    onPushToMessageQ={this.pushToMessageQ.bind(this)}
-                />
-            );
-        } else {
-            main = (
-                <main >
-                    <section className= "slider-placeholder" />
-                </main>
-            );
-        }
+        const hL = Object.keys(this.state.tree).length;
+
         return (
             <div className= "app" >
                 <Modal
@@ -284,7 +262,21 @@ class App extends Component<Props, State> {
                         onPushToMessageQ={this.pushToMessageQ.bind(this)}
                     />
                 </Modal>
-                { main }
+                <Main
+                    appState = {this.state.state}
+                    messageQ = {this.state.messageQ}
+                    runCmd = {this.state.runCmd}
+                    tree = { this.state.tree }
+                    onNodeSelectionChange = { this.updateNodeSelection.bind(this) }
+                    nodeSelection = { this.state.nodeSelection }
+                    historyLength = { hL }
+                    currentTime = { this.state.currentTime }
+                    onCurrentTimeChange = { this.updateCurrentTime.bind(this) }
+                    layout = { this.state.layout }
+                    PobLemmasMap = { this.state.PobLemmasMap }
+                    solvingCompleted = {this.state.solvingCompleted}
+                    onPushToMessageQ={this.pushToMessageQ.bind(this)}
+                />
                 <TransformerMenu
                     dumbReplaceMap ={this.state.dumbReplaceMap}
                     onApplyDumbReplaceMap={this.applyDumbReplaceMap.bind(this)}
