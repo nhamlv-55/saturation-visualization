@@ -3,7 +3,7 @@ import { DataSet, Network, Node, Edge } from 'vis'
 
 import '../styles/Graph.css'
 import { assert } from '../helpers/util';
-import {PobVisLayout, toVisEdge, toVisNode} from "../helpers/network";
+import { PobVisLayout, toVisEdge, toVisNode, ptColours} from "../helpers/network";
 import {findClosestNode} from "../helpers/navigation";
 import { ITree, IPobLemmasMap } from '../helpers/datatypes';
 
@@ -97,6 +97,9 @@ export default class Graph extends React.Component<Props, {}> {
         let nodeHasBeenSelected = this.props.nodeSelection.length > 0;
         let currentNodeExprID = Number.MIN_SAFE_INTEGER;
         let InvList:{id: number, start: number, end: number}[] = [];
+
+        let ptColorMap: {[ptName:string]: number} = {};
+
         if(nodeHasBeenSelected) {
             currentNodeExprID = ATree[this.props.nodeSelection[0]].exprID;
             InvList = currentNodeExprID in this.props.PobLemmasMap ? this.props.PobLemmasMap[currentNodeExprID].map((exprInfo ) => {
@@ -114,6 +117,13 @@ export default class Graph extends React.Component<Props, {}> {
 
         for (const nodeID in ATree){
             let node = ATree[nodeID];
+            let nodeColor:number = -1;
+            if(node.pt_name in ptColorMap){
+                nodeColor = ptColorMap[node.pt_name];
+            }else{
+                ptColorMap[node.pt_name] = Object.keys(ptColorMap).length;
+                nodeColor = ptColorMap[node.pt_name];
+            }
             const level = node.level==="oo"?Number.MAX_SAFE_INTEGER:parseInt(node.level);
             if(!node.to_be_vis) continue;
             let visNode;
@@ -121,11 +131,11 @@ export default class Graph extends React.Component<Props, {}> {
             let finalInv = (FinalInvList.filter(x => x[1] === level || x[1] === Number.MAX_SAFE_INTEGER).length);
             //Prioritize related nodes
             if (node.exprID === currentNodeExprID) {
-                visNode = toVisNode(node, "sameExprID", this.props.nodeSelection, finalInv)
+                visNode = toVisNode(node, "sameExprID", this.props.nodeSelection, finalInv, nodeColor)
             } else if (InvList.length > 0 && InvList.filter(exprInfo =>exprInfo.id === node.exprID).length > 0){
                 visNode = toVisNode(node, "lemma", this.props.nodeSelection, finalInv, InvList.findIndex(x => x.id === node.exprID) % 10);
             } else if (node.nodeID > this.props.currentTime) {
-                visNode = toVisNode(node, "activated", this.props.nodeSelection, finalInv);
+                visNode = toVisNode(node, "activated", this.props.nodeSelection, finalInv, nodeColor);
             } else {
                 visNode = toVisNode(node, "passive", this.props.nodeSelection, finalInv);
             }

@@ -24,7 +24,8 @@ export interface ITreeNode{
     nodeID: number,
     parent: number,
     pobID: number,
-    to_be_vis: boolean
+    to_be_vis: boolean,
+    pt_name: string
 }
 
 export interface IExprMap{

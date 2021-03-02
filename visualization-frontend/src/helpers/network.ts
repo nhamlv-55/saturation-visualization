@@ -15,6 +15,21 @@ export const lemmaColours = [
     "#800000",
 ];
 
+export const ptColours = [
+    "#e6194B",
+    "#f58231",
+    "#3cb44b",
+    "#42d4f4",
+    "#000075",
+    "#469990",
+    "#911eb4",
+    "#f032e6",
+    "#fabebe",
+    "#800000",
+];
+
+
+
 //BUILD POB LEMMAS MAP////////////////////
 export function buildPobLemmasMap(tree: ITree, varList: string[]): IPobLemmasMap{
     // construct PobExprID->a list of lemmas
@@ -134,7 +149,6 @@ export function toVisNode(node: any, style: string, nodeSelection: number[], fin
                 background : styleData.highlightStyle.background
         }
     };
-    
     if (style === "lemma" && color !== -1) {
         finalColor = {
             border: lemmaColours[color],
@@ -145,6 +159,17 @@ export function toVisNode(node: any, style: string, nodeSelection: number[], fin
             }
         }
     }
+    if (style === "activated" && color !== -1) {
+        finalColor = {
+            border: lemmaColours[color],
+            background: lemmaColours[color],
+            highlight: {
+                border: ptColours[color],
+                background: ptColours[color]
+            }
+        }
+    }
+
     return {
         id: node.nodeID,
         shape: finalInv > 0 ? finalInv > 1 ? "hexagon" : "star" : styleData.shape,
