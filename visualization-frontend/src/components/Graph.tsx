@@ -119,10 +119,10 @@ export default class Graph extends React.Component<Props, {}> {
             let node = ATree[nodeID];
             let nodeColor:number = -1;
             if(node.pt_name in ptColorMap){
-                nodeColor = ptColorMap[node.pt_name];
+                nodeColor = ptColorMap[node.pt_name]%10;
             }else{
                 ptColorMap[node.pt_name] = Object.keys(ptColorMap).length;
-                nodeColor = ptColorMap[node.pt_name];
+                nodeColor = ptColorMap[node.pt_name]%10;
             }
             const level = node.level==="oo"?Number.MAX_SAFE_INTEGER:parseInt(node.level);
             if(!node.to_be_vis) continue;
