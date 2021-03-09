@@ -418,6 +418,7 @@ export class AST {
 
 
     lstToAST(parentID: number, lst: SExp|SExpNode): number{
+        // console.log(lst);
         const nodeID = this.nodeList.length;
         if(isSExpNode(lst)){
             const node = new ASTNode(nodeID, lst.token, parentID, []);
@@ -439,9 +440,11 @@ export class AST {
             return nodeID;
         }else{
             //is a list
-            let node = new ASTNode(nodeID, (lst[0] as SExpNode).token, parentID, []); 
-            node.updateRange(lst[0] as SExpNode);
-            // let node = new ASTNode(nodeID, "list", parentID, []);
+            // console.log(lst[0], lst[0] as SExpNode, (lst[0] as SExpNode).token);
+            // let node = new ASTNode(nodeID, (lst[0] as SExpNode).token, parentID, []); 
+            let node = new ASTNode(nodeID, "list", parentID, []);
+            //TODO: fix the update range. it shouldnt be a problem with the visualizer, but only a problem for the VSCode extension
+            // node.updateRange(lst);
             this.nodeList.push(node);
 
             for(var _i=0; _i < lst.length; _i++){
