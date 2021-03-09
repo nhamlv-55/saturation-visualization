@@ -7,7 +7,8 @@ const _ = require("lodash");
 type Props = {
     expName: string,
     ExprMap: IExprMap,
-    onUpdateLocalExprMap: (exprMap: IExprMap) => void
+    onUpdateLocalExprMap: (exprMap: IExprMap) => void,
+    onPushToMessageQ: (channel: string, msg: string)=>void,
     key: string
 };
 type State = {
@@ -37,14 +38,28 @@ export default class TransformerTable extends React.Component<Props, State> {
 
     render() {
         return (
+            <div>
                 <div>
-                {this.state.progs.map((item, index) => (
-                    <button className="ts-button" key = {item.hash} onClick={this.multiTransformExprs!.bind(this, item.xml_ast)}>{item.human_readable_ast}</button>
-                ))}
+                    <button className="ts-button-half"
+                            onClick={this.multiTransformExprs.bind(this, "to_readable")}
+                    >To Readable</button>
+                    <button className="ts-button-half"
+                            onClick={this.toRaw.bind(this)}
+                    >To Raw</button>
+                </div>
+                    {this.state.progs.map((item, index) => (
+                        <button className="ts-button"
+                                key = {item.hash}
+                                onClick={this.multiTransformExprs.bind(this, item.xml_ast)}
+                        >
+                            {item.human_readable_ast}
+                        </button>
+                    ))}
                 <p>{this.state.isFetching ? 'Fetching transformer...' : ''}</p>
                 </div>
         )
     }
+
     async multiTransformExprs(programs: string) {
         let tmpExprMap = _.cloneDeep(this.props.ExprMap);
 
@@ -79,7 +94,12 @@ export default class TransformerTable extends React.Component<Props, State> {
             console.log("tExprMap", tExprMap);
             Object.keys(tExprMap).forEach((key) => {
                 localExprMap[key].editedRaw = tExprMap[key]['raw'];
-                localExprMap[key].editedReadable = toReadable(tExprMap[key]['raw']);
+                //NHAM: editedReadable is set ONLY when the user explictly click on the 'To Readable' button
+                if(programs === "to_readable"){
+                    localExprMap[key].editedReadable = tExprMap[key]['readable'];
+                }else{
+                    localExprMap[key].editedReadable = tExprMap[key]['raw'];
+                }
             });
 
             this.setState({
@@ -91,8 +111,20 @@ export default class TransformerTable extends React.Component<Props, State> {
             this.setState({
                 transformationErrorFlag: true
             });
+            this.props.onPushToMessageQ("Error", "Failed to apply the transformation. Possibly not supported.");
         }
     }
+
+    async toRaw(){
+        //simply overwritting editedReadable with editedRaw
+        let localExprMap = _.cloneDeep(this.props.ExprMap);
+        Object.keys(localExprMap).forEach((key) => {
+            localExprMap[key].editedReadable = localExprMap[key].editedRaw;
+        });
+
+        this.props.onUpdateLocalExprMap(localExprMap);
+    }
+
 
 
     async fetchProgs() {
