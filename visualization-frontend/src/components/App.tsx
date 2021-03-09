@@ -145,12 +145,11 @@ class App extends Component<Props, State> {
 
         try{
             const json = await fetchedJSON.json();
-
+            this.pushToMessageQ("App", "ExprMap is saved successfully.")
             console.log(json);
         }catch(error){
-            throw error;
+            this.pushToMessageQ("App", `Error in saveExprMap`);
         }
-
     }
 
     applyDumbReplaceMap(newReplaceMap: string){
@@ -168,6 +167,7 @@ class App extends Component<Props, State> {
             }
 
             this.setState({dumbReplaceMap: newReplaceMapJSON, ExprMap: newExprMap});
+            this.pushToMessageQ("App", `applyDumbReplaceMap ok!`);
         }catch(error){
             this.pushToMessageQ("App", `Error in applyDumbReplaceMap: ${error["message"]}`);
         }
