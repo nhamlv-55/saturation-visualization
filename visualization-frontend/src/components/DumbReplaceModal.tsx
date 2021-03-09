@@ -62,6 +62,7 @@ export default class TransformerMenu extends React.Component<Props, State> {
         }
     }
 
+
     updateRelatedExprMap(exprMap: IExprMap) {
         this.props.onPushToMessageQ("TransformerMenu", "")
         /* this.setState({
@@ -97,6 +98,7 @@ export default class TransformerMenu extends React.Component<Props, State> {
                      expName={this.props.expName}
                      ExprMap ={this.props.ExprMap}
                      onUpdateLocalExprMap = {this.props.onUpdateExprMap.bind(this)}
+                     onPushToMessageQ ={this.props.onPushToMessageQ.bind(this)}
                  />
             </div>
         );
