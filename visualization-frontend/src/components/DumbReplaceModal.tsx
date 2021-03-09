@@ -62,7 +62,6 @@ export default class TransformerMenu extends React.Component<Props, State> {
         }
     }
 
-
     updateRelatedExprMap(exprMap: IExprMap) {
         this.props.onPushToMessageQ("TransformerMenu", "")
         /* this.setState({
