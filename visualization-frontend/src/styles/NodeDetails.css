@@ -73,7 +73,7 @@
 .component-node-details article {
     padding: 0.5rem 0;
     overflow: auto;
-    resize: vertical;
+    resize: both;
     height: 500px;
 }
 
