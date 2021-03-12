@@ -1,6 +1,7 @@
 import * as React from 'react';
 import '../styles/StarModal.css';
 import { IExprMap, IPobLemmasMap } from '../helpers/datatypes';
+import { cleanLevel } from '../helpers/util';
 
 const _ = require("lodash");
 
@@ -78,9 +79,12 @@ export class StarModal extends React.Component<Props, State> {
                 expr_edited = this.props.ExprMap[lemma_id].editedReadable;
                 expr_raw = this.props.ExprMap[lemma_id].raw;
             }
+
+            let fromLvl = cleanLevel(lemma[1]);
+            let toLvl = cleanLevel(lemma[2]);
             lemRows.push(<tr key={"lemma-header-"+ lemma_id}>
                 <td>
-                    <h4>ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h4>
+                    <span>ExprID: {lemma[0]}, From: {fromLvl} to {toLvl}</span>
                 </td>
                 <td>
                 </td>

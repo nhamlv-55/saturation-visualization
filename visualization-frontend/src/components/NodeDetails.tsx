@@ -8,6 +8,7 @@ import {getCleanExprList} from "../helpers/readable";
 import Modal from 'react-modal';
 import { inOutExample, ITreeNode, IExprMap, IPobLemmasMap} from "../helpers/datatypes";
 import {EditorModal} from './EditorModal';
+import { cleanLevel } from '../helpers/util';
 type Props = {
     nodes: ITreeNode[],
     expName: string
@@ -91,10 +92,12 @@ export default class NodeDetails extends React.Component<Props, State> {
                     let lemmaStyle = {
                         color: lemmaColours[colorIndex]
                     };
-                    lemma_list.push(<h3 style={lemmaStyle} key={"lemma-header-"+ lemma[0]}>ExprID: {lemma[0]}, From: {lemma[1]} to {lemma[2]}</h3>);
+                    let fromLvl = cleanLevel(lemma[1]);
+                    let toLvl = cleanLevel(lemma[2]);
+                    lemma_list.push(<h3 style={lemmaStyle} key={"lemma-header-"+ lemma[0]}>ExprID: {lemma[0]}, From: {fromLvl} to {toLvl}</h3>);
                     const lemmaId = lemma[0];
                     let expr = this.props.ExprMap[lemmaId].editedReadable;
-                    if (typeof expr === "string"){
+                    if (false && typeof expr === "string"){//NHAM: temporary disable this branch
                         if (Object.keys(this.props.relatedExprMap).length > 0){
                             let keys = Object.keys(this.props.relatedExprMap);
                             for (let i = 0; i < keys.length; i++){
@@ -126,7 +129,7 @@ export default class NodeDetails extends React.Component<Props, State> {
                         });
                     }
                     else {
-                        lemma_list.push(<pre>{expr}</pre>);
+                        lemma_list.push(<pre key= {"lemma-expr-" + lemma[0]}>{expr}</pre>);
                     }
                 }
             }
