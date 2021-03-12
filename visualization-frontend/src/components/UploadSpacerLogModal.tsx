@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {ChangeEvent} from "react";
-const icons = require('../resources/icons/all.svg') as string;
 
 
 type Props = {
@@ -11,7 +10,6 @@ type State = {
     expName: string
 }
 export class UploadSpacerLogModal extends React.Component<Props, State> {
-    private runCmd = "";
     state = {
         inputProblem: "",
         spacerLog: "",
