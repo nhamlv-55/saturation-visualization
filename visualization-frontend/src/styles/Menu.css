@@ -2,7 +2,6 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    overflow: hidden;
     background: #f4f5f7;
 }
 
@@ -265,4 +264,14 @@
     box-shadow: 5px 5px 50px 0 rgba(0, 0, 0, 0.2) !important;
     box-sizing: border-box !important;
     z-index: 100;
+}
+
+.exp h5{
+    min-width: 20rem;
+    display: inline-block;
+}
+
+.exp button{
+    margin-right: 5rem;
+    margin-left: 5rem;
 }
